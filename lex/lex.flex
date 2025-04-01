@@ -43,12 +43,12 @@ true {printf("TRUE");}
 false {printf("FALSE");}
 \&\& {printf("AND");}
 \|\| {printf("OR");}
-[{ALPHA} [{ALPHA} {DIGIT}] [{ALPHA} {DIGIT} _]*] | {ALPHA} {printf("%s", yytext);}
+({ALPHA}({ALPHA}|{DIGIT}|\_)*({ALPHA}|{DIGIT}))|{ALPHA} {printf("variavel %s", yytext);}
+\_ {printf("underline");}
 {DIGIT}+ {printf("%s", yytext);}
 {DIGIT}+.{DIGIT}+ {printf("%s", yytext);}
 "[^{NOT_PRINTABLE}]" {printf("%s", yytext);}
 \n {printf("\n");}
-
 %%
 int main() {
     yylex();
