@@ -2,4 +2,14 @@ int balblabla;
 int bla_;
 int _bla;
 int a_a_a;
-int macarrao_com_salsicha;
+int macarrao_com_salsicha = 2*2;
+
+=
+print("balblabla");
+=
+
+
+//
+//
+//
+//
