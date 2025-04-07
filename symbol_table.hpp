@@ -27,7 +27,10 @@ public:
     }
 
     static std::string get(std::string key) {
-        return table[key].top();
+        if(!table[key].empty()) {
+            return table[key].top();
+        }
+        return "";
     }
     
     static void remove(std::string key) {
