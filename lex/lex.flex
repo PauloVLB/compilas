@@ -21,6 +21,7 @@ void update_token(std::string token_name, std::string yytxt="") {
         return;
     }
     current_token = token_name;
+    //printf("Updated current token: %s\n", current_token.c_str());
     printf("%s %s \n", token_name.c_str(), yytxt.c_str());
     nColunas += yyleng;
 }
@@ -117,7 +118,9 @@ print {update_token(yytext);return 1;}
 "<=" {update_token(yytext);return 1;}
 ">=" {update_token(yytext);return 1;}
 
-" " {update_token("ignore");return 1;}
+
+<<EOF>> {update_token("$"); return 1;}
+" " {update_token("ignore");}
 
 . {printf("\nERRO %d %d\n", nLinhas, nColunas); return 0;}
 

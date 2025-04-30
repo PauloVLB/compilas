@@ -11,7 +11,9 @@
 extern FILE* yyin;
 extern int yylex();
 extern std::string current_token;
+extern int nLinhas, nColunas;
 
+const char* FILE_NAME = "teste2.nao";
 
 const std::vector<std::string> non_terminals_list = {
     "PROGRAM",
@@ -512,6 +514,11 @@ std::string get_next_token() {
     return current_token;
 }
 
+void print_error_message() {
+    std::cerr << FILE_NAME << ":" << nLinhas<< ":" << nColunas << ": unexpected token " << current_token << std::endl; 
+    exit(1);
+}
+
 void syntax() {
     std::stack<std::string> pilha;
     std::set<std::string> non_terminals;
@@ -520,19 +527,22 @@ void syntax() {
     init_transition_table(transition_table);
 
     pilha.push("S");
+    // std::cout << "Consumindo primeiro token: " << std::endl;
     std::string current = get_next_token();
-
+    // int i = 0;
     while(current != "$" && !pilha.empty()) {
-
+        // i++;
+        // std::cout << "Iteração " << i << ": " << current << std::endl;
         std::string topo = pilha.top();
         if(!non_terminals.count(topo)) {
             if(current == topo) {
                 pilha.pop();
+                // std::cout << "Consumindo token: " << current << std::endl;
                 current = get_next_token();
+                // std::cout << "Próximo token: " << current << std::endl;
             }
             else {
-                std::cout << "Erro: " << topo << " != " << current << std::endl;
-                exit(0);
+                print_error_message();
             }
         }
         else {
@@ -540,6 +550,11 @@ void syntax() {
             if(transition_table.find(id) != transition_table.end()) {
                 pilha.pop();
                 std::vector<std::string> v = transition_table[id];
+                // std::cout << "Produção: " << topo << " -> ";
+                // for(const auto& s : v) {
+                //     std::cout << s << " ";
+                // }
+                // std::cout << std::endl;
                 while(!v.empty()) {
                     
                     pilha.push(v.back());
@@ -547,34 +562,37 @@ void syntax() {
                 }
             }
             else {
-                std::cout << "Erro: não encontrada transição para " << topo << " com " << current << std::endl;
-                exit(0);
+                print_error_message();
             }
 
         }
 
     }
 
-    if(current != "$" || !pilha.empty()) {
-        std::cout << "Erro: " << current << " != $ ou pilha não vazia" << std::endl;
-        exit(0);
+    if(pilha.size() == 1 && current == "$" && pilha.top() == "$") {
+        std::cout << "Análise sintática concluída com sucesso!" << std::endl;
     }
     else {
-        std::cout << "Análise sintática concluída com sucesso!" << std::endl;
+        std::cout << "Erro: " << current << " != $ ou pilha não vazia" << std::endl;
+        std::cout << "Pilha não vazia: ";
+        while(!pilha.empty()) {
+            std::cout << pilha.top() << " ";
+            pilha.pop();
+        }
+        std::cout << std::endl;
+        exit(0);
     }
 }
 
 int main() {
-    yyin = fopen("teste2.nao", "r");  // Abre o arquivo a ser compilado
+    yyin = fopen(FILE_NAME, "r");  // Abre o arquivo a ser compilado
     if (!yyin) {
         perror("Erro ao abrir o arquivo");
         return 1;
     }
 
+    // Chamada da função principal da análise sintática
     syntax();
-    // Chamada da função principal da análise sintática (ex: yyparse(), ou sua própria função)
-    // Exemplo com Bison:
-    // yyparse();
 
     fclose(yyin);  // Fecha o arquivo no final
     return 0;

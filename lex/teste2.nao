@@ -1,4 +1,4 @@
-program swapexample 
+program program swapexample 
     begin
         procedure swap(a : ref(int), b : ref(int))
         begin

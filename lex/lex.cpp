@@ -579,6 +579,7 @@ void update_token(std::string token_name, std::string yytxt="") {
         return;
     }
     current_token = token_name;
+    //printf("Updated current token: %s\n", current_token.c_str());
     printf("%s %s \n", token_name.c_str(), yytxt.c_str());
     nColunas += yyleng;
 }
@@ -593,8 +594,8 @@ void comment(std::string yytxt) {
     }
 }
 
-#line 597 "lex.cpp"
 #line 598 "lex.cpp"
+#line 599 "lex.cpp"
 
 #define INITIAL 0
 
@@ -811,10 +812,10 @@ YY_DECL
 		}
 
 	{
-#line 53 "lex.flex"
+#line 54 "lex.flex"
 
 
-#line 818 "lex.cpp"
+#line 819 "lex.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -874,319 +875,321 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 55 "lex.flex"
+#line 56 "lex.flex"
 {comment(yytext);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 56 "lex.flex"
+#line 57 "lex.flex"
 {comment(yytext);}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 57 "lex.flex"
+#line 58 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 58 "lex.flex"
+#line 59 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 59 "lex.flex"
+#line 60 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 60 "lex.flex"
+#line 61 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 61 "lex.flex"
+#line 62 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 62 "lex.flex"
+#line 63 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 63 "lex.flex"
+#line 64 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 64 "lex.flex"
+#line 65 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 65 "lex.flex"
+#line 66 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 66 "lex.flex"
+#line 67 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 67 "lex.flex"
+#line 68 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 68 "lex.flex"
+#line 69 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 69 "lex.flex"
+#line 70 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 70 "lex.flex"
+#line 71 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 71 "lex.flex"
+#line 72 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 72 "lex.flex"
+#line 73 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 73 "lex.flex"
+#line 74 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 74 "lex.flex"
+#line 75 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 75 "lex.flex"
+#line 76 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 76 "lex.flex"
+#line 77 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 77 "lex.flex"
+#line 78 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 78 "lex.flex"
+#line 79 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 79 "lex.flex"
+#line 80 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 80 "lex.flex"
+#line 81 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 81 "lex.flex"
+#line 82 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 82 "lex.flex"
+#line 83 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 83 "lex.flex"
+#line 84 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 84 "lex.flex"
+#line 85 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 85 "lex.flex"
+#line 86 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 86 "lex.flex"
+#line 87 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 88 "lex.flex"
+#line 89 "lex.flex"
 {update_token("STRING_LITERAL", yytext);return 1;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 89 "lex.flex"
+#line 90 "lex.flex"
 {update_token("NAME", yytext); symbol_table::insert(yytext, yytext);return 1;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 90 "lex.flex"
+#line 91 "lex.flex"
 {update_token("INT_LITERAL", yytext);return 1;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 91 "lex.flex"
+#line 92 "lex.flex"
 {update_token("FLOAT_LITERAL", yytext);return 1;}
 	YY_BREAK
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 92 "lex.flex"
+#line 93 "lex.flex"
 {update_token("\n");}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 94 "lex.flex"
+#line 95 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 95 "lex.flex"
+#line 96 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 97 "lex.flex"
+#line 98 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 98 "lex.flex"
+#line 99 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 99 "lex.flex"
+#line 100 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 100 "lex.flex"
+#line 101 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 101 "lex.flex"
+#line 102 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 102 "lex.flex"
+#line 103 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 104 "lex.flex"
+#line 105 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 105 "lex.flex"
+#line 106 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 106 "lex.flex"
+#line 107 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 107 "lex.flex"
+#line 108 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 108 "lex.flex"
+#line 109 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 109 "lex.flex"
+#line 110 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 110 "lex.flex"
+#line 111 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 111 "lex.flex"
+#line 112 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 112 "lex.flex"
+#line 113 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 114 "lex.flex"
+#line 115 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 115 "lex.flex"
+#line 116 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 116 "lex.flex"
+#line 117 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 117 "lex.flex"
+#line 118 "lex.flex"
 {update_token(yytext);return 1;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 118 "lex.flex"
+#line 119 "lex.flex"
 {update_token(yytext);return 1;}
+	YY_BREAK
+case YY_STATE_EOF(INITIAL):
+#line 122 "lex.flex"
+{update_token("$"); return 1;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 120 "lex.flex"
-{update_token("ignore");return 1;}
+#line 123 "lex.flex"
+{update_token("ignore");}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 122 "lex.flex"
+#line 125 "lex.flex"
 {printf("\nERRO %d %d\n", nLinhas, nColunas); return 0;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 124 "lex.flex"
+#line 127 "lex.flex"
 ECHO;
 	YY_BREAK
-#line 1188 "lex.cpp"
-case YY_STATE_EOF(INITIAL):
-	yyterminate();
+#line 1193 "lex.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2189,6 +2192,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 124 "lex.flex"
+#line 127 "lex.flex"
 
 
