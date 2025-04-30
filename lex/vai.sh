@@ -1,2 +1,2 @@
-flex -o lex.yy.cpp lex.flex
-g++ lex.yy.cpp -o lexico
+flex -o lex.cpp lex.flex
+g++ syntax.cpp lex.cpp -o compilas

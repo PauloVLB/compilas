@@ -2,9 +2,12 @@
 
 %{
 #include "../symbol_table.hpp"
+#include <string>
+std::string current_token;
 std::unordered_map<std::string, std::stack<std::string>> symbol_table::table;
 int nLinhas = 1;
 int nColunas = 0;
+
 
 void update_token(std::string token_name, std::string yytxt="") {
     if(token_name == "ignore") {
@@ -16,7 +19,8 @@ void update_token(std::string token_name, std::string yytxt="") {
         nLinhas++;
         nColunas = 0;
         return;
-    } 
+    }
+    current_token = token_name;
     printf("%s %s \n", token_name.c_str(), yytxt.c_str());
     nColunas += yyleng;
 }
@@ -50,77 +54,71 @@ END_OF_FILE <<EOF>>
 
 \(\*{TUDO}*\*\) {comment(yytext);}
 \/\/.* {comment(yytext);}
-program {update_token(yytext);}
-begin {update_token(yytext);}
-end {update_token(yytext);}
-var {update_token(yytext);}
-procedure {update_token(yytext);}
-in {update_token(yytext);}
-struct {update_token(yytext);}
-not {update_token(yytext);}
-new {update_token(yytext);}
-ref {update_token(yytext);}
-deref {update_token(yytext);}
-if {update_token(yytext);}
-then {update_token(yytext);}
-else {update_token(yytext);}
-fi {update_token(yytext);}
-while {update_token(yytext);}
-do {update_token(yytext);}
-od {update_token(yytext);}
-return {update_token(yytext);}
-float {update_token(yytext);}
-int {update_token(yytext);}
-string {update_token(yytext);}
-bool {update_token(yytext);}
-array {update_token(yytext);}
-of {update_token(yytext);}
-true {update_token(yytext);}
-false {update_token(yytext);}
-print {update_token(yytext);}
-\( {update_token(yytext);}
-\) {update_token(yytext);}
+program {update_token(yytext);return 1;}
+begin {update_token(yytext);return 1;}
+end {update_token(yytext);return 1;}
+var {update_token(yytext);return 1;}
+procedure {update_token(yytext);return 1;}
+in {update_token(yytext);return 1;}
+struct {update_token(yytext);return 1;}
+not {update_token(yytext);return 1;}
+new {update_token(yytext);return 1;}
+ref {update_token(yytext);return 1;}
+deref {update_token(yytext);return 1;}
+if {update_token(yytext);return 1;}
+then {update_token(yytext);return 1;}
+else {update_token(yytext);return 1;}
+fi {update_token(yytext);return 1;}
+while {update_token(yytext);return 1;}
+do {update_token(yytext);return 1;}
+od {update_token(yytext);return 1;}
+return {update_token(yytext);return 1;}
+float {update_token(yytext);return 1;}
+int {update_token(yytext);return 1;}
+string {update_token(yytext);return 1;}
+bool {update_token(yytext);return 1;}
+array {update_token(yytext);return 1;}
+of {update_token(yytext);return 1;}
+true {update_token(yytext);return 1;}
+false {update_token(yytext);return 1;}
+print {update_token(yytext);return 1;}
+\( {update_token(yytext);return 1;}
+\) {update_token(yytext);return 1;}
 
-{STRING_LITERAL} {update_token("STRING_LITERAL", yytext);}
-({ALPHA}({ALPHA}|{DIGIT}|\_)*({ALPHA}|{DIGIT}))|{ALPHA} {update_token("NAME", yytext); symbol_table::insert(yytext, yytext);}
-{DIGIT}+ {update_token("INT_LITERAL", yytext);}
-{DIGIT}+\.{DIGIT}+ {update_token("FLOAT_LITERAL", yytext);}
+{STRING_LITERAL} {update_token("STRING_LITERAL", yytext);return 1;}
+({ALPHA}({ALPHA}|{DIGIT}|\_)*({ALPHA}|{DIGIT}))|{ALPHA} {update_token("NAME", yytext); symbol_table::insert(yytext, yytext);return 1;}
+{DIGIT}+ {update_token("INT_LITERAL", yytext);return 1;}
+{DIGIT}+\.{DIGIT}+ {update_token("FLOAT_LITERAL", yytext);return 1;}
 \n {update_token("\n");}
 
-\&\& {update_token(yytext);}
-\|\| {update_token(yytext);}
+\&\& {update_token(yytext);return 1;}
+\|\| {update_token(yytext);return 1;}
 
-"+" {update_token(yytext);}
-"-" {update_token(yytext);}
-"*" {update_token(yytext);}
-"/" {update_token(yytext);}
-":=" {update_token(yytext);}
-";" {update_token(yytext);}
+"+" {update_token(yytext);return 1;}
+"-" {update_token(yytext);return 1;}
+"*" {update_token(yytext);return 1;}
+"/" {update_token(yytext);return 1;}
+":=" {update_token(yytext);return 1;}
+";" {update_token(yytext);return 1;}
 
-"^" {update_token(yytext);}
-"." {update_token(yytext);}
-"," {update_token(yytext);}
-"[" {update_token(yytext);}
-"]" {update_token(yytext);}
-"{" {update_token(yytext);}
-"}" {update_token(yytext);}
-":" {update_token(yytext);}
-"<>" {update_token(yytext);}
+"^" {update_token(yytext);return 1;}
+"." {update_token(yytext);return 1;}
+"," {update_token(yytext);return 1;}
+"[" {update_token(yytext);return 1;}
+"]" {update_token(yytext);return 1;}
+"{" {update_token(yytext);return 1;}
+"}" {update_token(yytext);return 1;}
+":" {update_token(yytext);return 1;}
+"<>" {update_token(yytext);return 1;}
 
-"=" {update_token(yytext);}
-"<" {update_token(yytext);}
-">" {update_token(yytext);}
-"<=" {update_token(yytext);}
-">=" {update_token(yytext);}
+"=" {update_token(yytext);return 1;}
+"<" {update_token(yytext);return 1;}
+">" {update_token(yytext);return 1;}
+"<=" {update_token(yytext);return 1;}
+">=" {update_token(yytext);return 1;}
 
-" " {update_token("ignore");}
+" " {update_token("ignore");return 1;}
 
 . {printf("\nERRO %d %d\n", nLinhas, nColunas); return 0;}
 
 %%
-
-
-int main() {
-    yylex();
-    
-}
