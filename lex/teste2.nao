@@ -1,4 +1,4 @@
-program program swapexample 
+program swapexample 
     begin
         procedure swap(a : ref(int), b : ref(int))
         begin
@@ -17,6 +17,11 @@ program program swapexample
             in 
                 x := 42; y := 84;
                 xr := ref(x); yr := ref(y);
-                swap(xr, yr)
+                swap(xr, yr);
+                if x then
+                    x := 32
+                else 
+                    x := 32
+                fi
             end
         end

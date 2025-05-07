@@ -16,12 +16,12 @@ program swapexample
                 var yr : ref(int)
             in 
                 x := 42; y := 84;
-                xr := ref((1 + 2).x); yr := ref(y);
-                xr := ref((1+2).x);         
-                xr := ref(2.x);
-                if x + y = 12 && x - y = 12 || x = 42 then
-                    swap(xr, yr)
-                else
+                xr := ref(x); yr := ref(y);
+                swap(xr, yr);
+                if x then
+                    x := 32
+                else 
+                    x := 32
                 fi
-            end
-        end
+            end
+        end

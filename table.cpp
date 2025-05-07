@@ -1,225 +1,29 @@
-#include <unordered_map>
-#include <stack>
-#include <set>
-#include <vector>
-#include <string>
-#include <utility>
-#include <map>
-#include <iostream>
-#include <cstdio>  // Para FILE*
-// #include "./lex/lex."
-extern FILE* yyin;
-extern int yylex();
-extern std::string current_token;
-extern int nLinhas, nColunas;
-
-const char* FILE_NAME = "teste3.nao";
-
-const std::vector<std::string> non_terminals_list = {
-    "PROGRAM",
-
-    "DECL_SECTION",
-    "DECL_SECTION",
-
-    "DECL_LIST",
-    "DECL_LIST",
-
-    "DECL",
-    "DECL",
-    "DECL",
-
-    "VAR_DECL",
-
-    "VAR_DECL_TYPE",
-    "VAR_DECL_TYPE",
-
-    "VAR_INIT",
-    "VAR_INIT",
-
-    "PROC_DECL",
-
-    "PARAMFIELD_LIST",
-    "PARAMFIELD_LIST",
-
-    "PARAMFIELD_LIST_TAIL",
-    "PARAMFIELD_LIST_TAIL",
-
-    "TYPE_ANNOTATION",
-    "TYPE_ANNOTATION",
-
-    "BLOCK",
-
-    "Z",
-    "Z",
-    "Z",
-
-    "REC_DECL",
-
-    "PARAMFIELD_DECLS",
-    "PARAMFIELD_DECLS",
-
-    "STMT_LIST",
-    "STMT_LIST",
-
-    "STMT_LIST_TAIL",
-    "STMT_LIST_TAIL",
-
-    "EXP",
-
-    "OR_EXP",
-
-    "OR_EXP_PRIME",
-    "OR_EXP_PRIME",
-
-    "AND_EXP",
-
-    "AND_EXP_PRIME",
-    "AND_EXP_PRIME",
-
-    "NOT_EXP",
-    "NOT_EXP",
-
-    "REL_EXP",
-
-    "REL_EXP_PRIME",
-    "REL_EXP_PRIME",
-
-    "ADD_EXP",
-
-    "ADD_EXP_PRIME",
-    "ADD_EXP_PRIME",
-    "ADD_EXP_PRIME",
-
-    "MUL_EXP",
-
-    "MUL_EXP_PRIME",
-    "MUL_EXP_PRIME",
-    "MUL_EXP_PRIME",
-
-    "EXP_EXP",
-
-    "EXP_EXP_PRIME",
-    "EXP_EXP_PRIME",
-
-    "PRIMARY",
-    "PRIMARY",
-    "PRIMARY",
-    "PRIMARY",
-    "PRIMARY",
-    "PRIMARY",
-
-    "REF_VAR",
-
-    "DEREF_VAR",
-
-    "C",
-    "C",
-
-    "PARAMFIELD_DECL",
-
-    "NAME_TAIL",
-    "NAME_TAIL",
-    "NAME_TAIL",
-    "NAME_TAIL",
-
-    "VAR",
-
-    "CALL_STMT",
-
-    "VAR_ACCESS",
-    "VAR_ACCESS",
-
-    "REL_OP",
-    "REL_OP",
-    "REL_OP",
-    "REL_OP",
-    "REL_OP",
-    "REL_OP",
-
-    "LITERAL",
-    "LITERAL",
-    "LITERAL",
-    "LITERAL",
-    "LITERAL",
-
-    "BOOL_LITERAL",
-    "BOOL_LITERAL",
-
-    "STMT",
-    "STMT",
-    "STMT",
-    "STMT",
-    "STMT",
-
-    "STMT_NAME_BEGIN",
-    "X",
-    "X",
-
-    "ASSIGN_STMT",
-    "ASSIGN_STMT",
-
-    "IF_STMT",
-
-    "D",
-    "D",
-
-    "WHILE_STMT",
-
-    "RETURN_STMT",
-
-    "E",
-
-    "E_TAIL",
-    "E_TAIL",
-
-    "TYPE",
-    "TYPE",
-    "TYPE",
-    "TYPE",
-    "TYPE",
-    "TYPE",
-    "TYPE",
-
-    "F",
-    "F",
-    "S"
-
-};
-
-void init_non_terminals(std::set<std::string> & s) {
-
-    for(std::string non_terminal : non_terminals_list) {
-        s.insert(non_terminal);
-    }
-}
-
-void init_transition_table(std::map<std::pair<std::string, std::string>, std::vector<std::string>> & t) {
-    
-    t[{"S", "program"}] = {"PROGRAM", "$"};
+std::map<std::pair<std::string, std::string>, std::vector<std::string>> t;
+t[{"S", "program"}] = {"PROGRAM", "$"};
 t[{"PROGRAM", "program"}] = {"program", "NAME", "begin", "DECL_SECTION", "end"};
-t[{"DECL_SECTION", "end"}] = {};
+t[{"DECL_SECTION", "end"}] = {"ε"};
 t[{"DECL_SECTION", "var"}] = {"DECL", "DECL_LIST"};
 t[{"DECL_SECTION", "procedure"}] = {"DECL", "DECL_LIST"};
 t[{"DECL_SECTION", "struct"}] = {"DECL", "DECL_LIST"};
-t[{"DECL_LIST", "end"}] = {};
+t[{"DECL_LIST", "end"}] = {"ε"};
 t[{"DECL_LIST", ";"}] = {";", "DECL", "DECL_LIST"};
-t[{"DECL_LIST", "in"}] = {};
+t[{"DECL_LIST", "in"}] = {"ε"};
 t[{"DECL", "var"}] = {"VAR_DECL"};
 t[{"DECL", "procedure"}] = {"PROC_DECL"};
 t[{"DECL", "struct"}] = {"REC_DECL"};
 t[{"VAR_DECL", "var"}] = {"var", "NAME", "VAR_DECL_TYPE"};
 t[{"VAR_DECL_TYPE", ":"}] = {":", "TYPE", "VAR_INIT"};
 t[{"VAR_DECL_TYPE", ":="}] = {":=", "EXP"};
-t[{"VAR_INIT", "end"}] = {};
-t[{"VAR_INIT", ";"}] = {};
+t[{"VAR_INIT", "end"}] = {"ε"};
+t[{"VAR_INIT", ";"}] = {"ε"};
 t[{"VAR_INIT", ":="}] = {":=", "EXP"};
-t[{"VAR_INIT", "in"}] = {};
+t[{"VAR_INIT", "in"}] = {"ε"};
 t[{"PROC_DECL", "procedure"}] = {"procedure", "NAME", "(", "PARAMFIELD_LIST", ")", "TYPE_ANNOTATION", "BLOCK"};
 t[{"PARAMFIELD_LIST", "NAME"}] = {"PARAMFIELD_DECL", "PARAMFIELD_LIST_TAIL"};
-t[{"PARAMFIELD_LIST", ")"}] = {};
-t[{"PARAMFIELD_LIST_TAIL", ")"}] = {};
+t[{"PARAMFIELD_LIST", ")"}] = {"ε"};
+t[{"PARAMFIELD_LIST_TAIL", ")"}] = {"ε"};
 t[{"PARAMFIELD_LIST_TAIL", ","}] = {",", "PARAMFIELD_DECL", "PARAMFIELD_LIST_TAIL"};
-t[{"TYPE_ANNOTATION", "begin"}] = {};
+t[{"TYPE_ANNOTATION", "begin"}] = {"ε"};
 t[{"TYPE_ANNOTATION", ":"}] = {":", "TYPE"};
 t[{"BLOCK", "begin"}] = {"begin", "Z", "end"};
 t[{"Z", "NAME"}] = {"STMT_LIST"};
@@ -234,21 +38,21 @@ t[{"Z", "while"}] = {"STMT_LIST"};
 t[{"Z", "return"}] = {"STMT_LIST"};
 t[{"REC_DECL", "struct"}] = {"struct", "NAME", "{", "PARAMFIELD_DECLS", "}"};
 t[{"PARAMFIELD_DECLS", "NAME"}] = {"PARAMFIELD_DECL", ";", "PARAMFIELD_DECLS"};
-t[{"PARAMFIELD_DECLS", "}"}] = {};
+t[{"PARAMFIELD_DECLS", "}"}] = {"ε"};
 t[{"STMT_LIST", "NAME"}] = {"STMT", "STMT_LIST_TAIL"};
-t[{"STMT_LIST", "end"}] = {};
+t[{"STMT_LIST", "end"}] = {"ε"};
 t[{"STMT_LIST", "deref"}] = {"STMT", "STMT_LIST_TAIL"};
 t[{"STMT_LIST", "if"}] = {"STMT", "STMT_LIST_TAIL"};
-t[{"STMT_LIST", "fi"}] = {};
-t[{"STMT_LIST", "else"}] = {};
+t[{"STMT_LIST", "fi"}] = {"ε"};
+t[{"STMT_LIST", "else"}] = {"ε"};
 t[{"STMT_LIST", "while"}] = {"STMT", "STMT_LIST_TAIL"};
-t[{"STMT_LIST", "od"}] = {};
+t[{"STMT_LIST", "od"}] = {"ε"};
 t[{"STMT_LIST", "return"}] = {"STMT", "STMT_LIST_TAIL"};
-t[{"STMT_LIST_TAIL", "end"}] = {};
+t[{"STMT_LIST_TAIL", "end"}] = {"ε"};
 t[{"STMT_LIST_TAIL", ";"}] = {";", "STMT", "STMT_LIST_TAIL"};
-t[{"STMT_LIST_TAIL", "fi"}] = {};
-t[{"STMT_LIST_TAIL", "else"}] = {};
-t[{"STMT_LIST_TAIL", "od"}] = {};
+t[{"STMT_LIST_TAIL", "fi"}] = {"ε"};
+t[{"STMT_LIST_TAIL", "else"}] = {"ε"};
+t[{"STMT_LIST_TAIL", "od"}] = {"ε"};
 t[{"EXP", "NAME"}] = {"OR_EXP"};
 t[{"EXP", "("}] = {"OR_EXP"};
 t[{"EXP", "not"}] = {"OR_EXP"};
@@ -273,18 +77,18 @@ t[{"OR_EXP", "STRING_LITERAL"}] = {"AND_EXP", "OR_EXP_PRIME"};
 t[{"OR_EXP", "null"}] = {"AND_EXP", "OR_EXP_PRIME"};
 t[{"OR_EXP", "true"}] = {"AND_EXP", "OR_EXP_PRIME"};
 t[{"OR_EXP", "false"}] = {"AND_EXP", "OR_EXP_PRIME"};
-t[{"OR_EXP_PRIME", "end"}] = {};
-t[{"OR_EXP_PRIME", ";"}] = {};
-t[{"OR_EXP_PRIME", ")"}] = {};
-t[{"OR_EXP_PRIME", ","}] = {};
-t[{"OR_EXP_PRIME", "in"}] = {};
+t[{"OR_EXP_PRIME", "end"}] = {"ε"};
+t[{"OR_EXP_PRIME", ";"}] = {"ε"};
+t[{"OR_EXP_PRIME", ")"}] = {"ε"};
+t[{"OR_EXP_PRIME", ","}] = {"ε"};
+t[{"OR_EXP_PRIME", "in"}] = {"ε"};
 t[{"OR_EXP_PRIME", "||"}] = {"||", "AND_EXP", "OR_EXP_PRIME"};
-t[{"OR_EXP_PRIME", "]"}] = {};
-t[{"OR_EXP_PRIME", "then"}] = {};
-t[{"OR_EXP_PRIME", "fi"}] = {};
-t[{"OR_EXP_PRIME", "else"}] = {};
-t[{"OR_EXP_PRIME", "do"}] = {};
-t[{"OR_EXP_PRIME", "od"}] = {};
+t[{"OR_EXP_PRIME", "]"}] = {"ε"};
+t[{"OR_EXP_PRIME", "then"}] = {"ε"};
+t[{"OR_EXP_PRIME", "fi"}] = {"ε"};
+t[{"OR_EXP_PRIME", "else"}] = {"ε"};
+t[{"OR_EXP_PRIME", "do"}] = {"ε"};
+t[{"OR_EXP_PRIME", "od"}] = {"ε"};
 t[{"AND_EXP", "NAME"}] = {"NOT_EXP", "AND_EXP_PRIME"};
 t[{"AND_EXP", "("}] = {"NOT_EXP", "AND_EXP_PRIME"};
 t[{"AND_EXP", "not"}] = {"NOT_EXP", "AND_EXP_PRIME"};
@@ -297,19 +101,19 @@ t[{"AND_EXP", "STRING_LITERAL"}] = {"NOT_EXP", "AND_EXP_PRIME"};
 t[{"AND_EXP", "null"}] = {"NOT_EXP", "AND_EXP_PRIME"};
 t[{"AND_EXP", "true"}] = {"NOT_EXP", "AND_EXP_PRIME"};
 t[{"AND_EXP", "false"}] = {"NOT_EXP", "AND_EXP_PRIME"};
-t[{"AND_EXP_PRIME", "end"}] = {};
-t[{"AND_EXP_PRIME", ";"}] = {};
-t[{"AND_EXP_PRIME", ")"}] = {};
-t[{"AND_EXP_PRIME", ","}] = {};
-t[{"AND_EXP_PRIME", "in"}] = {};
-t[{"AND_EXP_PRIME", "||"}] = {};
+t[{"AND_EXP_PRIME", "end"}] = {"ε"};
+t[{"AND_EXP_PRIME", ";"}] = {"ε"};
+t[{"AND_EXP_PRIME", ")"}] = {"ε"};
+t[{"AND_EXP_PRIME", ","}] = {"ε"};
+t[{"AND_EXP_PRIME", "in"}] = {"ε"};
+t[{"AND_EXP_PRIME", "||"}] = {"ε"};
 t[{"AND_EXP_PRIME", "&&"}] = {"&&", "NOT_EXP", "AND_EXP_PRIME"};
-t[{"AND_EXP_PRIME", "]"}] = {};
-t[{"AND_EXP_PRIME", "then"}] = {};
-t[{"AND_EXP_PRIME", "fi"}] = {};
-t[{"AND_EXP_PRIME", "else"}] = {};
-t[{"AND_EXP_PRIME", "do"}] = {};
-t[{"AND_EXP_PRIME", "od"}] = {};
+t[{"AND_EXP_PRIME", "]"}] = {"ε"};
+t[{"AND_EXP_PRIME", "then"}] = {"ε"};
+t[{"AND_EXP_PRIME", "fi"}] = {"ε"};
+t[{"AND_EXP_PRIME", "else"}] = {"ε"};
+t[{"AND_EXP_PRIME", "do"}] = {"ε"};
+t[{"AND_EXP_PRIME", "od"}] = {"ε"};
 t[{"NOT_EXP", "NAME"}] = {"REL_EXP"};
 t[{"NOT_EXP", "("}] = {"REL_EXP"};
 t[{"NOT_EXP", "not"}] = {"not", "NOT_EXP"};
@@ -333,25 +137,25 @@ t[{"REL_EXP", "STRING_LITERAL"}] = {"ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP", "null"}] = {"ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP", "true"}] = {"ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP", "false"}] = {"ADD_EXP", "REL_EXP_PRIME"};
-t[{"REL_EXP_PRIME", "end"}] = {};
-t[{"REL_EXP_PRIME", ";"}] = {};
-t[{"REL_EXP_PRIME", ")"}] = {};
-t[{"REL_EXP_PRIME", ","}] = {};
-t[{"REL_EXP_PRIME", "in"}] = {};
-t[{"REL_EXP_PRIME", "||"}] = {};
-t[{"REL_EXP_PRIME", "&&"}] = {};
-t[{"REL_EXP_PRIME", "]"}] = {};
+t[{"REL_EXP_PRIME", "end"}] = {"ε"};
+t[{"REL_EXP_PRIME", ";"}] = {"ε"};
+t[{"REL_EXP_PRIME", ")"}] = {"ε"};
+t[{"REL_EXP_PRIME", ","}] = {"ε"};
+t[{"REL_EXP_PRIME", "in"}] = {"ε"};
+t[{"REL_EXP_PRIME", "||"}] = {"ε"};
+t[{"REL_EXP_PRIME", "&&"}] = {"ε"};
+t[{"REL_EXP_PRIME", "]"}] = {"ε"};
 t[{"REL_EXP_PRIME", "<"}] = {"REL_OP", "ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP_PRIME", "<="}] = {"REL_OP", "ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP_PRIME", ">"}] = {"REL_OP", "ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP_PRIME", ">="}] = {"REL_OP", "ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP_PRIME", "="}] = {"REL_OP", "ADD_EXP", "REL_EXP_PRIME"};
 t[{"REL_EXP_PRIME", "<>"}] = {"REL_OP", "ADD_EXP", "REL_EXP_PRIME"};
-t[{"REL_EXP_PRIME", "then"}] = {};
-t[{"REL_EXP_PRIME", "fi"}] = {};
-t[{"REL_EXP_PRIME", "else"}] = {};
-t[{"REL_EXP_PRIME", "do"}] = {};
-t[{"REL_EXP_PRIME", "od"}] = {};
+t[{"REL_EXP_PRIME", "then"}] = {"ε"};
+t[{"REL_EXP_PRIME", "fi"}] = {"ε"};
+t[{"REL_EXP_PRIME", "else"}] = {"ε"};
+t[{"REL_EXP_PRIME", "do"}] = {"ε"};
+t[{"REL_EXP_PRIME", "od"}] = {"ε"};
 t[{"ADD_EXP", "NAME"}] = {"MUL_EXP", "ADD_EXP_PRIME"};
 t[{"ADD_EXP", "("}] = {"MUL_EXP", "ADD_EXP_PRIME"};
 t[{"ADD_EXP", "new"}] = {"MUL_EXP", "ADD_EXP_PRIME"};
@@ -363,27 +167,27 @@ t[{"ADD_EXP", "STRING_LITERAL"}] = {"MUL_EXP", "ADD_EXP_PRIME"};
 t[{"ADD_EXP", "null"}] = {"MUL_EXP", "ADD_EXP_PRIME"};
 t[{"ADD_EXP", "true"}] = {"MUL_EXP", "ADD_EXP_PRIME"};
 t[{"ADD_EXP", "false"}] = {"MUL_EXP", "ADD_EXP_PRIME"};
-t[{"ADD_EXP_PRIME", "end"}] = {};
-t[{"ADD_EXP_PRIME", ";"}] = {};
-t[{"ADD_EXP_PRIME", ")"}] = {};
-t[{"ADD_EXP_PRIME", ","}] = {};
-t[{"ADD_EXP_PRIME", "in"}] = {};
-t[{"ADD_EXP_PRIME", "||"}] = {};
-t[{"ADD_EXP_PRIME", "&&"}] = {};
+t[{"ADD_EXP_PRIME", "end"}] = {"ε"};
+t[{"ADD_EXP_PRIME", ";"}] = {"ε"};
+t[{"ADD_EXP_PRIME", ")"}] = {"ε"};
+t[{"ADD_EXP_PRIME", ","}] = {"ε"};
+t[{"ADD_EXP_PRIME", "in"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "||"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "&&"}] = {"ε"};
 t[{"ADD_EXP_PRIME", "+"}] = {"+", "MUL_EXP", "ADD_EXP_PRIME"};
 t[{"ADD_EXP_PRIME", "-"}] = {"-", "MUL_EXP", "ADD_EXP_PRIME"};
-t[{"ADD_EXP_PRIME", "]"}] = {};
-t[{"ADD_EXP_PRIME", "<"}] = {};
-t[{"ADD_EXP_PRIME", "<="}] = {};
-t[{"ADD_EXP_PRIME", ">"}] = {};
-t[{"ADD_EXP_PRIME", ">="}] = {};
-t[{"ADD_EXP_PRIME", "="}] = {};
-t[{"ADD_EXP_PRIME", "<>"}] = {};
-t[{"ADD_EXP_PRIME", "then"}] = {};
-t[{"ADD_EXP_PRIME", "fi"}] = {};
-t[{"ADD_EXP_PRIME", "else"}] = {};
-t[{"ADD_EXP_PRIME", "do"}] = {};
-t[{"ADD_EXP_PRIME", "od"}] = {};
+t[{"ADD_EXP_PRIME", "]"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "<"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "<="}] = {"ε"};
+t[{"ADD_EXP_PRIME", ">"}] = {"ε"};
+t[{"ADD_EXP_PRIME", ">="}] = {"ε"};
+t[{"ADD_EXP_PRIME", "="}] = {"ε"};
+t[{"ADD_EXP_PRIME", "<>"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "then"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "fi"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "else"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "do"}] = {"ε"};
+t[{"ADD_EXP_PRIME", "od"}] = {"ε"};
 t[{"MUL_EXP", "NAME"}] = {"EXP_EXP", "MUL_EXP_PRIME"};
 t[{"MUL_EXP", "("}] = {"EXP_EXP", "MUL_EXP_PRIME"};
 t[{"MUL_EXP", "new"}] = {"EXP_EXP", "MUL_EXP_PRIME"};
@@ -395,29 +199,29 @@ t[{"MUL_EXP", "STRING_LITERAL"}] = {"EXP_EXP", "MUL_EXP_PRIME"};
 t[{"MUL_EXP", "null"}] = {"EXP_EXP", "MUL_EXP_PRIME"};
 t[{"MUL_EXP", "true"}] = {"EXP_EXP", "MUL_EXP_PRIME"};
 t[{"MUL_EXP", "false"}] = {"EXP_EXP", "MUL_EXP_PRIME"};
-t[{"MUL_EXP_PRIME", "end"}] = {};
-t[{"MUL_EXP_PRIME", ";"}] = {};
-t[{"MUL_EXP_PRIME", ")"}] = {};
-t[{"MUL_EXP_PRIME", ","}] = {};
-t[{"MUL_EXP_PRIME", "in"}] = {};
-t[{"MUL_EXP_PRIME", "||"}] = {};
-t[{"MUL_EXP_PRIME", "&&"}] = {};
-t[{"MUL_EXP_PRIME", "+"}] = {};
-t[{"MUL_EXP_PRIME", "-"}] = {};
+t[{"MUL_EXP_PRIME", "end"}] = {"ε"};
+t[{"MUL_EXP_PRIME", ";"}] = {"ε"};
+t[{"MUL_EXP_PRIME", ")"}] = {"ε"};
+t[{"MUL_EXP_PRIME", ","}] = {"ε"};
+t[{"MUL_EXP_PRIME", "in"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "||"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "&&"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "+"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "-"}] = {"ε"};
 t[{"MUL_EXP_PRIME", "*"}] = {"*", "EXP_EXP", "MUL_EXP_PRIME"};
 t[{"MUL_EXP_PRIME", "/"}] = {"/", "EXP_EXP", "MUL_EXP_PRIME"};
-t[{"MUL_EXP_PRIME", "]"}] = {};
-t[{"MUL_EXP_PRIME", "<"}] = {};
-t[{"MUL_EXP_PRIME", "<="}] = {};
-t[{"MUL_EXP_PRIME", ">"}] = {};
-t[{"MUL_EXP_PRIME", ">="}] = {};
-t[{"MUL_EXP_PRIME", "="}] = {};
-t[{"MUL_EXP_PRIME", "<>"}] = {};
-t[{"MUL_EXP_PRIME", "then"}] = {};
-t[{"MUL_EXP_PRIME", "fi"}] = {};
-t[{"MUL_EXP_PRIME", "else"}] = {};
-t[{"MUL_EXP_PRIME", "do"}] = {};
-t[{"MUL_EXP_PRIME", "od"}] = {};
+t[{"MUL_EXP_PRIME", "]"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "<"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "<="}] = {"ε"};
+t[{"MUL_EXP_PRIME", ">"}] = {"ε"};
+t[{"MUL_EXP_PRIME", ">="}] = {"ε"};
+t[{"MUL_EXP_PRIME", "="}] = {"ε"};
+t[{"MUL_EXP_PRIME", "<>"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "then"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "fi"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "else"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "do"}] = {"ε"};
+t[{"MUL_EXP_PRIME", "od"}] = {"ε"};
 t[{"EXP_EXP", "NAME"}] = {"PRIMARY", "EXP_EXP_PRIME"};
 t[{"EXP_EXP", "("}] = {"PRIMARY", "EXP_EXP_PRIME"};
 t[{"EXP_EXP", "new"}] = {"PRIMARY", "EXP_EXP_PRIME"};
@@ -429,30 +233,30 @@ t[{"EXP_EXP", "STRING_LITERAL"}] = {"PRIMARY", "EXP_EXP_PRIME"};
 t[{"EXP_EXP", "null"}] = {"PRIMARY", "EXP_EXP_PRIME"};
 t[{"EXP_EXP", "true"}] = {"PRIMARY", "EXP_EXP_PRIME"};
 t[{"EXP_EXP", "false"}] = {"PRIMARY", "EXP_EXP_PRIME"};
-t[{"EXP_EXP_PRIME", "end"}] = {};
-t[{"EXP_EXP_PRIME", ";"}] = {};
-t[{"EXP_EXP_PRIME", ")"}] = {};
-t[{"EXP_EXP_PRIME", ","}] = {};
-t[{"EXP_EXP_PRIME", "in"}] = {};
-t[{"EXP_EXP_PRIME", "||"}] = {};
-t[{"EXP_EXP_PRIME", "&&"}] = {};
-t[{"EXP_EXP_PRIME", "+"}] = {};
-t[{"EXP_EXP_PRIME", "-"}] = {};
-t[{"EXP_EXP_PRIME", "*"}] = {};
-t[{"EXP_EXP_PRIME", "/"}] = {};
+t[{"EXP_EXP_PRIME", "end"}] = {"ε"};
+t[{"EXP_EXP_PRIME", ";"}] = {"ε"};
+t[{"EXP_EXP_PRIME", ")"}] = {"ε"};
+t[{"EXP_EXP_PRIME", ","}] = {"ε"};
+t[{"EXP_EXP_PRIME", "in"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "||"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "&&"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "+"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "-"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "*"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "/"}] = {"ε"};
 t[{"EXP_EXP_PRIME", "^"}] = {"^", "PRIMARY", "EXP_EXP_PRIME"};
-t[{"EXP_EXP_PRIME", "]"}] = {};
-t[{"EXP_EXP_PRIME", "<"}] = {};
-t[{"EXP_EXP_PRIME", "<="}] = {};
-t[{"EXP_EXP_PRIME", ">"}] = {};
-t[{"EXP_EXP_PRIME", ">="}] = {};
-t[{"EXP_EXP_PRIME", "="}] = {};
-t[{"EXP_EXP_PRIME", "<>"}] = {};
-t[{"EXP_EXP_PRIME", "then"}] = {};
-t[{"EXP_EXP_PRIME", "fi"}] = {};
-t[{"EXP_EXP_PRIME", "else"}] = {};
-t[{"EXP_EXP_PRIME", "do"}] = {};
-t[{"EXP_EXP_PRIME", "od"}] = {};
+t[{"EXP_EXP_PRIME", "]"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "<"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "<="}] = {"ε"};
+t[{"EXP_EXP_PRIME", ">"}] = {"ε"};
+t[{"EXP_EXP_PRIME", ">="}] = {"ε"};
+t[{"EXP_EXP_PRIME", "="}] = {"ε"};
+t[{"EXP_EXP_PRIME", "<>"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "then"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "fi"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "else"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "do"}] = {"ε"};
+t[{"EXP_EXP_PRIME", "od"}] = {"ε"};
 t[{"PRIMARY", "NAME"}] = {"VAR"};
 t[{"PRIMARY", "("}] = {"(", "EXP", ")"};
 t[{"PRIMARY", "new"}] = {"new", "NAME"};
@@ -469,37 +273,37 @@ t[{"DEREF_VAR", "deref"}] = {"deref", "(", "C", ")"};
 t[{"C", "NAME"}] = {"VAR"};
 t[{"C", "deref"}] = {"DEREF_VAR"};
 t[{"PARAMFIELD_DECL", "NAME"}] = {"NAME", ":", "TYPE"};
-t[{"NAME_TAIL", "end"}] = {};
-t[{"NAME_TAIL", ";"}] = {};
-t[{"NAME_TAIL", ":="}] = {};
+t[{"NAME_TAIL", "end"}] = {"ε"};
+t[{"NAME_TAIL", ";"}] = {"ε"};
+t[{"NAME_TAIL", ":="}] = {"ε"};
 t[{"NAME_TAIL", "("}] = {"(", "E", ")", "NAME_TAIL"};
-t[{"NAME_TAIL", ")"}] = {};
-t[{"NAME_TAIL", ","}] = {};
-t[{"NAME_TAIL", "in"}] = {};
-t[{"NAME_TAIL", "||"}] = {};
-t[{"NAME_TAIL", "&&"}] = {};
-t[{"NAME_TAIL", "+"}] = {};
-t[{"NAME_TAIL", "-"}] = {};
-t[{"NAME_TAIL", "*"}] = {};
-t[{"NAME_TAIL", "/"}] = {};
-t[{"NAME_TAIL", "^"}] = {};
+t[{"NAME_TAIL", ")"}] = {"ε"};
+t[{"NAME_TAIL", ","}] = {"ε"};
+t[{"NAME_TAIL", "in"}] = {"ε"};
+t[{"NAME_TAIL", "||"}] = {"ε"};
+t[{"NAME_TAIL", "&&"}] = {"ε"};
+t[{"NAME_TAIL", "+"}] = {"ε"};
+t[{"NAME_TAIL", "-"}] = {"ε"};
+t[{"NAME_TAIL", "*"}] = {"ε"};
+t[{"NAME_TAIL", "/"}] = {"ε"};
+t[{"NAME_TAIL", "^"}] = {"ε"};
 t[{"NAME_TAIL", "."}] = {".", "NAME", "NAME_TAIL"};
 t[{"NAME_TAIL", "["}] = {"[", "EXP", "]", "NAME_TAIL"};
-t[{"NAME_TAIL", "]"}] = {};
-t[{"NAME_TAIL", "<"}] = {};
-t[{"NAME_TAIL", "<="}] = {};
-t[{"NAME_TAIL", ">"}] = {};
-t[{"NAME_TAIL", ">="}] = {};
-t[{"NAME_TAIL", "="}] = {};
-t[{"NAME_TAIL", "<>"}] = {};
-t[{"NAME_TAIL", "then"}] = {};
-t[{"NAME_TAIL", "fi"}] = {};
-t[{"NAME_TAIL", "else"}] = {};
-t[{"NAME_TAIL", "do"}] = {};
-t[{"NAME_TAIL", "od"}] = {};
+t[{"NAME_TAIL", "]"}] = {"ε"};
+t[{"NAME_TAIL", "<"}] = {"ε"};
+t[{"NAME_TAIL", "<="}] = {"ε"};
+t[{"NAME_TAIL", ">"}] = {"ε"};
+t[{"NAME_TAIL", ">="}] = {"ε"};
+t[{"NAME_TAIL", "="}] = {"ε"};
+t[{"NAME_TAIL", "<>"}] = {"ε"};
+t[{"NAME_TAIL", "then"}] = {"ε"};
+t[{"NAME_TAIL", "fi"}] = {"ε"};
+t[{"NAME_TAIL", "else"}] = {"ε"};
+t[{"NAME_TAIL", "do"}] = {"ε"};
+t[{"NAME_TAIL", "od"}] = {"ε"};
 t[{"VAR", "NAME"}] = {"NAME", "NAME_TAIL"};
 t[{"CALL_STMT", "NAME"}] = {"NAME", "(", "E", ")"};
-t[{"VAR_ACCESS", ":="}] = {};
+t[{"VAR_ACCESS", ":="}] = {"ε"};
 t[{"VAR_ACCESS", "["}] = {"[", "EXP", "]", "VAR_ACCESS"};
 t[{"REL_OP", "<"}] = {"<"};
 t[{"REL_OP", "<="}] = {"<="};
@@ -527,7 +331,7 @@ t[{"X", "["}] = {"VAR_ACCESS", ":=", "EXP"};
 t[{"ASSIGN_STMT", "NAME"}] = {"VAR", ":=", "EXP"};
 t[{"ASSIGN_STMT", "deref"}] = {"DEREF_VAR", ":=", "EXP"};
 t[{"IF_STMT", "if"}] = {"if", "EXP", "then", "STMT_LIST", "D", "fi"};
-t[{"D", "fi"}] = {};
+t[{"D", "fi"}] = {"ε"};
 t[{"D", "else"}] = {"else", "STMT_LIST"};
 t[{"WHILE_STMT", "while"}] = {"while", "EXP", "do", "STMT_LIST", "od"};
 t[{"RETURN_STMT", "return"}] = {"return", "(", "EXP", ")"};
@@ -543,7 +347,7 @@ t[{"E", "STRING_LITERAL"}] = {"EXP", "E_TAIL"};
 t[{"E", "null"}] = {"EXP", "E_TAIL"};
 t[{"E", "true"}] = {"EXP", "E_TAIL"};
 t[{"E", "false"}] = {"EXP", "E_TAIL"};
-t[{"E_TAIL", ")"}] = {};
+t[{"E_TAIL", ")"}] = {"ε"};
 t[{"E_TAIL", ","}] = {",", "EXP", "E_TAIL"};
 t[{"TYPE", "NAME"}] = {"NAME"};
 t[{"TYPE", "ref"}] = {"ref", "(", "TYPE", ")"};
@@ -553,97 +357,4 @@ t[{"TYPE", "string"}] = {"string"};
 t[{"TYPE", "bool"}] = {"bool"};
 t[{"TYPE", "array"}] = {"array", "F", "of", "TYPE"};
 t[{"F", "INT_LITERAL"}] = {"INT_LITERAL"};
-t[{"F", "of"}] = {};
-
-
-
-}
-
-std::string get_next_token() {
-    yylex(); // avança no input e atualiza current_token
-    return current_token;
-}
-
-void print_error_message() {
-    std::cerr << FILE_NAME << ":" << nLinhas<< ":" << nColunas << ": unexpected token " << current_token << std::endl; 
-    exit(1);
-}
-
-void syntax() {
-    std::stack<std::string> pilha;
-    std::set<std::string> non_terminals;
-    init_non_terminals(non_terminals);
-    std::map<std::pair<std::string, std::string>, std::vector<std::string>> transition_table;
-    init_transition_table(transition_table);
-
-    pilha.push("S");
-    // std::cout << "Consumindo primeiro token: " << std::endl;
-    std::string current = get_next_token();
-    // int i = 0;
-    while(current != "$" && !pilha.empty()) {
-        // i++;
-        // std::cout << "Iteração " << i << ": " << current << std::endl;
-        std::string topo = pilha.top();
-        if(!non_terminals.count(topo)) {
-            if(current == topo) {
-                pilha.pop();
-                // std::cout << "Consumindo token: " << current << std::endl;
-                current = get_next_token();
-                // std::cout << "Próximo token: " << current << std::endl;
-            }
-            else {
-                print_error_message();
-            }
-        }
-        else {
-            std::pair<std::string, std::string> id = {topo, current};
-            if(transition_table.find(id) != transition_table.end()) {
-                pilha.pop();
-                std::vector<std::string> v = transition_table[id];
-                // std::cout << "Produção: " << topo << " -> ";
-                // for(const auto& s : v) {
-                //     std::cout << s << " ";
-                // }
-                // std::cout << std::endl;
-                while(!v.empty()) {
-                    
-                    pilha.push(v.back());
-                    v.pop_back();
-                }
-            }
-            else {
-                print_error_message();
-            }
-
-        }
-
-    }
-
-    if(pilha.size() == 1 && current == "$" && pilha.top() == "$") {
-        std::cout << "Análise sintática concluída com sucesso!" << std::endl;
-    }
-    else {
-        std::cout << "Erro: " << current << " != $ ou pilha não vazia" << std::endl;
-        std::cout << "Pilha não vazia: ";
-        while(!pilha.empty()) {
-            std::cout << pilha.top() << " ";
-            pilha.pop();
-        }
-        std::cout << std::endl;
-        exit(0);
-    }
-}
-
-int main() {
-    yyin = fopen(FILE_NAME, "r");  // Abre o arquivo a ser compilado
-    if (!yyin) {
-        perror("Erro ao abrir o arquivo");
-        return 1;
-    }
-
-    // Chamada da função principal da análise sintática
-    syntax();
-
-    fclose(yyin);  // Fecha o arquivo no final
-    return 0;
-}
+t[{"F", "of"}] = {"ε"};
