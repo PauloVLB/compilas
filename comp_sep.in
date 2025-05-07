@@ -134,11 +134,16 @@ STMT ::= WHILE_STMT
 STMT ::= RETURN_STMT
 
 STMT_NAME_BEGIN ::= NAME X
-X ::= VAR_ACCESS := EXP
-X ::= ( E )
+
+X ::= . NAME NAME_TAIL := EXP
+X ::= [ EXP ] NAME_TAIL := EXP
+X ::= := EXP
+X ::= ( E ) XX
+
+XX ::= ''
+XX ::= NAME_TAIL := EXP
 
 ASSIGN_STMT ::= VAR := EXP
-ASSIGN_STMT ::= DEREF_VAR := EXP
 
 IF_STMT ::= if EXP then STMT_LIST D fi
 

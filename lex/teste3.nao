@@ -18,8 +18,18 @@ program swapexample
                 x := 42; y := 84;
                 xr := ref(x); yr := ref(y);
                 swap(xr, yr);
+                x.x := 2;
                 if x then
-                    x := 32
+                    x := 32; 
+                    x := x;
+                    x := x[2];
+                    x := x.x;
+                    x := x.x.y;
+                    x := x[2][2][2];
+                    x := x.y[2 + 4].t[((q + 28 * 2 * 7))].n;
+                    x.x := 21;
+                    x.y[2].x[(45 * 33 + 21 - dddd[2][24].x.x.x.x.x.x.x.x.x)] := a;
+                    x[2][2][2] := w[(((((q + (a[2] * 32))))))].x.u[9]
                 else 
                     x := 32
                 fi

@@ -10,63 +10,122 @@
 const std::vector<std::string> non_terminals_list = {
     "PROGRAM",
     "DECL_SECTION",
+    "DECL_SECTION",
     "DECL_LIST",
+    "DECL_LIST",
+    "DECL",
+    "DECL",
     "DECL",
     "VAR_DECL",
     "VAR_DECL_TYPE",
+    "VAR_DECL_TYPE",
+    "VAR_INIT",
     "VAR_INIT",
     "PROC_DECL",
     "PARAMFIELD_LIST",
+    "PARAMFIELD_LIST",
     "PARAMFIELD_LIST_TAIL",
+    "PARAMFIELD_LIST_TAIL",
+    "TYPE_ANNOTATION",
     "TYPE_ANNOTATION",
     "BLOCK",
     "Z",
+    "Z",
+    "Z",
     "REC_DECL",
     "PARAMFIELD_DECLS",
+    "PARAMFIELD_DECLS",
     "STMT_LIST",
+    "STMT_LIST",
+    "STMT_LIST_TAIL",
     "STMT_LIST_TAIL",
     "EXP",
     "OR_EXP",
     "OR_EXP_PRIME",
+    "OR_EXP_PRIME",
     "AND_EXP",
     "AND_EXP_PRIME",
+    "AND_EXP_PRIME",
+    "NOT_EXP",
     "NOT_EXP",
     "REL_EXP",
     "REL_EXP_PRIME",
+    "REL_EXP_PRIME",
     "ADD_EXP",
+    "ADD_EXP_PRIME",
+    "ADD_EXP_PRIME",
     "ADD_EXP_PRIME",
     "MUL_EXP",
     "MUL_EXP_PRIME",
+    "MUL_EXP_PRIME",
+    "MUL_EXP_PRIME",
     "EXP_EXP",
     "EXP_EXP_PRIME",
-    "ACCESS",
-    "ACCESS_PRIME",
+    "EXP_EXP_PRIME",
+    "PRIMARY",
+    "PRIMARY",
+    "PRIMARY",
+    "PRIMARY",
+    "PRIMARY",
     "PRIMARY",
     "REF_VAR",
     "DEREF_VAR",
     "C",
+    "C",
     "PARAMFIELD_DECL",
-    "PRIMARY_NAME_BEGIN",
-    "Y",
+    "NAME_TAIL",
+    "NAME_TAIL",
+    "NAME_TAIL",
+    "NAME_TAIL",
     "VAR",
     "CALL_STMT",
     "VAR_ACCESS",
+    "VAR_ACCESS",
+    "REL_OP",
+    "REL_OP",
+    "REL_OP",
+    "REL_OP",
+    "REL_OP",
     "REL_OP",
     "LITERAL",
+    "LITERAL",
+    "LITERAL",
+    "LITERAL",
+    "LITERAL",
     "BOOL_LITERAL",
+    "BOOL_LITERAL",
+    "STMT",
+    "STMT",
+    "STMT",
+    "STMT",
     "STMT",
     "STMT_NAME_BEGIN",
     "X",
+    "X",
+    "X",
+    "X",
+    "XX",
+    "XX",
     "ASSIGN_STMT",
     "IF_STMT",
+    "D",
     "D",
     "WHILE_STMT",
     "RETURN_STMT",
     "E",
     "E_TAIL",
+    "E_TAIL",
+    "TYPE",
+    "TYPE",
+    "TYPE",
+    "TYPE",
+    "TYPE",
+    "TYPE",
     "TYPE",
     "F",
+    "F",
     "S"
+
 };
 
 void init_non_terminals(std::set<std::string> & s) {
@@ -77,7 +136,7 @@ void init_non_terminals(std::set<std::string> & s) {
 }
 
 void init_transition_table(std::map<std::pair<std::string, std::string>, std::vector<std::string>> & t) {
-
+    
     t[{"S", "program"}] = {"PROGRAM", "$"};
     t[{"PROGRAM", "program"}] = {"program", "NAME", "begin", "DECL_SECTION", "end"};
     t[{"DECL_SECTION", "end"}] = {};
@@ -301,17 +360,17 @@ void init_transition_table(std::map<std::pair<std::string, std::string>, std::ve
     t[{"MUL_EXP_PRIME", "else"}] = {};
     t[{"MUL_EXP_PRIME", "do"}] = {};
     t[{"MUL_EXP_PRIME", "od"}] = {};
-    t[{"EXP_EXP", "NAME"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "("}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "new"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "ref"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "deref"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "FLOAT_LITERAL"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "INT_LITERAL"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "STRING_LITERAL"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "null"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "true"}] = {"ACCESS", "EXP_EXP_PRIME"};
-    t[{"EXP_EXP", "false"}] = {"ACCESS", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "NAME"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "("}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "new"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "ref"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "deref"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "FLOAT_LITERAL"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "INT_LITERAL"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "STRING_LITERAL"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "null"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "true"}] = {"PRIMARY", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP", "false"}] = {"PRIMARY", "EXP_EXP_PRIME"};
     t[{"EXP_EXP_PRIME", "end"}] = {};
     t[{"EXP_EXP_PRIME", ";"}] = {};
     t[{"EXP_EXP_PRIME", ")"}] = {};
@@ -323,7 +382,7 @@ void init_transition_table(std::map<std::pair<std::string, std::string>, std::ve
     t[{"EXP_EXP_PRIME", "-"}] = {};
     t[{"EXP_EXP_PRIME", "*"}] = {};
     t[{"EXP_EXP_PRIME", "/"}] = {};
-    t[{"EXP_EXP_PRIME", "^"}] = {"^", "ACCESS", "EXP_EXP_PRIME"};
+    t[{"EXP_EXP_PRIME", "^"}] = {"^", "PRIMARY", "EXP_EXP_PRIME"};
     t[{"EXP_EXP_PRIME", "]"}] = {};
     t[{"EXP_EXP_PRIME", "<"}] = {};
     t[{"EXP_EXP_PRIME", "<="}] = {};
@@ -336,43 +395,7 @@ void init_transition_table(std::map<std::pair<std::string, std::string>, std::ve
     t[{"EXP_EXP_PRIME", "else"}] = {};
     t[{"EXP_EXP_PRIME", "do"}] = {};
     t[{"EXP_EXP_PRIME", "od"}] = {};
-    t[{"ACCESS", "NAME"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "("}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "new"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "ref"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "deref"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "FLOAT_LITERAL"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "INT_LITERAL"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "STRING_LITERAL"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "null"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "true"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS", "false"}] = {"PRIMARY", "ACCESS_PRIME"};
-    t[{"ACCESS_PRIME", "end"}] = {};
-    t[{"ACCESS_PRIME", ";"}] = {};
-    t[{"ACCESS_PRIME", ")"}] = {};
-    t[{"ACCESS_PRIME", ","}] = {};
-    t[{"ACCESS_PRIME", "in"}] = {};
-    t[{"ACCESS_PRIME", "||"}] = {};
-    t[{"ACCESS_PRIME", "&&"}] = {};
-    t[{"ACCESS_PRIME", "+"}] = {};
-    t[{"ACCESS_PRIME", "-"}] = {};
-    t[{"ACCESS_PRIME", "*"}] = {};
-    t[{"ACCESS_PRIME", "/"}] = {};
-    t[{"ACCESS_PRIME", "^"}] = {};
-    t[{"ACCESS_PRIME", "."}] = {".", "NAME", "ACCESS_PRIME"};
-    t[{"ACCESS_PRIME", "]"}] = {};
-    t[{"ACCESS_PRIME", "<"}] = {};
-    t[{"ACCESS_PRIME", "<="}] = {};
-    t[{"ACCESS_PRIME", ">"}] = {};
-    t[{"ACCESS_PRIME", ">="}] = {};
-    t[{"ACCESS_PRIME", "="}] = {};
-    t[{"ACCESS_PRIME", "<>"}] = {};
-    t[{"ACCESS_PRIME", "then"}] = {};
-    t[{"ACCESS_PRIME", "fi"}] = {};
-    t[{"ACCESS_PRIME", "else"}] = {};
-    t[{"ACCESS_PRIME", "do"}] = {};
-    t[{"ACCESS_PRIME", "od"}] = {};
-    t[{"PRIMARY", "NAME"}] = {"PRIMARY_NAME_BEGIN"};
+    t[{"PRIMARY", "NAME"}] = {"VAR"};
     t[{"PRIMARY", "("}] = {"(", "EXP", ")"};
     t[{"PRIMARY", "new"}] = {"new", "NAME"};
     t[{"PRIMARY", "ref"}] = {"REF_VAR"};
@@ -388,63 +411,37 @@ void init_transition_table(std::map<std::pair<std::string, std::string>, std::ve
     t[{"C", "NAME"}] = {"VAR"};
     t[{"C", "deref"}] = {"DEREF_VAR"};
     t[{"PARAMFIELD_DECL", "NAME"}] = {"NAME", ":", "TYPE"};
-    t[{"PRIMARY_NAME_BEGIN", "NAME"}] = {"NAME", "Y"};
-    t[{"Y", "end"}] = {"VAR_ACCESS"};
-    t[{"Y", ";"}] = {"VAR_ACCESS"};
-    t[{"Y", "("}] = {"(", "E", ")"};
-    t[{"Y", ")"}] = {"VAR_ACCESS"};
-    t[{"Y", ","}] = {"VAR_ACCESS"};
-    t[{"Y", "in"}] = {"VAR_ACCESS"};
-    t[{"Y", "||"}] = {"VAR_ACCESS"};
-    t[{"Y", "&&"}] = {"VAR_ACCESS"};
-    t[{"Y", "+"}] = {"VAR_ACCESS"};
-    t[{"Y", "-"}] = {"VAR_ACCESS"};
-    t[{"Y", "*"}] = {"VAR_ACCESS"};
-    t[{"Y", "/"}] = {"VAR_ACCESS"};
-    t[{"Y", "^"}] = {"VAR_ACCESS"};
-    t[{"Y", "."}] = {"VAR_ACCESS"};
-    t[{"Y", "["}] = {"VAR_ACCESS"};
-    t[{"Y", "]"}] = {"VAR_ACCESS"};
-    t[{"Y", "<"}] = {"VAR_ACCESS"};
-    t[{"Y", "<="}] = {"VAR_ACCESS"};
-    t[{"Y", ">"}] = {"VAR_ACCESS"};
-    t[{"Y", ">="}] = {"VAR_ACCESS"};
-    t[{"Y", "="}] = {"VAR_ACCESS"};
-    t[{"Y", "<>"}] = {"VAR_ACCESS"};
-    t[{"Y", "then"}] = {"VAR_ACCESS"};
-    t[{"Y", "fi"}] = {"VAR_ACCESS"};
-    t[{"Y", "else"}] = {"VAR_ACCESS"};
-    t[{"Y", "do"}] = {"VAR_ACCESS"};
-    t[{"Y", "od"}] = {"VAR_ACCESS"};
-    t[{"VAR", "NAME"}] = {"NAME", "VAR_ACCESS"};
+    t[{"NAME_TAIL", "end"}] = {};
+    t[{"NAME_TAIL", ";"}] = {};
+    t[{"NAME_TAIL", ":="}] = {};
+    t[{"NAME_TAIL", "("}] = {"(", "E", ")", "NAME_TAIL"};
+    t[{"NAME_TAIL", ")"}] = {};
+    t[{"NAME_TAIL", ","}] = {};
+    t[{"NAME_TAIL", "in"}] = {};
+    t[{"NAME_TAIL", "||"}] = {};
+    t[{"NAME_TAIL", "&&"}] = {};
+    t[{"NAME_TAIL", "+"}] = {};
+    t[{"NAME_TAIL", "-"}] = {};
+    t[{"NAME_TAIL", "*"}] = {};
+    t[{"NAME_TAIL", "/"}] = {};
+    t[{"NAME_TAIL", "^"}] = {};
+    t[{"NAME_TAIL", "."}] = {".", "NAME", "NAME_TAIL"};
+    t[{"NAME_TAIL", "["}] = {"[", "EXP", "]", "NAME_TAIL"};
+    t[{"NAME_TAIL", "]"}] = {};
+    t[{"NAME_TAIL", "<"}] = {};
+    t[{"NAME_TAIL", "<="}] = {};
+    t[{"NAME_TAIL", ">"}] = {};
+    t[{"NAME_TAIL", ">="}] = {};
+    t[{"NAME_TAIL", "="}] = {};
+    t[{"NAME_TAIL", "<>"}] = {};
+    t[{"NAME_TAIL", "then"}] = {};
+    t[{"NAME_TAIL", "fi"}] = {};
+    t[{"NAME_TAIL", "else"}] = {};
+    t[{"NAME_TAIL", "do"}] = {};
+    t[{"NAME_TAIL", "od"}] = {};
+    t[{"VAR", "NAME"}] = {"NAME", "NAME_TAIL"};
     t[{"CALL_STMT", "NAME"}] = {"NAME", "(", "E", ")"};
-    t[{"VAR_ACCESS", "end"}] = {};
-    t[{"VAR_ACCESS", ";"}] = {};
-    t[{"VAR_ACCESS", ":="}] = {};
-    t[{"VAR_ACCESS", ")"}] = {};
-    t[{"VAR_ACCESS", ","}] = {};
-    t[{"VAR_ACCESS", "in"}] = {};
-    t[{"VAR_ACCESS", "||"}] = {};
-    t[{"VAR_ACCESS", "&&"}] = {};
-    t[{"VAR_ACCESS", "+"}] = {};
-    t[{"VAR_ACCESS", "-"}] = {};
-    t[{"VAR_ACCESS", "*"}] = {};
-    t[{"VAR_ACCESS", "/"}] = {};
-    t[{"VAR_ACCESS", "^"}] = {};
-    t[{"VAR_ACCESS", "."}] = {};
     t[{"VAR_ACCESS", "["}] = {"[", "EXP", "]", "VAR_ACCESS"};
-    t[{"VAR_ACCESS", "]"}] = {};
-    t[{"VAR_ACCESS", "<"}] = {};
-    t[{"VAR_ACCESS", "<="}] = {};
-    t[{"VAR_ACCESS", ">"}] = {};
-    t[{"VAR_ACCESS", ">="}] = {};
-    t[{"VAR_ACCESS", "="}] = {};
-    t[{"VAR_ACCESS", "<>"}] = {};
-    t[{"VAR_ACCESS", "then"}] = {};
-    t[{"VAR_ACCESS", "fi"}] = {};
-    t[{"VAR_ACCESS", "else"}] = {};
-    t[{"VAR_ACCESS", "do"}] = {};
-    t[{"VAR_ACCESS", "od"}] = {};
     t[{"REL_OP", "<"}] = {"<"};
     t[{"REL_OP", "<="}] = {"<="};
     t[{"REL_OP", ">"}] = {">"};
@@ -465,11 +462,20 @@ void init_transition_table(std::map<std::pair<std::string, std::string>, std::ve
     t[{"STMT", "while"}] = {"WHILE_STMT"};
     t[{"STMT", "return"}] = {"RETURN_STMT"};
     t[{"STMT_NAME_BEGIN", "NAME"}] = {"NAME", "X"};
-    t[{"X", ":="}] = {"VAR_ACCESS", ":=", "EXP"};
-    t[{"X", "("}] = {"(", "E", ")"};
-    t[{"X", "["}] = {"VAR_ACCESS", ":=", "EXP"};
+    t[{"X", ":="}] = {":=", "EXP"};
+    t[{"X", "("}] = {"(", "E", ")", "XX"};
+    t[{"X", "."}] = {".", "NAME", "NAME_TAIL", ":=", "EXP"};
+    t[{"X", "["}] = {"[", "EXP", "]", "NAME_TAIL", ":=", "EXP"};
+    t[{"XX", "end"}] = {};
+    t[{"XX", ";"}] = {};
+    t[{"XX", ":="}] = {"NAME_TAIL", ":=", "EXP"};
+    t[{"XX", "("}] = {"NAME_TAIL", ":=", "EXP"};
+    t[{"XX", "."}] = {"NAME_TAIL", ":=", "EXP"};
+    t[{"XX", "["}] = {"NAME_TAIL", ":=", "EXP"};
+    t[{"XX", "fi"}] = {};
+    t[{"XX", "else"}] = {};
+    t[{"XX", "od"}] = {};
     t[{"ASSIGN_STMT", "NAME"}] = {"VAR", ":=", "EXP"};
-    t[{"ASSIGN_STMT", "deref"}] = {"DEREF_VAR", ":=", "EXP"};
     t[{"IF_STMT", "if"}] = {"if", "EXP", "then", "STMT_LIST", "D", "fi"};
     t[{"D", "fi"}] = {};
     t[{"D", "else"}] = {"else", "STMT_LIST"};

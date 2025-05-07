@@ -7,23 +7,14 @@
 #include <map>
 #include <iostream>
 #include <cstdio>  // Para FILE*
-// #include "./lex/lex.
+#include "syntax_rec.h"
 
 extern FILE* yyin;
 extern int yylex();
 extern std::string current_token;
 extern int nLinhas, nColunas;
 std::string current;
-const char* FILE_NAME = "teste2.nao";
-
-void match(std::string a) {
-    if(a == current) {
-        current = get_next_token();
-    }
-    else {
-        print_error_message();
-    }
-}
+const char* FILE_NAME = "teste3.nao";
 
 std::string get_next_token() {
     yylex(); // avança no input e atualiza current_token
@@ -35,126 +26,13 @@ void print_error_message() {
     exit(1);
 }
 
-void S() {
-    
-    if(current == "program") {
-        PROGRAM();
-        match("$");
+void match(std::string a) {
+    if(a == current) {
+        current = get_next_token();
     }
     else {
         print_error_message();
     }
-}
-
-void ACCESS() {
-    if(current == "("){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "FLOAT_LITERAL"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "INT_LITERAL"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "NAME"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "STRING_LITERAL"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "deref"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "false"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "new"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "null"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "ref"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else if(current == "true"){
-        PRIMARY();
-        ACCESS_PRIME();
-    }
-    else {
-        print_error_message();
-    }
-
-}
-
-void ACCESS_PRIME() {
-    if(current == "&&"){
-    }
-    else if(current == ")"){
-    }
-    else if(current == "*"){
-    }
-    else if(current == "+"){
-    }
-    else if(current == ","){
-    }
-    else if(current == "-"){
-    }
-    else if(current == "."){
-        match(".");
-        match("NAME");
-        ACCESS_PRIME();
-    }
-    else if(current == "/"){
-    }
-    else if(current == ";"){
-    }
-    else if(current == "<"){
-    }
-    else if(current == "<="){
-    }
-    else if(current == "<>"){
-    }
-    else if(current == "="){
-    }
-    else if(current == ">"){
-    }
-    else if(current == ">="){
-    }
-    else if(current == "]"){
-    }
-    else if(current == "^"){
-    }
-    else if(current == "do"){
-    }
-    else if(current == "else"){
-    }
-    else if(current == "end"){
-    }
-    else if(current == "fi"){
-    }
-    else if(current == "in"){
-    }
-    else if(current == "od"){
-    }
-    else if(current == "then"){
-    }
-    else if(current == "||"){
-    }
-    else {
-        print_error_message();
-    }
-
 }
 
 void ADD_EXP() {
@@ -357,11 +235,6 @@ void AND_EXP_PRIME() {
 void ASSIGN_STMT() {
     if(current == "NAME"){
         VAR();
-        match(":=");
-        EXP();
-    }
-    else if(current == "deref"){
-        DEREF_VAR();
         match(":=");
         EXP();
     }
@@ -601,47 +474,47 @@ void EXP() {
 
 void EXP_EXP() {
     if(current == "("){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "FLOAT_LITERAL"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "INT_LITERAL"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "NAME"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "STRING_LITERAL"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "deref"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "false"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "new"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "null"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "ref"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "true"){
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else {
@@ -683,7 +556,7 @@ void EXP_EXP_PRIME() {
     }
     else if(current == "^"){
         match("^");
-        ACCESS();
+        PRIMARY();
         EXP_EXP_PRIME();
     }
     else if(current == "do"){
@@ -861,6 +734,80 @@ void MUL_EXP_PRIME() {
     else if(current == ">="){
     }
     else if(current == "]"){
+    }
+    else if(current == "do"){
+    }
+    else if(current == "else"){
+    }
+    else if(current == "end"){
+    }
+    else if(current == "fi"){
+    }
+    else if(current == "in"){
+    }
+    else if(current == "od"){
+    }
+    else if(current == "then"){
+    }
+    else if(current == "||"){
+    }
+    else {
+        print_error_message();
+    }
+
+}
+
+void NAME_TAIL() {
+    if(current == "&&"){
+    }
+    else if(current == "("){
+        match("(");
+        E();
+        match(")");
+        NAME_TAIL();
+    }
+    else if(current == ")"){
+    }
+    else if(current == "*"){
+    }
+    else if(current == "+"){
+    }
+    else if(current == ","){
+    }
+    else if(current == "-"){
+    }
+    else if(current == "."){
+        match(".");
+        match("NAME");
+        NAME_TAIL();
+    }
+    else if(current == "/"){
+    }
+    else if(current == ":="){
+    }
+    else if(current == ";"){
+    }
+    else if(current == "<"){
+    }
+    else if(current == "<="){
+    }
+    else if(current == "<>"){
+    }
+    else if(current == "="){
+    }
+    else if(current == ">"){
+    }
+    else if(current == ">="){
+    }
+    else if(current == "["){
+        match("[");
+        EXP();
+        match("]");
+        NAME_TAIL();
+    }
+    else if(current == "]"){
+    }
+    else if(current == "^"){
     }
     else if(current == "do"){
     }
@@ -1083,7 +1030,7 @@ void PRIMARY() {
         LITERAL();
     }
     else if(current == "NAME"){
-        PRIMARY_NAME_BEGIN();
+        VAR();
     }
     else if(current == "STRING_LITERAL"){
         LITERAL();
@@ -1106,17 +1053,6 @@ void PRIMARY() {
     }
     else if(current == "true"){
         LITERAL();
-    }
-    else {
-        print_error_message();
-    }
-
-}
-
-void PRIMARY_NAME_BEGIN() {
-    if(current == "NAME"){
-        match("NAME");
-        Y();
     }
     else {
         print_error_message();
@@ -1484,7 +1420,7 @@ void TYPE_ANNOTATION() {
 void VAR() {
     if(current == "NAME"){
         match("NAME");
-        VAR_ACCESS();
+        NAME_TAIL();
     }
     else {
         print_error_message();
@@ -1493,63 +1429,11 @@ void VAR() {
 }
 
 void VAR_ACCESS() {
-    if(current == "&&"){
-    }
-    else if(current == ")"){
-    }
-    else if(current == "*"){
-    }
-    else if(current == "+"){
-    }
-    else if(current == ","){
-    }
-    else if(current == "-"){
-    }
-    else if(current == "."){
-    }
-    else if(current == "/"){
-    }
-    else if(current == ":="){
-    }
-    else if(current == ";"){
-    }
-    else if(current == "<"){
-    }
-    else if(current == "<="){
-    }
-    else if(current == "<>"){
-    }
-    else if(current == "="){
-    }
-    else if(current == ">"){
-    }
-    else if(current == ">="){
-    }
-    else if(current == "["){
+    if(current == "["){
         match("[");
         EXP();
         match("]");
         VAR_ACCESS();
-    }
-    else if(current == "]"){
-    }
-    else if(current == "^"){
-    }
-    else if(current == "do"){
-    }
-    else if(current == "else"){
-    }
-    else if(current == "end"){
-    }
-    else if(current == "fi"){
-    }
-    else if(current == "in"){
-    }
-    else if(current == "od"){
-    }
-    else if(current == "then"){
-    }
-    else if(current == "||"){
     }
     else {
         print_error_message();
@@ -1621,14 +1505,24 @@ void X() {
         match("(");
         E();
         match(")");
+        XX();
+    }
+    else if(current == "."){
+        match(".");
+        match("NAME");
+        NAME_TAIL();
+        match(":=");
+        EXP();
     }
     else if(current == ":="){
-        VAR_ACCESS();
         match(":=");
         EXP();
     }
     else if(current == "["){
-        VAR_ACCESS();
+        match("[");
+        EXP();
+        match("]");
+        NAME_TAIL();
         match(":=");
         EXP();
     }
@@ -1638,89 +1532,36 @@ void X() {
 
 }
 
-void Y() {
-    if(current == "&&"){
-        VAR_ACCESS();
-    }
-    else if(current == "("){
-        match("(");
-        E();
-        match(")");
-    }
-    else if(current == ")"){
-        VAR_ACCESS();
-    }
-    else if(current == "*"){
-        VAR_ACCESS();
-    }
-    else if(current == "+"){
-        VAR_ACCESS();
-    }
-    else if(current == ","){
-        VAR_ACCESS();
-    }
-    else if(current == "-"){
-        VAR_ACCESS();
+void XX() {
+    if(current == "("){
+        NAME_TAIL();
+        match(":=");
+        EXP();
     }
     else if(current == "."){
-        VAR_ACCESS();
+        NAME_TAIL();
+        match(":=");
+        EXP();
     }
-    else if(current == "/"){
-        VAR_ACCESS();
+    else if(current == ":="){
+        NAME_TAIL();
+        match(":=");
+        EXP();
     }
     else if(current == ";"){
-        VAR_ACCESS();
-    }
-    else if(current == "<"){
-        VAR_ACCESS();
-    }
-    else if(current == "<="){
-        VAR_ACCESS();
-    }
-    else if(current == "<>"){
-        VAR_ACCESS();
-    }
-    else if(current == "="){
-        VAR_ACCESS();
-    }
-    else if(current == ">"){
-        VAR_ACCESS();
-    }
-    else if(current == ">="){
-        VAR_ACCESS();
     }
     else if(current == "["){
-        VAR_ACCESS();
-    }
-    else if(current == "]"){
-        VAR_ACCESS();
-    }
-    else if(current == "^"){
-        VAR_ACCESS();
-    }
-    else if(current == "do"){
-        VAR_ACCESS();
+        NAME_TAIL();
+        match(":=");
+        EXP();
     }
     else if(current == "else"){
-        VAR_ACCESS();
     }
     else if(current == "end"){
-        VAR_ACCESS();
     }
     else if(current == "fi"){
-        VAR_ACCESS();
-    }
-    else if(current == "in"){
-        VAR_ACCESS();
     }
     else if(current == "od"){
-        VAR_ACCESS();
-    }
-    else if(current == "then"){
-        VAR_ACCESS();
-    }
-    else if(current == "||"){
-        VAR_ACCESS();
     }
     else {
         print_error_message();
@@ -1777,15 +1618,11 @@ void Z() {
 
 
 
-
-
-
-
-
-
 void syntax() {
-    
+
+    current = get_next_token();
     S();
+    std::cout << "Análise sintática concluída com sucesso!" << std::endl;
 
 }
 
