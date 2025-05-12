@@ -13,7 +13,7 @@ extern int yylex();
 extern std::string current_token;
 extern int nLinhas, nColunas;
 
-const char* FILE_NAME = "teste3.nao";
+const char* FILE_NAME = "../tests/teste3.nao";
 
 const std::vector<std::string> non_terminals_list = {
     "PROGRAM",

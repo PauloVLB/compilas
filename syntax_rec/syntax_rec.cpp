@@ -14,7 +14,7 @@ extern int yylex();
 extern std::string current_token;
 extern int nLinhas, nColunas;
 std::string current;
-const char* FILE_NAME = "teste3.nao";
+const char* FILE_NAME = "../tests/teste3.nao";
 
 std::string get_next_token() {
     yylex(); // avança no input e atualiza current_token
