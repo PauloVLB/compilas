@@ -16,7 +16,7 @@ int yylex(void);
 
 %token PROGRAM BEGIN END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT
 
-%token ASSIGN  // :=
+%token ASSIGN // :=
 %token AND OR
 %token LT LE GT GE EQ NE
 %token PLUS MINUS MULT DIV EXP_OP
@@ -24,6 +24,15 @@ int yylex(void);
 %token FLOAT_T INT_T STRING_T BOOL_T
 
 %start program
+
+// Precedência dos operadores
+%left OR
+%left AND
+%right NOT
+%nonassoc LT LE GT GE EQ NE
+%left PLUS MINUS
+%left MULT DIV
+%right EXP_OP
 
 %%
 
@@ -77,7 +86,7 @@ opt_type:
     ;
 
 block:
-    BEGIN proc_body_opt STMT_LIST END
+    BEGIN proc_body_opt stmt_list END
     ;
 
 proc_body_opt:
@@ -163,10 +172,20 @@ call_args_tail:
     ;
 
 exp:
-      exp LOG_OP exp
+      exp OR exp
+    | exp AND exp
     | NOT exp
-    | exp REL_OP exp
-    | exp ARITH_OP exp
+    | exp LT exp
+    | exp LE exp
+    | exp GT exp
+    | exp GE exp
+    | exp EQ exp
+    | exp NE exp
+    | exp PLUS exp
+    | exp MINUS exp
+    | exp MULT exp
+    | exp DIV exp
+    | exp EXP_OP exp
     | literal
     | call_stmt
     | NEW NAME
@@ -211,10 +230,6 @@ type:
     | NAME
     | REF '(' type ')'
     ;
-
-LOG_OP: AND | OR
-REL_OP: LT | LE | GT | GE | EQ | NE
-ARITH_OP: PLUS | MINUS | MULT | DIV | EXP_OP
 
 %%
 
