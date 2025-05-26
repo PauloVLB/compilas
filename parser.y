@@ -16,7 +16,7 @@ int yylex(void);
 
 %token PROGRAM BEGIN END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT
 
-%token ASSIGN // :=
+%token ASSIGN        // :=
 %token AND OR
 %token LT LE GT GE EQ NE
 %token PLUS MINUS MULT DIV EXP_OP
@@ -25,7 +25,6 @@ int yylex(void);
 
 %start program
 
-// Precedência dos operadores
 %left OR
 %left AND
 %right NOT
@@ -58,12 +57,12 @@ decl:
 
 var_decl:
       VAR NAME ':' type var_init_opt
-    | VAR NAME ASSIGN exp
+    | VAR NAME ASSIGN expression
     ;
 
 var_init_opt:
       /* vazio */
-    | ASSIGN exp
+    | ASSIGN expression
     ;
 
 proc_decl:
@@ -131,12 +130,12 @@ stmt:
     ;
 
 assign_stmt:
-      var ASSIGN exp
-    | deref_var ASSIGN exp
+      var ASSIGN expression
+    | deref_var ASSIGN expression
     ;
 
 if_stmt:
-    IF exp THEN stmt_list else_opt FI
+    IF expression THEN stmt_list else_opt FI
     ;
 
 else_opt:
@@ -145,7 +144,7 @@ else_opt:
     ;
 
 while_stmt:
-    WHILE exp DO stmt_list OD
+    WHILE expression DO stmt_list OD
     ;
 
 return_stmt:
@@ -154,7 +153,7 @@ return_stmt:
 
 return_exp_opt:
       /* vazio */
-    | exp
+    | expression
     ;
 
 call_stmt:
@@ -163,36 +162,90 @@ call_stmt:
 
 call_args_opt:
       /* vazio */
-    | exp call_args_tail
+    | expression call_args_tail
     ;
 
 call_args_tail:
       /* vazio */
-    | ',' exp call_args_tail
+    | ',' expression call_args_tail
     ;
 
-exp:
-      exp OR exp
-    | exp AND exp
-    | NOT exp
-    | exp LT exp
-    | exp LE exp
-    | exp GT exp
-    | exp GE exp
-    | exp EQ exp
-    | exp NE exp
-    | exp PLUS exp
-    | exp MINUS exp
-    | exp MULT exp
-    | exp DIV exp
-    | exp EXP_OP exp
-    | literal
+//////////////////////////
+// EXPRESSIONS COM NÍVEIS
+//////////////////////////
+
+expression:
+      or_exp
+    ;
+
+or_exp:
+      or_exp OR and_exp
+    | and_exp
+    ;
+
+and_exp:
+      and_exp AND not_exp
+    | not_exp
+    ;
+
+not_exp:
+      NOT not_exp
+    | rel_exp
+    ;
+
+rel_exp:
+      rel_exp LT add_exp
+    | rel_exp LE add_exp
+    | rel_exp GT add_exp
+    | rel_exp GE add_exp
+    | rel_exp EQ add_exp
+    | rel_exp NE add_exp
+    | add_exp
+    ;
+
+add_exp:
+      add_exp PLUS mult_exp
+    | add_exp MINUS mult_exp
+    | mult_exp
+    ;
+
+mult_exp:
+      mult_exp MULT exp_exp
+    | mult_exp DIV exp_exp
+    | exp_exp
+    ;
+
+exp_exp:
+      unary_exp EXP_OP exp_exp
+    | unary_exp
+    ;
+
+unary_exp:
+      MINUS unary_exp
+    | primary_exp
+    ;
+
+primary_exp:
+      literal
     | call_stmt
     | NEW NAME
     | var
     | ref_var
     | deref_var
-    | '(' exp ')'
+    | '(' expression ')'
+    ;
+
+//////////////////////////
+// VARIÁVEIS
+//////////////////////////
+
+var:
+      NAME var_suffix
+    ;
+
+var_suffix:
+      /* vazio */
+    | '.' NAME var_suffix
     ;
 
 ref_var:
@@ -204,10 +257,9 @@ deref_var:
     | DEREF '(' deref_var ')'
     ;
 
-var:
-      NAME
-    | exp '.' NAME
-    ;
+//////////////////////////
+// LITERAIS
+//////////////////////////
 
 literal:
       FLOAT_LITERAL
@@ -221,6 +273,10 @@ bool_literal:
       TRUE
     | FALSE
     ;
+
+//////////////////////////
+// TIPOS
+//////////////////////////
 
 type:
       FLOAT_T
