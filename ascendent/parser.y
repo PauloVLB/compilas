@@ -14,7 +14,7 @@ int yylex(void);
 %token <str> FLOAT_LITERAL INT_LITERAL STRING_LITERAL
 %token TRUE FALSE NULL_LIT
 
-%token PROGRAM BEGIN END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT
+%token PROGRAM BEGIN_TOK END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT
 
 %token ASSIGN        // :=
 %token AND OR
@@ -36,7 +36,7 @@ int yylex(void);
 %%
 
 program:
-    PROGRAM NAME BEGIN opt_decls END
+    PROGRAM NAME BEGIN_TOK opt_decls END
     ;
 
 opt_decls:
@@ -85,7 +85,7 @@ opt_type:
     ;
 
 block:
-    BEGIN proc_body_opt stmt_list END
+    BEGIN_TOK proc_body_opt stmt_list END
     ;
 
 proc_body_opt:
