@@ -80,11 +80,10 @@ float {update_token(yytext); return yytokentype::FLOAT_T;}
 int {update_token(yytext); return yytokentype::INT_T;}
 string {update_token(yytext); return yytokentype::STRING_T;}
 bool {update_token(yytext); return yytokentype::BOOL_T;}
-array {update_token(yytext); return 1;}
-of {update_token(yytext); return 1;}
+array {update_token(yytext); return yytokentype::ARRAY;}
+of {update_token(yytext); return yytokentype::OF;}
 true {update_token(yytext); return yytokentype::TRUE;}
 false {update_token(yytext); return yytokentype::FALSE;}
-print {update_token(yytext); return 1;}
 \( {update_token(yytext); return '(';}
 \) {update_token(yytext); return ')';}
 

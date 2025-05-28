@@ -14,7 +14,7 @@ int yylex(void);
 %token <str> FLOAT_LITERAL INT_LITERAL STRING_LITERAL
 %token TRUE FALSE NULL_LIT
 
-%token PROGRAM BEGIN_TOK END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT
+%token PROGRAM BEGIN_TOK END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT ARRAY OF
 
 %token ASSIGN        // :=
 %token AND OR
@@ -246,6 +246,7 @@ var:
 var_suffix:
       /* vazio */
     | '.' NAME var_suffix
+    | '[' expression ']' var_suffix
     ;
 
 ref_var:
@@ -285,6 +286,7 @@ type:
     | BOOL_T
     | NAME
     | REF '(' type ')'
+    | ARRAY '[' INT_LITERAL ']' OF type
     ;
 
 %%

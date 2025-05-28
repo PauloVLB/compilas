@@ -80,24 +80,26 @@ extern int yydebug;
     DEREF = 281,                   /* DEREF  */
     REF = 282,                     /* REF  */
     NOT = 283,                     /* NOT  */
-    ASSIGN = 284,                  /* ASSIGN  */
-    AND = 285,                     /* AND  */
-    OR = 286,                      /* OR  */
-    LT = 287,                      /* LT  */
-    LE = 288,                      /* LE  */
-    GT = 289,                      /* GT  */
-    GE = 290,                      /* GE  */
-    EQ = 291,                      /* EQ  */
-    NE = 292,                      /* NE  */
-    PLUS = 293,                    /* PLUS  */
-    MINUS = 294,                   /* MINUS  */
-    MULT = 295,                    /* MULT  */
-    DIV = 296,                     /* DIV  */
-    EXP_OP = 297,                  /* EXP_OP  */
-    FLOAT_T = 298,                 /* FLOAT_T  */
-    INT_T = 299,                   /* INT_T  */
-    STRING_T = 300,                /* STRING_T  */
-    BOOL_T = 301                   /* BOOL_T  */
+    ARRAY = 284,                   /* ARRAY  */
+    OF = 285,                      /* OF  */
+    ASSIGN = 286,                  /* ASSIGN  */
+    AND = 287,                     /* AND  */
+    OR = 288,                      /* OR  */
+    LT = 289,                      /* LT  */
+    LE = 290,                      /* LE  */
+    GT = 291,                      /* GT  */
+    GE = 292,                      /* GE  */
+    EQ = 293,                      /* EQ  */
+    NE = 294,                      /* NE  */
+    PLUS = 295,                    /* PLUS  */
+    MINUS = 296,                   /* MINUS  */
+    MULT = 297,                    /* MULT  */
+    DIV = 298,                     /* DIV  */
+    EXP_OP = 299,                  /* EXP_OP  */
+    FLOAT_T = 300,                 /* FLOAT_T  */
+    INT_T = 301,                   /* INT_T  */
+    STRING_T = 302,                /* STRING_T  */
+    BOOL_T = 303                   /* BOOL_T  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -110,7 +112,7 @@ union YYSTYPE
 
     char* str;
 
-#line 114 "parser.hpp"
+#line 116 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
