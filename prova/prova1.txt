@@ -1,0 +1,25 @@
+program media
+    begin
+        procedure main ( )
+            begin
+                var x : int;
+                var soma : int;
+                var count : int
+            in
+                soma := 0;
+                count := 0;
+                x := readint();
+                while x <> 0 do
+                    soma := soma + x;
+                    count := count + 1;
+                    x := readint()
+                od;
+
+                if soma = 0 then
+                    printint(soma)
+                else
+                    printfloat(soma/count)
+                fi
+
+            end
+    end
