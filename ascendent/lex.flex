@@ -7,16 +7,19 @@
 #include "parser.hpp"
 #include <iostream>
 std::string current_token;
-//std::unordered_map<std::string, std::stack<std::string>> symbol_table::table;
+//std::vector<std::unordered_map<std::string, TokenInfo>> SymbolTable::scopes;
 int nLinhas = 1;
 int nColunas = 0;
 
 
 void update_token(std::string token_name, std::string yytxt="") {
     if(token_name == "ignore") {
+        // std::cout << "Ignore" << std::endl;
         nColunas += yyleng;
         return;
     }
+
+    // SymbolTable::print_all();
 
     if(token_name == "\n" || token_name == "\r\n") {
         nLinhas++;

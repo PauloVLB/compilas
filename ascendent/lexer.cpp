@@ -562,16 +562,19 @@ char *yytext;
 #include "parser.hpp"
 #include <iostream>
 std::string current_token;
-//std::unordered_map<std::string, std::stack<std::string>> symbol_table::table;
+//std::vector<std::unordered_map<std::string, TokenInfo>> SymbolTable::scopes;
 int nLinhas = 1;
 int nColunas = 0;
 
 
 void update_token(std::string token_name, std::string yytxt="") {
     if(token_name == "ignore") {
+        // std::cout << "Ignore" << std::endl;
         nColunas += yyleng;
         return;
     }
+
+    // SymbolTable::print_all();
 
     if(token_name == "\n" || token_name == "\r\n") {
         nLinhas++;
@@ -594,8 +597,8 @@ void comment(std::string yytxt) {
     }
 }
 
-#line 598 "lexer.cpp"
-#line 599 "lexer.cpp"
+#line 601 "lexer.cpp"
+#line 602 "lexer.cpp"
 
 #define INITIAL 0
 
@@ -812,10 +815,10 @@ YY_DECL
 		}
 
 	{
-#line 57 "lex.flex"
+#line 60 "lex.flex"
 
 
-#line 819 "lexer.cpp"
+#line 822 "lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -875,316 +878,316 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 59 "lex.flex"
+#line 62 "lex.flex"
 {comment(yytext);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 60 "lex.flex"
+#line 63 "lex.flex"
 {comment(yytext);}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 61 "lex.flex"
+#line 64 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::PROGRAM;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 62 "lex.flex"
+#line 65 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::BEGIN_TOK;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 63 "lex.flex"
+#line 66 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::END;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 64 "lex.flex"
+#line 67 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::VAR;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 65 "lex.flex"
+#line 68 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::PROCEDURE;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 66 "lex.flex"
+#line 69 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::IN;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 67 "lex.flex"
+#line 70 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::STRUCT;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 68 "lex.flex"
+#line 71 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::NOT;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 69 "lex.flex"
+#line 72 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::NEW;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 70 "lex.flex"
+#line 73 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::REF;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 71 "lex.flex"
+#line 74 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::DEREF;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 72 "lex.flex"
+#line 75 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::IF;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 73 "lex.flex"
+#line 76 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::THEN;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 74 "lex.flex"
+#line 77 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::ELSE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 75 "lex.flex"
+#line 78 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::FI;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 76 "lex.flex"
+#line 79 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::WHILE;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 77 "lex.flex"
+#line 80 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::DO;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 78 "lex.flex"
+#line 81 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::OD;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 79 "lex.flex"
+#line 82 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::RETURN;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 80 "lex.flex"
+#line 83 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::FLOAT_T;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 81 "lex.flex"
+#line 84 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::INT_T;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 82 "lex.flex"
+#line 85 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::STRING_T;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 83 "lex.flex"
+#line 86 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::BOOL_T;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 84 "lex.flex"
+#line 87 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::ARRAY;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 85 "lex.flex"
+#line 88 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::OF;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 86 "lex.flex"
+#line 89 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::TRUE;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 87 "lex.flex"
+#line 90 "lex.flex"
 {update_token(yytext); return yy::parser::token::yytokentype::FALSE;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 88 "lex.flex"
+#line 91 "lex.flex"
 {update_token(yytext); return '(';}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 89 "lex.flex"
+#line 92 "lex.flex"
 {update_token(yytext); return ')';}
 	YY_BREAK
 case 32:
 /* rule 32 can match eol */
 YY_RULE_SETUP
-#line 91 "lex.flex"
+#line 94 "lex.flex"
 {update_token("STRING_LITERAL", yytext);return yy::parser::token::yytokentype::STRING_LITERAL;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 92 "lex.flex"
+#line 95 "lex.flex"
 {update_token("NAME", yytext); return yy::parser::token::yytokentype::NAME;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 93 "lex.flex"
+#line 96 "lex.flex"
 {update_token("INT_LITERAL", yytext);return yy::parser::token::yytokentype::INT_LITERAL;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 94 "lex.flex"
+#line 97 "lex.flex"
 {update_token("FLOAT_LITERAL", yytext);return yy::parser::token::yytokentype::FLOAT_LITERAL;}
 	YY_BREAK
 case 36:
 /* rule 36 can match eol */
 YY_RULE_SETUP
-#line 95 "lex.flex"
+#line 98 "lex.flex"
 {update_token("\n");}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 97 "lex.flex"
+#line 100 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::AND;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 98 "lex.flex"
+#line 101 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::OR;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 100 "lex.flex"
+#line 103 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::PLUS;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 101 "lex.flex"
+#line 104 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::MINUS;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 102 "lex.flex"
+#line 105 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::MULT;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 103 "lex.flex"
+#line 106 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::DIV;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 104 "lex.flex"
+#line 107 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::ASSIGN;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 105 "lex.flex"
+#line 108 "lex.flex"
 {update_token(yytext);return ';';}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 107 "lex.flex"
+#line 110 "lex.flex"
 {update_token(yytext); return '[';}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 108 "lex.flex"
+#line 111 "lex.flex"
 {update_token(yytext); return ']';}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 109 "lex.flex"
+#line 112 "lex.flex"
 {update_token(yytext); return '{';}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 110 "lex.flex"
+#line 113 "lex.flex"
 {update_token(yytext); return '}';}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 111 "lex.flex"
+#line 114 "lex.flex"
 {update_token(yytext); return ':';}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 112 "lex.flex"
+#line 115 "lex.flex"
 {update_token(yytext); return '.';}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 113 "lex.flex"
+#line 116 "lex.flex"
 {update_token(yytext); return ',';}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 114 "lex.flex"
+#line 117 "lex.flex"
 {update_token(yytext); return '^';}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 115 "lex.flex"
+#line 118 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::NE;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 117 "lex.flex"
+#line 120 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::EQ;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 118 "lex.flex"
+#line 121 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::LT;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 119 "lex.flex"
+#line 122 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::GT;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 120 "lex.flex"
+#line 123 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::LE;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 121 "lex.flex"
+#line 124 "lex.flex"
 {update_token(yytext);return yy::parser::token::yytokentype::GE;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 123 "lex.flex"
+#line 126 "lex.flex"
 {update_token("$"); return 0;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 124 "lex.flex"
+#line 127 "lex.flex"
 {update_token("ignore");}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 126 "lex.flex"
+#line 129 "lex.flex"
 {printf("\nERRO %d %d\n", nLinhas, nColunas); return 0;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 128 "lex.flex"
+#line 131 "lex.flex"
 ECHO;
 	YY_BREAK
-#line 1188 "lexer.cpp"
+#line 1191 "lexer.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2187,6 +2190,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 128 "lex.flex"
+#line 131 "lex.flex"
 
 

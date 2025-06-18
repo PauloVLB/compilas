@@ -213,10 +213,6 @@ namespace yy {
         value.YY_MOVE_OR_COPY< TypedAttr > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_NAME: // NAME
-        value.YY_MOVE_OR_COPY< std::string > (YY_MOVE (that.value));
-        break;
-
       default:
         break;
     }
@@ -246,10 +242,6 @@ namespace yy {
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_type: // type
         value.move< TypedAttr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_NAME: // NAME
-        value.move< std::string > (YY_MOVE (that.value));
         break;
 
       default:
@@ -283,10 +275,6 @@ namespace yy {
         value.copy< TypedAttr > (that.value);
         break;
 
-      case symbol_kind::S_NAME: // NAME
-        value.copy< std::string > (that.value);
-        break;
-
       default:
         break;
     }
@@ -314,10 +302,6 @@ namespace yy {
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_type: // type
         value.move< TypedAttr > (that.value);
-        break;
-
-      case symbol_kind::S_NAME: // NAME
-        value.move< std::string > (that.value);
         break;
 
       default:
@@ -590,10 +574,6 @@ namespace yy {
         yylhs.value.emplace< TypedAttr > ();
         break;
 
-      case symbol_kind::S_NAME: // NAME
-        yylhs.value.emplace< std::string > ();
-        break;
-
       default:
         break;
     }
@@ -610,7 +590,8 @@ namespace yy {
             {
   case 2: // program: PROGRAM NAME BEGIN_TOK opt_decls END
 #line 56 "parser.y"
-    {
+    {   
+        // std::cout << "quawuda" << std::endl;
         yylhs.value.as < BoolAttr > ().ok = yystack_[1].value.as < BoolAttr > ().ok;
         if(yylhs.value.as < BoolAttr > ().ok) {
             printf("Análise sintática concluída com sucesso!\n");
@@ -619,173 +600,184 @@ namespace yy {
             printf("Erro de tipo encontrado no programa.\n");
 		}
     }
-#line 623 "parser.cpp"
+#line 604 "parser.cpp"
     break;
 
   case 3: // opt_decls: %empty
-#line 69 "parser.y"
+#line 70 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = true;
     }
-#line 631 "parser.cpp"
+#line 612 "parser.cpp"
     break;
 
   case 4: // opt_decls: decl decl_tail
-#line 73 "parser.y"
+#line 74 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = yystack_[1].value.as < BoolAttr > ().ok && yystack_[0].value.as < BoolAttr > ().ok;
     }
-#line 639 "parser.cpp"
+#line 620 "parser.cpp"
     break;
 
   case 5: // decl_tail: %empty
-#line 80 "parser.y"
+#line 81 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = true;
     }
-#line 647 "parser.cpp"
+#line 628 "parser.cpp"
     break;
 
   case 6: // decl_tail: ';' decl decl_tail
-#line 84 "parser.y"
+#line 85 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = yystack_[1].value.as < BoolAttr > ().ok && yystack_[0].value.as < BoolAttr > ().ok;
     }
-#line 655 "parser.cpp"
+#line 636 "parser.cpp"
     break;
 
   case 7: // decl: var_decl
-#line 91 "parser.y"
+#line 92 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = yystack_[0].value.as < BoolAttr > ().ok;
     }
-#line 663 "parser.cpp"
+#line 644 "parser.cpp"
     break;
 
   case 8: // decl: proc_decl
-#line 95 "parser.y"
+#line 96 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = yystack_[0].value.as < BoolAttr > ().ok;
     }
-#line 671 "parser.cpp"
+#line 652 "parser.cpp"
     break;
 
   case 9: // decl: rec_decl
-#line 99 "parser.y"
+#line 100 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = yystack_[0].value.as < BoolAttr > ().ok;
     }
-#line 679 "parser.cpp"
+#line 660 "parser.cpp"
     break;
 
   case 10: // var_decl: VAR NAME ':' type var_init_opt
-#line 106 "parser.y"
+#line 107 "parser.y"
     {
         yystack_[0].value.as < TypedAttr > ().type = yystack_[1].value.as < TypedAttr > ().type;
-        bool insert_ok = SymbolTable::insert(yystack_[3].value.as < std::string > (), TokenInfo({}, yystack_[1].value.as < TypedAttr > ().type, Tag::VAR));
+        bool insert_ok = SymbolTable::insert("name", TokenInfo({}, yystack_[1].value.as < TypedAttr > ().type, Tag::VAR));
         if (!insert_ok) {
-            std::cout << "Erro: Variável '" << yystack_[3].value.as < std::string > () << "' já declarada." << std::endl;
+            std::cout << "Erro: Variável '" << "name" << "' já declarada." << std::endl;
             yylhs.value.as < BoolAttr > ().ok = false;
         } else {
             yylhs.value.as < BoolAttr > ().ok = yystack_[0].value.as < TypedAttr > ().ok;
         }
     }
-#line 694 "parser.cpp"
+#line 675 "parser.cpp"
     break;
 
   case 11: // var_decl: VAR NAME ASSIGN expression
-#line 117 "parser.y"
+#line 118 "parser.y"
     {
         yylhs.value.as < BoolAttr > ().ok = yystack_[0].value.as < TypedAttr > ().ok;
-        SymbolTable::insert(yystack_[2].value.as < std::string > (), TokenInfo({}, yystack_[0].value.as < TypedAttr > ().type, Tag::VAR));
+        SymbolTable::print_all();
+        SymbolTable::insert("name", TokenInfo({}, yystack_[0].value.as < TypedAttr > ().type, Tag::VAR));
+    }
+#line 685 "parser.cpp"
+    break;
+
+  case 12: // var_init_opt: %empty
+#line 127 "parser.y"
+    {
+        //$$.ok = true;
+        //$$.type = "bool";
+    }
+#line 694 "parser.cpp"
+    break;
+
+  case 13: // var_init_opt: ASSIGN expression
+#line 132 "parser.y"
+    {
+        // $$.ok = true;
+        // $$.type = "bool";
     }
 #line 703 "parser.cpp"
     break;
 
-  case 12: // var_init_opt: %empty
-#line 125 "parser.y"
+  case 14: // proc_decl: PROCEDURE NAME '(' opt_param_list ')' opt_type block
+#line 140 "parser.y"
     {
-        yylhs.value.as < TypedAttr > ().ok = true;
+        yylhs.value.as < BoolAttr > ().ok = true;
     }
 #line 711 "parser.cpp"
     break;
 
-  case 13: // var_init_opt: ASSIGN expression
-#line 129 "parser.y"
+  case 24: // rec_decl: STRUCT NAME '{' opt_paramfield_decls '}'
+#line 171 "parser.y"
     {
-
+        yylhs.value.as < BoolAttr > ().ok = true;
     }
 #line 719 "parser.cpp"
     break;
 
-  case 14: // proc_decl: PROCEDURE NAME '(' opt_param_list ')' opt_type block
-#line 136 "parser.y"
+  case 31: // stmt_list: stmt stmt_tail
+#line 193 "parser.y"
     {
-        yylhs.value.as < BoolAttr > ().ok = true;
+        std::cout << "Socorro" << std::endl;
     }
 #line 727 "parser.cpp"
     break;
 
-  case 24: // rec_decl: STRUCT NAME '{' opt_paramfield_decls '}'
-#line 167 "parser.y"
-    {
-        yylhs.value.as < BoolAttr > ().ok = true;
-    }
-#line 735 "parser.cpp"
-    break;
-
   case 53: // expression: or_exp
-#line 251 "parser.y"
+#line 258 "parser.y"
       {
         yylhs.value.as < TypedAttr > ().ok = true;
         yylhs.value.as < TypedAttr > ().type = "ERR";
       }
-#line 744 "parser.cpp"
+#line 736 "parser.cpp"
     break;
 
   case 98: // type: FLOAT_T
-#line 360 "parser.y"
+#line 367 "parser.y"
       {
         yylhs.value.as < TypedAttr > ().ok = true;
         yylhs.value.as < TypedAttr > ().type = "FLOAT";
       }
-#line 753 "parser.cpp"
+#line 745 "parser.cpp"
     break;
 
   case 99: // type: INT_T
-#line 365 "parser.y"
+#line 372 "parser.y"
     {
         yylhs.value.as < TypedAttr > ().ok = true;
         yylhs.value.as < TypedAttr > ().type = "INT";
     }
-#line 762 "parser.cpp"
+#line 754 "parser.cpp"
     break;
 
   case 100: // type: STRING_T
-#line 370 "parser.y"
+#line 377 "parser.y"
     {
         yylhs.value.as < TypedAttr > ().ok = true;
         yylhs.value.as < TypedAttr > ().type = "STRING";
     }
-#line 771 "parser.cpp"
+#line 763 "parser.cpp"
     break;
 
   case 101: // type: BOOL_T
-#line 375 "parser.y"
+#line 382 "parser.y"
     {
         yylhs.value.as < TypedAttr > ().ok = true;
         yylhs.value.as < TypedAttr > ().type = "BOOL";
     }
-#line 780 "parser.cpp"
+#line 772 "parser.cpp"
     break;
 
   case 102: // type: NAME
-#line 380 "parser.y"
+#line 387 "parser.y"
     {
-        auto lookup_result = SymbolTable::lookup(yystack_[0].value.as < std::string > ());
+        auto lookup_result = SymbolTable::lookup("name");
         if (lookup_result) {
             if (lookup_result->tag != Tag::STRUCT) {
-                std::cout << "Erro: '" << yystack_[0].value.as < std::string > () << "' não é um tipo." << std::endl;
+                std::cout << "Erro: '" << "name" << "' não é um tipo." << std::endl;
                 yylhs.value.as < TypedAttr > ().ok = false;
                 yylhs.value.as < TypedAttr > ().type = "ERR";
             }
@@ -794,25 +786,25 @@ namespace yy {
                 yylhs.value.as < TypedAttr > ().type = lookup_result->type;
             }
         } else {
-            std::cout << "Erro: Tipo '" << yystack_[0].value.as < std::string > () << "' não declarado." << std::endl;
+            std::cout << "Erro: Tipo '" << "name" << "' não declarado." << std::endl;
             yylhs.value.as < TypedAttr > ().ok = false;
             yylhs.value.as < TypedAttr > ().type = "ERR";
         }
     }
-#line 803 "parser.cpp"
+#line 795 "parser.cpp"
     break;
 
   case 103: // type: REF '(' type ')'
-#line 399 "parser.y"
+#line 406 "parser.y"
     {
         yylhs.value.as < TypedAttr > ().ok = yystack_[1].value.as < TypedAttr > ().ok;
         yylhs.value.as < TypedAttr > ().type = yystack_[1].value.as < TypedAttr > ().type;
     }
-#line 812 "parser.cpp"
+#line 804 "parser.cpp"
     break;
 
 
-#line 816 "parser.cpp"
+#line 808 "parser.cpp"
 
             default:
               break;
@@ -1369,17 +1361,17 @@ namespace yy {
   const short
   parser::yyrline_[] =
   {
-       0,    55,    55,    69,    72,    80,    83,    90,    94,    98,
-     105,   116,   125,   128,   135,   141,   143,   146,   148,   151,
-     153,   157,   160,   162,   166,   172,   174,   177,   179,   183,
-     186,   188,   191,   193,   197,   198,   199,   200,   201,   205,
-     206,   210,   213,   215,   219,   223,   226,   228,   232,   235,
-     237,   240,   242,   250,   258,   259,   263,   264,   268,   269,
-     273,   274,   275,   276,   277,   278,   279,   283,   284,   285,
-     289,   290,   291,   295,   296,   300,   301,   305,   306,   307,
-     308,   309,   310,   311,   319,   322,   324,   325,   329,   333,
-     334,   342,   343,   344,   345,   346,   350,   351,   359,   364,
-     369,   374,   379,   398,   403
+       0,    55,    55,    70,    73,    81,    84,    91,    95,    99,
+     106,   117,   127,   131,   139,   145,   147,   150,   152,   155,
+     157,   161,   164,   166,   170,   176,   178,   181,   183,   187,
+     190,   192,   198,   200,   204,   205,   206,   207,   208,   212,
+     213,   217,   220,   222,   226,   230,   233,   235,   239,   242,
+     244,   247,   249,   257,   265,   266,   270,   271,   275,   276,
+     280,   281,   282,   283,   284,   285,   286,   290,   291,   292,
+     296,   297,   298,   302,   303,   307,   308,   312,   313,   314,
+     315,   316,   317,   318,   326,   329,   331,   332,   336,   340,
+     341,   349,   350,   351,   352,   353,   357,   358,   366,   371,
+     376,   381,   386,   405,   410
   };
 
   void
@@ -1411,9 +1403,9 @@ namespace yy {
 
 
 } // yy
-#line 1415 "parser.cpp"
+#line 1407 "parser.cpp"
 
-#line 406 "parser.y"
+#line 413 "parser.y"
 
 
 void yy::parser::error(const std::string& msg) {
@@ -1425,6 +1417,7 @@ void yyerror(const char *s) {
 }
 
 int main(void) {
+    SymbolTable::enter_scope();
     yy::parser parser;
     return parser.parse();
 }

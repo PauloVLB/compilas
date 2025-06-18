@@ -415,9 +415,6 @@ namespace yy {
       // expression
       // type
       char dummy2[sizeof (TypedAttr)];
-
-      // NAME
-      char dummy3[sizeof (std::string)];
     };
 
     /// The size of the largest semantic type.
@@ -683,10 +680,6 @@ namespace yy {
         value.move< TypedAttr > (std::move (that.value));
         break;
 
-      case symbol_kind::S_NAME: // NAME
-        value.move< std::string > (std::move (that.value));
-        break;
-
       default:
         break;
     }
@@ -732,18 +725,6 @@ namespace yy {
       {}
 #endif
 
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::string&& v)
-        : Base (t)
-        , value (std::move (v))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::string& v)
-        : Base (t)
-        , value (v)
-      {}
-#endif
-
       /// Destroy the symbol.
       ~basic_symbol ()
       {
@@ -782,10 +763,6 @@ switch (yykind)
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_type: // type
         value.template destroy< TypedAttr > ();
-        break;
-
-      case symbol_kind::S_NAME: // NAME
-        value.template destroy< std::string > ();
         break;
 
       default:
@@ -883,8 +860,7 @@ switch (yykind)
       {
 #if !defined _MSC_VER || defined __clang__
         YY_ASSERT (tok == token::YYEOF
-                   || (token::YYerror <= tok && tok <= token::YYUNDEF)
-                   || (token::FLOAT_LITERAL <= tok && tok <= token::BOOL_T)
+                   || (token::YYerror <= tok && tok <= token::BOOL_T)
                    || tok == 59
                    || tok == 58
                    || (40 <= tok && tok <= 41)
@@ -894,18 +870,6 @@ switch (yykind)
                    || tok == 46
                    || tok == 91
                    || tok == 93);
-#endif
-      }
-#if 201103L <= YY_CPLUSPLUS
-      symbol_type (int tok, std::string v)
-        : super_type (token_kind_type (tok), std::move (v))
-#else
-      symbol_type (int tok, const std::string& v)
-        : super_type (token_kind_type (tok), v)
-#endif
-      {
-#if !defined _MSC_VER || defined __clang__
-        YY_ASSERT (tok == token::NAME);
 #endif
       }
     };
@@ -1003,16 +967,16 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_NAME (std::string v)
+      make_NAME ()
       {
-        return symbol_type (token::NAME, std::move (v));
+        return symbol_type (token::NAME);
       }
 #else
       static
       symbol_type
-      make_NAME (const std::string& v)
+      make_NAME ()
       {
-        return symbol_type (token::NAME, v);
+        return symbol_type (token::NAME);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -2104,10 +2068,6 @@ switch (yykind)
         value.copy< TypedAttr > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_NAME: // NAME
-        value.copy< std::string > (YY_MOVE (that.value));
-        break;
-
       default:
         break;
     }
@@ -2153,10 +2113,6 @@ switch (yykind)
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_type: // type
         value.move< TypedAttr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_NAME: // NAME
-        value.move< std::string > (YY_MOVE (s.value));
         break;
 
       default:
@@ -2224,7 +2180,7 @@ switch (yykind)
 
 
 } // yy
-#line 2228 "parser.hpp"
+#line 2184 "parser.hpp"
 
 
 

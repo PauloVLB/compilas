@@ -51,19 +51,19 @@ class SymbolTable {
     private:
         static std::vector<std::unordered_map<std::string, TokenInfo>> scopes;
     
-        SymbolTable() {
-            enter_scope(); // escopo global
-        }
+        // SymbolTable() {
+        //     enter_scope(); // escopo global
+        // }
     
-        void enter_scope() {
+    public:
+        static void enter_scope() {
             scopes.emplace_back();
         }
     
-        void exit_scope() {
+        static void exit_scope() {
             if (!scopes.empty())
                 scopes.pop_back();
         }
-    public:
 
 
     static bool insert(const std::string& name, const TokenInfo& info) {

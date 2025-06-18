@@ -20,8 +20,8 @@ std::vector<std::unordered_map<std::string, TokenInfo>> SymbolTable::scopes;
 %}
 
 
-%token <std::string> NAME
-%token <std::string> FLOAT_LITERAL INT_LITERAL STRING_LITERAL
+%token NAME
+%token FLOAT_LITERAL INT_LITERAL STRING_LITERAL
 %token TRUE FALSE NULL_LIT
 
 %token PROGRAM BEGIN_TOK END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT ARRAY OF
@@ -53,7 +53,8 @@ std::vector<std::unordered_map<std::string, TokenInfo>> SymbolTable::scopes;
 
 program:
     PROGRAM NAME BEGIN_TOK opt_decls END
-    {
+    {   
+        // std::cout << "quawuda" << std::endl;
         $$.ok = $4.ok;
         if($$.ok) {
             printf("Análise sintática concluída com sucesso!\n");
@@ -105,9 +106,9 @@ var_decl:
       VAR NAME ':' type var_init_opt
     {
         $5.type = $4.type;
-        bool insert_ok = SymbolTable::insert($2, TokenInfo({}, $4.type, Tag::VAR));
+        bool insert_ok = SymbolTable::insert("name", TokenInfo({}, $4.type, Tag::VAR));
         if (!insert_ok) {
-            std::cout << "Erro: Variável '" << $2 << "' já declarada." << std::endl;
+            std::cout << "Erro: Variável '" << "name" << "' já declarada." << std::endl;
             $$.ok = false;
         } else {
             $$.ok = $5.ok;
@@ -116,18 +117,21 @@ var_decl:
     | VAR NAME ASSIGN expression
     {
         $$.ok = $4.ok;
-        SymbolTable::insert($2, TokenInfo({}, $4.type, Tag::VAR));
+        SymbolTable::print_all();
+        SymbolTable::insert("name", TokenInfo({}, $4.type, Tag::VAR));
     }
     ;
 
 var_init_opt:
       /* vazio */
     {
-        $$.ok = true;
+        //$$.ok = true;
+        //$$.type = "bool";
     }
     | ASSIGN expression
     {
-
+        // $$.ok = true;
+        // $$.type = "bool";
     }
     ;
 
@@ -186,6 +190,9 @@ paramfield_decl:
 stmt_list:
       /* vazio */
     | stmt stmt_tail
+    {
+        std::cout << "Socorro" << std::endl;
+    }
     ;
 
 stmt_tail:
@@ -378,10 +385,10 @@ type:
     }
     | NAME
     {
-        auto lookup_result = SymbolTable::lookup($1);
+        auto lookup_result = SymbolTable::lookup("name");
         if (lookup_result) {
             if (lookup_result->tag != Tag::STRUCT) {
-                std::cout << "Erro: '" << $1 << "' não é um tipo." << std::endl;
+                std::cout << "Erro: '" << "name" << "' não é um tipo." << std::endl;
                 $$.ok = false;
                 $$.type = "ERR";
             }
@@ -390,7 +397,7 @@ type:
                 $$.type = lookup_result->type;
             }
         } else {
-            std::cout << "Erro: Tipo '" << $1 << "' não declarado." << std::endl;
+            std::cout << "Erro: Tipo '" << "name" << "' não declarado." << std::endl;
             $$.ok = false;
             $$.type = "ERR";
         }
@@ -414,6 +421,7 @@ void yyerror(const char *s) {
 }
 
 int main(void) {
+    SymbolTable::enter_scope();
     yy::parser parser;
     return parser.parse();
 }

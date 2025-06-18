@@ -1,0 +1,17 @@
+program swapexample 
+    begin
+        procedure swap(a : ref(int), b : ref(int))
+        begin
+            
+        end;
+        procedure main()
+            begin
+                var x : int
+            in 
+
+            x := 2;
+            if swap(2, 3) then
+            fi
+                
+            end
+        end
