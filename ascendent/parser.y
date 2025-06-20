@@ -1,7 +1,3 @@
-%define api.value.type variant
-%define parse.error verbose
-%define api.token.constructor
-%define parse.assert
 
 
 %{
@@ -9,24 +5,33 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string>
+#include <iostream>
 
 #include "types/attrs.hpp"
 #include "symbol_table/symbol_table.hpp"
 
+extern int yylex();
 void yyerror(const char *s);
-int yylex(void);
 std::vector<std::unordered_map<std::string, TokenInfo>> SymbolTable::scopes;
 
 %}
 
+%union {
+    std::string* sval;
+    BoolAttr* b_attr;
+    TypedAttr* t_attr;
+}
 
-%token NAME
-%token FLOAT_LITERAL INT_LITERAL STRING_LITERAL
+
+%token <sval> NAME
+%token <sval> FLOAT_LITERAL INT_LITERAL STRING_LITERAL
 %token TRUE FALSE NULL_LIT
+
+%token LPAREN RPAREN SEMICOLON LBRACKET RBRACKET LBRACE RBRACE COLON DOT COMMA CARET
 
 %token PROGRAM BEGIN_TOK END VAR PROCEDURE STRUCT IN IF THEN ELSE FI WHILE DO OD RETURN NEW DEREF REF NOT ARRAY OF
 
-%token ASSIGN        // :=
+%token ASSIGN
 %token AND OR
 %token LT LE GT GE EQ NE
 %token PLUS MINUS MULT DIV EXP_OP
@@ -45,9 +50,9 @@ std::vector<std::unordered_map<std::string, TokenInfo>> SymbolTable::scopes;
 
 // ATRIBUTOS
 
-%type <BoolAttr> program opt_decls decl_tail decl var_decl proc_decl rec_decl
+%type <b_attr> program opt_decls decl_tail decl var_decl proc_decl rec_decl
 
-%type <TypedAttr> var_init_opt type expression
+%type <t_attr> var_init_opt type expression
 
 %%
 
@@ -55,90 +60,119 @@ program:
     PROGRAM NAME BEGIN_TOK opt_decls END
     {   
         // std::cout << "quawuda" << std::endl;
-        $$.ok = $4.ok;
-        if($$.ok) {
+        $$ = new BoolAttr();
+        $$->ok = $4->ok;
+        if($$->ok) {
             printf("Análise sintática concluída com sucesso!\n");
         }
-        if (!$$.ok) {
+        if (!$$->ok) {
             printf("Erro de tipo encontrado no programa.\n");
 		}
+        delete $2;
+        delete $4;
     }
     ;
 
 opt_decls:
       /* vazio */
     {
-        $$.ok = true;
+        $$ = new BoolAttr();
+        $$->ok = true;
     }
     | decl decl_tail
-    {
-        $$.ok = $1.ok && $2.ok;
+    {   
+        $$ = new BoolAttr();
+        $$->ok = $1->ok && $2->ok;
+        delete $1;
+        delete $2;
     }
     ;
 
 decl_tail:
       /* vazio */
     {
-        $$.ok = true;
+        $$ = new BoolAttr();
+        $$->ok = true;
     }
     | ';' decl decl_tail
     {
-        $$.ok = $2.ok && $3.ok;
+        $$->ok = $2->ok && $3->ok;
+        delete $2;
+        delete $3;
     }
     ;
 
 decl:
       var_decl
     {
-        $$.ok = $1.ok;
+        $$ = new BoolAttr();
+        $$->ok = $1->ok;
+        delete $1;
     }
     | proc_decl
     {
-        $$.ok = $1.ok;
+        $$ = new BoolAttr();
+        $$->ok = $1->ok;
+        delete $1;
     }
     | rec_decl
     {
-        $$.ok = $1.ok;
+        $$ = new BoolAttr();
+        $$->ok = $1->ok;
+        delete $1;
     }
     ;
 
 var_decl:
       VAR NAME ':' type var_init_opt
     {
-        $5.type = $4.type;
-        bool insert_ok = SymbolTable::insert("name", TokenInfo({}, $4.type, Tag::VAR));
+        $$ = new BoolAttr();
+        $5->type = $4->type;
+        bool insert_ok = SymbolTable::insert(*$2, TokenInfo({}, $4->type, Tag::VAR));
         if (!insert_ok) {
-            std::cout << "Erro: Variável '" << "name" << "' já declarada." << std::endl;
-            $$.ok = false;
+            std::cout << "Erro: Variável '" << *$2 << "' já declarada." << std::endl;
+            YYABORT;
+            $$->ok = false;
         } else {
-            $$.ok = $5.ok;
+            $$->ok = $5->ok;
         }
+        delete $2;
+        delete $4;
+        delete $5;
+        SymbolTable::print_all();
     }
     | VAR NAME ASSIGN expression
     {
-        $$.ok = $4.ok;
+        $$ = new BoolAttr();
+        $$->ok = $4->ok;
         SymbolTable::print_all();
-        SymbolTable::insert("name", TokenInfo({}, $4.type, Tag::VAR));
+        SymbolTable::insert(*$2, TokenInfo({}, $4->type, Tag::VAR));
+        delete $2;
+        delete $4;
+        SymbolTable::print_all();
     }
     ;
 
 var_init_opt:
       /* vazio */
     {
-        //$$.ok = true;
-        //$$.type = "bool";
+        $$ = new TypedAttr();
+        $$->ok = true;
+        $$->type = "bool";
     }
     | ASSIGN expression
     {
-        // $$.ok = true;
-        // $$.type = "bool";
+        $$ = new TypedAttr();
+        $$->ok = true;
+        $$->type = "bool";
     }
     ;
 
 proc_decl:
     PROCEDURE NAME '(' opt_param_list ')' opt_type block
     {
-        $$.ok = true;
+        $$ = new BoolAttr();
+        $$->ok = true;
     }
     ;
 
@@ -169,7 +203,8 @@ proc_body_opt:
 rec_decl:
     STRUCT NAME '{' opt_paramfield_decls '}'
     {
-        $$.ok = true;
+        $$ = new BoolAttr();
+        $$->ok = true;
     }
     ;
 
@@ -190,9 +225,6 @@ paramfield_decl:
 stmt_list:
       /* vazio */
     | stmt stmt_tail
-    {
-        std::cout << "Socorro" << std::endl;
-    }
     ;
 
 stmt_tail:
@@ -256,8 +288,9 @@ call_args_tail:
 expression:
       or_exp
       {
-        $$.ok = true;
-        $$.type = "ERR";
+        $$ = new TypedAttr();
+        $$->ok = true;
+        $$->type = "ERR";
       }
     ;
 
@@ -365,56 +398,74 @@ bool_literal:
 type:
       FLOAT_T
       {
-        $$.ok = true;
-        $$.type = "FLOAT";
+        $$ = new TypedAttr();
+        $$->ok = true;
+        $$->type = "FLOAT";
       }
     | INT_T
     {
-        $$.ok = true;
-        $$.type = "INT";
+        $$ = new TypedAttr();
+        $$->ok = true;
+        $$->type = "INT";
     }
     | STRING_T
     {
-        $$.ok = true;
-        $$.type = "STRING";
+        $$ = new TypedAttr();
+        $$->ok = true;
+        $$->type = "STRING";
     }
     | BOOL_T
     {
-        $$.ok = true;
-        $$.type = "BOOL";
+        $$ = new TypedAttr();
+        $$->ok = true;
+        $$->type = "BOOL";
     }
     | NAME
     {
+        $$ = new TypedAttr();
         auto lookup_result = SymbolTable::lookup("name");
         if (lookup_result) {
             if (lookup_result->tag != Tag::STRUCT) {
-                std::cout << "Erro: '" << "name" << "' não é um tipo." << std::endl;
-                $$.ok = false;
-                $$.type = "ERR";
+                std::cout << "Erro: '" << *$1 << "' não é um tipo." << std::endl;
+                YYABORT;
+                $$->ok = false;
+                $$->type = "ERR";
             }
             else {
-                $$.ok = true;
-                $$.type = lookup_result->type;
+                $$->ok = true;
+                $$->type = lookup_result->type;
             }
         } else {
-            std::cout << "Erro: Tipo '" << "name" << "' não declarado." << std::endl;
-            $$.ok = false;
-            $$.type = "ERR";
+            std::cout << "Erro: Tipo '" << *$1 << "' não declarado." << std::endl;
+            YYABORT;
+            $$->ok = false;
+            $$->type = "ERR";
         }
+        delete $1;
     }
     | REF '(' type ')'
     {
-        $$.ok = $3.ok;
-        $$.type = $3.type;
+        $$ = new TypedAttr();
+        $$->ok = $3->ok;
+        $$->type = $3->type;
+        delete $3;
     }
     | ARRAY '[' INT_LITERAL ']' OF type
+    {
+        $$ = new TypedAttr();
+        $$->ok = $6->ok;
+        // Aqui você deve construir o tipo do array.
+        // Por exemplo, você pode criar uma string como "ARRAY OF " + tipo_base.
+        if($$->ok) {
+            $$->type = "ARRAY OF " + $6->type; 
+        } else {
+            $$->type = "ERR";
+        }
+        delete $6;
+    }
     ;
 
 %%
-
-void yy::parser::error(const std::string& msg) {
-    std::cerr << "Erro de sintaxe: " << msg << std::endl;
-}
 
 void yyerror(const char *s) {
     fprintf(stderr, "Erro de sintaxe: %s\n", s);
@@ -422,6 +473,6 @@ void yyerror(const char *s) {
 
 int main(void) {
     SymbolTable::enter_scope();
-    yy::parser parser;
-    return parser.parse();
+    // yydebug = 1;
+    return yyparse();
 }

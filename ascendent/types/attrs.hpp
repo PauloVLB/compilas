@@ -15,4 +15,8 @@ typedef struct {
     bool ok;
 } BoolAttr;
 
+typedef struct {
+    std::string name;
+} NamedAttr;
+
 #endif

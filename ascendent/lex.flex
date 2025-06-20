@@ -1,13 +1,13 @@
 %option noyywrap
 
 %{
-//#include "symbol_table/symbol_table.hpp"
 #include <string>
 #include "types/attrs.hpp"
-#include "parser.hpp"
+#include "parser.tab.h"
 #include <iostream>
+extern YYSTYPE yylval;
+
 std::string current_token;
-//std::vector<std::unordered_map<std::string, TokenInfo>> SymbolTable::scopes;
 int nLinhas = 1;
 int nColunas = 0;
 
@@ -61,50 +61,66 @@ END_OF_FILE <<EOF>>
 
 \(\*{TUDO}*\*\) {comment(yytext);}
 \/\/.* {comment(yytext);}
-program {update_token(yytext); return yy::parser::token::yytokentype::PROGRAM;}
-begin {update_token(yytext); return yy::parser::token::yytokentype::BEGIN_TOK;}
-end {update_token(yytext); return yy::parser::token::yytokentype::END;}
-var {update_token(yytext); return yy::parser::token::yytokentype::VAR;}
-procedure {update_token(yytext); return yy::parser::token::yytokentype::PROCEDURE;}
-in {update_token(yytext); return yy::parser::token::yytokentype::IN;}
-struct {update_token(yytext); return yy::parser::token::yytokentype::STRUCT;}
-not {update_token(yytext); return yy::parser::token::yytokentype::NOT;}
-new {update_token(yytext); return yy::parser::token::yytokentype::NEW;}
-ref {update_token(yytext); return yy::parser::token::yytokentype::REF;}
-deref {update_token(yytext); return yy::parser::token::yytokentype::DEREF;}
-if {update_token(yytext); return yy::parser::token::yytokentype::IF;}
-then {update_token(yytext); return yy::parser::token::yytokentype::THEN;}
-else {update_token(yytext); return yy::parser::token::yytokentype::ELSE;}
-fi {update_token(yytext); return yy::parser::token::yytokentype::FI;}
-while {update_token(yytext); return yy::parser::token::yytokentype::WHILE;}
-do {update_token(yytext); return yy::parser::token::yytokentype::DO;}
-od {update_token(yytext); return yy::parser::token::yytokentype::OD;}
-return {update_token(yytext); return yy::parser::token::yytokentype::RETURN;}
-float {update_token(yytext); return yy::parser::token::yytokentype::FLOAT_T;}
-int {update_token(yytext); return yy::parser::token::yytokentype::INT_T;}
-string {update_token(yytext); return yy::parser::token::yytokentype::STRING_T;}
-bool {update_token(yytext); return yy::parser::token::yytokentype::BOOL_T;}
-array {update_token(yytext); return yy::parser::token::yytokentype::ARRAY;}
-of {update_token(yytext); return yy::parser::token::yytokentype::OF;}
-true {update_token(yytext); return yy::parser::token::yytokentype::TRUE;}
-false {update_token(yytext); return yy::parser::token::yytokentype::FALSE;}
+program {update_token(yytext); return PROGRAM;}
+begin {update_token(yytext); return BEGIN_TOK;}
+end {update_token(yytext); return END;}
+var {update_token(yytext); return VAR;}
+procedure {update_token(yytext); return PROCEDURE;}
+in {update_token(yytext); return IN;}
+struct {update_token(yytext); return STRUCT;}
+not {update_token(yytext); return NOT;}
+new {update_token(yytext); return NEW;}
+ref {update_token(yytext); return REF;}
+deref {update_token(yytext); return DEREF;}
+if {update_token(yytext); return IF;}
+then {update_token(yytext); return THEN;}
+else {update_token(yytext); return ELSE;}
+fi {update_token(yytext); return FI;}
+while {update_token(yytext); return WHILE;}
+do {update_token(yytext); return DO;}
+od {update_token(yytext); return OD;}
+return {update_token(yytext); return RETURN;}
+float {update_token(yytext); return FLOAT_T;}
+int {update_token(yytext); return INT_T;}
+string {update_token(yytext); return STRING_T;}
+bool {update_token(yytext); return BOOL_T;}
+array {update_token(yytext); return ARRAY;}
+of {update_token(yytext); return OF;}
+true {update_token(yytext); return TRUE;}
+false {update_token(yytext); return FALSE;}
 \( {update_token(yytext); return '(';}
 \) {update_token(yytext); return ')';}
 
-{STRING_LITERAL} {update_token("STRING_LITERAL", yytext);return yy::parser::token::yytokentype::STRING_LITERAL;}
-({ALPHA}({ALPHA}|{DIGIT}|\_)*({ALPHA}|{DIGIT}))|{ALPHA} {update_token("NAME", yytext); return yy::parser::token::yytokentype::NAME;}
-{DIGIT}+ {update_token("INT_LITERAL", yytext);return yy::parser::token::yytokentype::INT_LITERAL;}
-{DIGIT}+\.{DIGIT}+ {update_token("FLOAT_LITERAL", yytext);return yy::parser::token::yytokentype::FLOAT_LITERAL;}
+{STRING_LITERAL} {
+    update_token("STRING_LITERAL", yytext);
+    yylval.sval = new std::string(yytext);
+    return STRING_LITERAL;
+}
+({ALPHA}({ALPHA}|{DIGIT}|\_)*({ALPHA}|{DIGIT}))|{ALPHA} {
+    update_token("NAME", yytext);
+    yylval.sval = new std::string(yytext);
+    return NAME;
+}
+{DIGIT}+ {
+    update_token("INT_LITERAL", yytext);
+    yylval.sval = new std::string(yytext);
+    return INT_LITERAL;
+}
+{DIGIT}+\.{DIGIT}+ {
+    update_token("FLOAT_LITERAL", yytext);
+    yylval.sval = new std::string(yytext);
+    return FLOAT_LITERAL;
+}
 \n {update_token("\n");}
 
-\&\& {update_token(yytext);return yy::parser::token::yytokentype::AND;}
-\|\| {update_token(yytext);return yy::parser::token::yytokentype::OR;}
+\&\& {update_token(yytext);return AND;}
+\|\| {update_token(yytext);return OR;}
 
-"+" {update_token(yytext);return yy::parser::token::yytokentype::PLUS;}
-"-" {update_token(yytext);return yy::parser::token::yytokentype::MINUS;}
-"*" {update_token(yytext);return yy::parser::token::yytokentype::MULT;}
-"/" {update_token(yytext);return yy::parser::token::yytokentype::DIV;}
-":=" {update_token(yytext);return yy::parser::token::yytokentype::ASSIGN;}
+"+" {update_token(yytext);return PLUS;}
+"-" {update_token(yytext);return MINUS;}
+"*" {update_token(yytext);return MULT;}
+"/" {update_token(yytext);return DIV;}
+":=" {update_token(yytext);return ASSIGN;}
 ";" {update_token(yytext);return ';';}
 
 "[" {update_token(yytext); return '[';}
@@ -115,13 +131,13 @@ false {update_token(yytext); return yy::parser::token::yytokentype::FALSE;}
 "." {update_token(yytext); return '.';}
 "," {update_token(yytext); return ',';}
 "^" {update_token(yytext); return '^';}
-"<>" {update_token(yytext);return yy::parser::token::yytokentype::NE;}
+"<>" {update_token(yytext);return NE;}
 
-"=" {update_token(yytext);return yy::parser::token::yytokentype::EQ;}
-"<" {update_token(yytext);return yy::parser::token::yytokentype::LT;}
-">" {update_token(yytext);return yy::parser::token::yytokentype::GT;}
-"<=" {update_token(yytext);return yy::parser::token::yytokentype::LE;}
-">=" {update_token(yytext);return yy::parser::token::yytokentype::GE;}
+"=" {update_token(yytext);return EQ;}
+"<" {update_token(yytext);return LT;}
+">" {update_token(yytext);return GT;}
+"<=" {update_token(yytext);return LE;}
+">=" {update_token(yytext);return GE;}
 
 <<EOF>> {update_token("$"); return 0;}
 " " {update_token("ignore");}
