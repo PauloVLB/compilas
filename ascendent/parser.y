@@ -719,6 +719,7 @@ rel_exp: rel_exp LT add_exp {
 }
 | add_exp {
   $$ = new TypedAttr();
+ 
   $$->ok = $1->ok;
   $$->type = $1->type;
   delete $1;
@@ -728,6 +729,20 @@ rel_exp: rel_exp LT add_exp {
 
 add_exp:
       add_exp PLUS mult_exp
+    {
+        $$ = new TypedAttr();
+        $$->ok = $1->ok && $3->ok;
+        if ($$->ok && ($1->type == "INT" || $1->type == "FLOAT") && ($3->type == "INT" || $3->type == "FLOAT")) {
+            $$->type = ($1->type == "FLOAT" || $3->type == "FLOAT") ? "FLOAT" : "INT";
+        } else {
+            std::cout << "Erro de tipo: Operandos de adição/subtração devem ser numéricos." << std::endl;
+            YYABORT;
+            $$->ok = false;
+            $$->type = "ERR";
+        }
+        delete $1;
+        delete $3;
+    }
     | add_exp MINUS mult_exp
     {
         $$ = new TypedAttr();
@@ -754,6 +769,20 @@ add_exp:
 
 mult_exp:
       mult_exp MULT exp_exp
+    {
+        $$ = new TypedAttr();
+        $$->ok = $1->ok && $3->ok;
+        if ($$->ok && ($1->type == "INT" || $1->type == "FLOAT") && ($3->type == "INT" || $3->type == "FLOAT")) {
+            $$->type = ($1->type == "FLOAT" || $3->type == "FLOAT") ? "FLOAT" : "INT";
+        } else {
+            std::cout << "Erro de tipo: Operandos de multiplicação/divisão devem ser numéricos." << std::endl;
+            YYABORT;
+            $$->ok = false;
+            $$->type = "ERR";
+        }
+        delete $1;
+        delete $3;
+    }
     | mult_exp DIV exp_exp
     {
         $$ = new TypedAttr();
