@@ -13,7 +13,8 @@
 enum class Tag {
     VAR,
     PROC,
-    STRUCT
+    STRUCT,
+    PROC_PARAM
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Tag& tag) {
@@ -21,6 +22,7 @@ inline std::ostream& operator<<(std::ostream& os, const Tag& tag) {
         case Tag::VAR: os << "VAR"; break;
         case Tag::PROC: os << "PROC"; break;
         case Tag::STRUCT: os << "STRUCT"; break;
+        case Tag::PROC_PARAM: os << "PROC_PARAM"; break;
     }
     return os;
 }

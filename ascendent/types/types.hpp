@@ -67,7 +67,7 @@ struct Tipo {
 };
 
 
-std::string to_string(const Tipo& tipo) {
+inline std::string to_string(const Tipo& tipo) {
     switch (tipo.tag) {
         case TipoTag::BASE:
             switch (tipo.base) {

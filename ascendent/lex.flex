@@ -1,10 +1,12 @@
 %option noyywrap
 
 %{
+#include <vector> 
 #include <string>
 #include "types/attrs.hpp"
 #include "parser.tab.h"
 #include <iostream>
+
 extern YYSTYPE yylval;
 
 std::string current_token;

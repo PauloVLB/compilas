@@ -4,7 +4,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -g
 
 # Arquivos fonte que você escreveu
-# SOURCES = main.cpp symbol_table.cpp # Adicione aqui seus outros arquivos .cpp
+SOURCES = main.cpp symbol_table/symbol_table.cpp # Uncomment and add your .cpp files here
 
 # Alvo final
 TARGET = syntax_asc
