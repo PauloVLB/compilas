@@ -47,7 +47,13 @@ inline std::ostream& operator<<(std::ostream& os, const TokenInfo& info) {
     for (const auto& type : info.paramList) {
         os << type << ", ";
     }
-    os << "], type: " << info.type << ", tag: " << info.tag << ")";
+    os << "], type: " << info.type << ", tag: " << info.tag;
+    os << ", members: {";
+    for (const auto& [name, type] : info.members) {
+        os << name << ": " << type << ", ";
+    }
+    os << "})";
+
     return os;
 }
 
