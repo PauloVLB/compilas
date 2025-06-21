@@ -447,7 +447,13 @@ while_stmt:
     WHILE expression DO stmt_list OD
     {
         $$ = new BoolAttr();
-        $$->ok = $2->ok && $4->ok;
+        if ($2->type != "BOOL") {
+            std::cout << "Erro de tipo: Condição do WHILE deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
+            YYABORT;
+            $$->ok = false;
+        } else {
+            $$->ok = $2->ok && $4->ok;
+        }
         delete $2;
         delete $4;
     }
@@ -627,35 +633,98 @@ not_exp:
     }
     ;
 
-rel_exp:
-      rel_exp LT add_exp
-    | rel_exp LE add_exp
-    | rel_exp GT add_exp
-    | rel_exp GE add_exp
-    | rel_exp EQ add_exp
-    | rel_exp NE add_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && $1->type == $3->type) {
-            $$->type = "BOOL";
-        } else {
-            std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
-    }
-    | add_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
-    ;
+rel_exp: rel_exp LT add_exp {
+  $$ = new TypedAttr();
+  $$->ok = $1->ok && $3->ok;
+  if ($$->ok && $1->type == $3->type) {
+    $$->type = "BOOL";
+  } else {
+    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
+    YYABORT;
+    $$->ok = false;
+    $$->type = "ERR";
+  }
+  delete $1;
+  delete $3;
+}
+| rel_exp LE add_exp {
+  $$ = new TypedAttr();
+  $$->ok = $1->ok && $3->ok;
+  if ($$->ok && $1->type == $3->type) {
+    $$->type = "BOOL";
+  } else {
+    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
+    YYABORT;
+    $$->ok = false;
+    $$->type = "ERR";
+  }
+  delete $1;
+  delete $3;
+}
+| rel_exp GT add_exp{
+  $$ = new TypedAttr();
+  $$->ok = $1->ok && $3->ok;
+  if ($$->ok && $1->type == $3->type) {
+    $$->type = "BOOL";
+  } else {
+    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
+    YYABORT;
+    $$->ok = false;
+    $$->type = "ERR";
+  }
+  delete $1;
+  delete $3;
+}
+| rel_exp GE add_exp {
+  $$ = new TypedAttr();
+  $$->ok = $1->ok && $3->ok;
+  if ($$->ok && $1->type == $3->type) {
+    $$->type = "BOOL";
+  } else {
+    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
+    YYABORT;
+    $$->ok = false;
+    $$->type = "ERR";
+  }
+  delete $1;
+  delete $3;
+}
+| rel_exp EQ add_exp {
+  $$ = new TypedAttr();
+  $$->ok = $1->ok && $3->ok;
+  if ($$->ok && $1->type == $3->type) {
+    $$->type = "BOOL";
+  } else {
+    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
+    YYABORT;
+    $$->ok = false;
+    $$->type = "ERR";
+  }
+  delete $1;
+  delete $3;
+}
+| rel_exp NE add_exp {
+  $$ = new TypedAttr();
+  $$->ok = $1->ok && $3->ok;
+  if ($$->ok && $1->type == $3->type) {
+    $$->type = "BOOL";
+  } else {
+    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
+    YYABORT;
+    $$->ok = false;
+    $$->type = "ERR";
+  }
+  delete $1;
+  delete $3;
+}
+| add_exp {
+  $$ = new TypedAttr();
+  $$->ok = $1->ok;
+  $$->type = $1->type;
+  delete $1;
+}
+;
+
 
 add_exp:
       add_exp PLUS mult_exp
