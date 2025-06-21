@@ -28,12 +28,15 @@ inline std::ostream& operator<<(std::ostream& os, const Tag& tag) {
 }
 
 struct TokenInfo {
-    std::vector<std::string> paramList; // se for PROC ou STRUCT
+    std::vector<std::string> paramList; // se for PROC
     std::string type;
     Tag tag;
+    // Para STRUCT
+    // Mapeia nome do membro para seu tipo
+    std::unordered_map<std::string, std::string> members;
 
-    TokenInfo(std::vector<std::string> pl, std::string t, Tag tg)
-        : paramList(std::move(pl)), type(t), tag(tg) {}
+    TokenInfo(std::vector<std::string> pl, std::string t, Tag tg, std::unordered_map<std::string, std::string> mp = {})
+        : paramList(std::move(pl)), type(t), tag(tg), members(std::move(mp)) {}
 
     TokenInfo() : paramList({}), type(), tag() {}
 };

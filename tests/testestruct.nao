@@ -1,0 +1,22 @@
+program teststruct
+    begin
+        struct Pessoa {
+            nome : string
+        };
+
+        procedure teste(nome : string)
+        begin
+        end;
+
+        procedure main()
+        begin
+            var x : int;
+            var y : Pessoa;
+            var z : Pessoa
+        in
+            x := 2;
+            y.nome := "ab";
+            z := y
+        end
+
+    end

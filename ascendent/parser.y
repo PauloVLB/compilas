@@ -1,3 +1,7 @@
+%code requires {
+    #include <unordered_map>
+}
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,9 +9,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <unordered_map>
 #include <optional>
-
 #include "types/attrs.hpp"
 #include "symbol_table/symbol_table.hpp"
 
@@ -20,6 +22,7 @@ void yyerror(const char *s);
     BoolAttr* b_attr;
     TypedAttr* t_attr;
     std::vector<std::string>* param_types_list;
+    std::unordered_map<std::string, std::string>* member_map;
 }
 
 %token <sval> NAME FLOAT_LITERAL INT_LITERAL STRING_LITERAL
@@ -42,9 +45,9 @@ void yyerror(const char *s);
 %right EXP_OP
 
 %type <b_attr> program opt_decls decl_tail decl var_decl proc_decl rec_decl block proc_body_opt
-%type <b_attr> opt_paramfield_decls paramfield_decl_tail
 %type <b_attr> stmt_list stmt_tail stmt assign_stmt if_stmt else_opt while_stmt call_stmt
 %type <b_attr> M_proc_scope_enter
+%type <member_map> opt_struct_members struct_member_tail struct_member_decl
 
 %type <t_attr> var_init_opt opt_type return_stmt return_exp_opt call_args_opt call_args_tail call_exp
 %type <t_attr> expression or_exp and_exp not_exp rel_exp add_exp mult_exp exp_exp unary_exp primary_exp
@@ -257,50 +260,85 @@ proc_body_opt:
     ;
 
 rec_decl:
-    STRUCT NAME '{' opt_paramfield_decls '}'
+    STRUCT NAME '{' opt_struct_members '}'
     {
-        $$ = new BoolAttr();
         std::string struct_name = *$2;
-        bool insert_ok = SymbolTable::insert(struct_name, TokenInfo({}, "STRUCT(" + struct_name + ")", Tag::STRUCT));
+
+        if (SymbolTable::exists_in_current_scope(struct_name)) {
+             std::cout << "Erro: Redefinição do tipo '" << struct_name << "'." << std::endl;
+             YYABORT;
+        }
+
+        bool insert_ok = SymbolTable::insert(struct_name, TokenInfo({}, struct_name, Tag::STRUCT, *$4));
         
         if (!insert_ok) {
             std::cout << "Erro: Struct '" << struct_name << "' já declarado." << std::endl;
             YYABORT;
-            $$->ok = false;
-        } else {
-            $$->ok = $4->ok;
         }
+        
+        $$ = new BoolAttr();
+        $$->ok = true;
+
         delete $2;
         delete $4;
     }
     ;
 
-opt_paramfield_decls:
-      /* vazio */
+opt_struct_members:
+    /* vazio */
     {
-        $$ = new BoolAttr();
-        $$->ok = true;
+        $$ = new std::unordered_map<std::string, std::string>();
     }
-    | paramfield_decl paramfield_decl_tail
+    | struct_member_decl struct_member_tail
     {
-        $$ = new BoolAttr();
-        $$->ok = $1->ok && $2->ok;
+        $$ = $2;
+        auto& first_member_map = *$1;
+        const auto& [name, type] = *first_member_map.begin();
+
+        if ($$->count(name) > 0) {
+            std::cout << "Erro: Membro da struct '" << name << "' já foi declarado." << std::endl;
+            YYABORT;
+        }
+        (*$$)[name] = type;
         delete $1;
+    }
+    ;
+
+struct_member_tail:
+    /* vazio */
+    {
+        $$ = new std::unordered_map<std::string, std::string>();
+    }
+    | ';' struct_member_decl struct_member_tail
+    {
+        $$ = $3;
+        auto& new_member_map = *$2;
+        const auto& [name, type] = *new_member_map.begin();
+
+        if ($$->count(name) > 0) {
+            std::cout << "Erro: Membro da struct '" << name << "' já foi declarado." << std::endl;
+            YYABORT;
+        }
+        (*$$)[name] = type;
         delete $2;
     }
     ;
 
-paramfield_decl_tail:
-      /* vazio */
+struct_member_decl:
+    NAME ':' type
     {
-        $$ = new BoolAttr();
-        $$->ok = true;
-    }
-    | ';' paramfield_decl paramfield_decl_tail
-    {
-        $$ = new BoolAttr();
-        $$->ok = $2->ok && $3->ok;
-        delete $2;
+        $$ = new std::unordered_map<std::string, std::string>();
+        
+        if (!$3->ok) {
+            std::cout << "Erro: Tipo '" << $3->type << "' inválido para membro de struct." << std::endl;
+            YYABORT;
+        }
+
+        std::string member_name = *$1;
+        std::string member_type = $3->type;
+        (*$$)[member_name] = member_type;
+
+        delete $1;
         delete $3;
     }
     ;
@@ -906,20 +944,36 @@ var:
         $$->type = "ERR";
 
         if ($$->ok) {
-            std::string base_type = $1->type;
+            std::string base_type_name = $1->type; // ex: "Point"
             std::string field_name = *$3;
             delete $3;
 
-            if (base_type == "INT" || base_type == "FLOAT" || base_type == "STRING" || base_type == "BOOL") {
-                std::cout << "Erro de tipo: Tentativa de acessar o campo '" << field_name << "' em um tipo primitivo ('" << base_type << "')." << std::endl;
+            auto base_type_info_opt = SymbolTable::lookup(base_type_name);
+
+            if (!base_type_info_opt || base_type_info_opt->tag != Tag::STRUCT) {
+                std::cout << "Erro de tipo: Tentativa de acessar o campo '" << field_name 
+                        << "' em um tipo não-struct ('" << base_type_name << "')." << std::endl;
                 YYABORT;
                 $$->ok = false;
             } else {
-                std::cout << "AVISO: Verificação semântica para o campo '" << field_name << "' não está totalmente implementada." << std::endl;
-                $$->ok = true;
-                $$->type = "any";
+                auto& base_type_info = *base_type_info_opt;
+
+                const auto& members_map = base_type_info.members;
+                auto member_iterator = members_map.find(field_name);
+
+                if (member_iterator == members_map.end()) {
+                    std::cout << "Erro de tipo: O tipo '" << base_type_name 
+                            << "' não possui um membro chamado '" << field_name << "'." << std::endl;
+                    YYABORT;
+                    $$->ok = false;
+                } else {
+                    $$->ok = true;
+                    $$->type = member_iterator->second;
+                }
             }
         }
+        
+        // Limpa a memória do atributo da variável.
         delete $1;
     }
 |   var '[' expression ']'
