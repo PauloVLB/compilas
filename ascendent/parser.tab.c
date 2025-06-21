@@ -210,24 +210,25 @@ enum yysymbol_kind_t
   YYSYMBOL_return_stmt = 95,               /* return_stmt  */
   YYSYMBOL_return_exp_opt = 96,            /* return_exp_opt  */
   YYSYMBOL_call_stmt = 97,                 /* call_stmt  */
-  YYSYMBOL_call_args_opt = 98,             /* call_args_opt  */
-  YYSYMBOL_call_args_tail = 99,            /* call_args_tail  */
-  YYSYMBOL_expression = 100,               /* expression  */
-  YYSYMBOL_or_exp = 101,                   /* or_exp  */
-  YYSYMBOL_and_exp = 102,                  /* and_exp  */
-  YYSYMBOL_not_exp = 103,                  /* not_exp  */
-  YYSYMBOL_rel_exp = 104,                  /* rel_exp  */
-  YYSYMBOL_add_exp = 105,                  /* add_exp  */
-  YYSYMBOL_mult_exp = 106,                 /* mult_exp  */
-  YYSYMBOL_exp_exp = 107,                  /* exp_exp  */
-  YYSYMBOL_unary_exp = 108,                /* unary_exp  */
-  YYSYMBOL_primary_exp = 109,              /* primary_exp  */
-  YYSYMBOL_var = 110,                      /* var  */
-  YYSYMBOL_ref_var = 111,                  /* ref_var  */
-  YYSYMBOL_deref_var = 112,                /* deref_var  */
-  YYSYMBOL_literal = 113,                  /* literal  */
-  YYSYMBOL_bool_literal = 114,             /* bool_literal  */
-  YYSYMBOL_type = 115                      /* type  */
+  YYSYMBOL_call_exp = 98,                  /* call_exp  */
+  YYSYMBOL_call_args_opt = 99,             /* call_args_opt  */
+  YYSYMBOL_call_args_tail = 100,           /* call_args_tail  */
+  YYSYMBOL_expression = 101,               /* expression  */
+  YYSYMBOL_or_exp = 102,                   /* or_exp  */
+  YYSYMBOL_and_exp = 103,                  /* and_exp  */
+  YYSYMBOL_not_exp = 104,                  /* not_exp  */
+  YYSYMBOL_rel_exp = 105,                  /* rel_exp  */
+  YYSYMBOL_add_exp = 106,                  /* add_exp  */
+  YYSYMBOL_mult_exp = 107,                 /* mult_exp  */
+  YYSYMBOL_exp_exp = 108,                  /* exp_exp  */
+  YYSYMBOL_unary_exp = 109,                /* unary_exp  */
+  YYSYMBOL_primary_exp = 110,              /* primary_exp  */
+  YYSYMBOL_var = 111,                      /* var  */
+  YYSYMBOL_ref_var = 112,                  /* ref_var  */
+  YYSYMBOL_deref_var = 113,                /* deref_var  */
+  YYSYMBOL_literal = 114,                  /* literal  */
+  YYSYMBOL_bool_literal = 115,             /* bool_literal  */
+  YYSYMBOL_type = 116                      /* type  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -560,11 +561,11 @@ union yyalloc
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  70
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  46
+#define YYNNTS  47
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  103
+#define YYNRULES  104
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  186
+#define YYNSTATES  187
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   314
@@ -619,17 +620,17 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    62,    62,    79,    80,    84,    85,    89,    90,    91,
-      95,   110,   111,   115,   119,   134,   135,   139,   140,   144,
-     145,   149,   159,   160,   164,   176,   177,   181,   182,   186,
-     199,   200,   204,   205,   209,   210,   211,   212,   213,   217,
-     218,   222,   232,   233,   237,   241,   245,   246,   250,   262,
-     263,   267,   268,   272,   275,   276,   278,   279,   281,   282,
-     284,   285,   286,   287,   288,   289,   290,   292,   293,   294,
-     296,   297,   298,   300,   300,   302,   302,   305,   306,   307,
-     308,   309,   310,   311,   315,   329,   349,   377,   381,   382,
-     386,   387,   388,   389,   390,   394,   395,   399,   400,   401,
-     402,   403,   404,   405
+       0,    60,    60,    79,    83,    94,    98,   108,   109,   110,
+     114,   136,   141,   152,   160,   185,   188,   202,   205,   219,
+     224,   234,   246,   250,   260,   280,   284,   295,   299,   309,
+     331,   335,   346,   350,   360,   361,   362,   363,   364,   368,
+     375,   385,   403,   407,   416,   426,   437,   442,   452,   461,
+     483,   488,   500,   505,   516,   526,   541,   551,   566,   576,
+     590,   600,   601,   602,   603,   604,   605,   620,   630,   631,
+     646,   656,   657,   672,   682,   697,   707,   721,   731,   732,
+     733,   749,   750,   751,   752,   756,   773,   796,   828,   842,
+     856,   873,   874,   875,   876,   877,   881,   882,   886,   887,
+     888,   889,   890,   907,   918
 };
 #endif
 
@@ -660,10 +661,11 @@ static const char *const yytname[] =
   "proc_body_opt", "rec_decl", "opt_paramfield_decls",
   "paramfield_decl_tail", "paramfield_decl", "stmt_list", "stmt_tail",
   "stmt", "assign_stmt", "if_stmt", "else_opt", "while_stmt",
-  "return_stmt", "return_exp_opt", "call_stmt", "call_args_opt",
-  "call_args_tail", "expression", "or_exp", "and_exp", "not_exp",
-  "rel_exp", "add_exp", "mult_exp", "exp_exp", "unary_exp", "primary_exp",
-  "var", "ref_var", "deref_var", "literal", "bool_literal", "type", YY_NULLPTR
+  "return_stmt", "return_exp_opt", "call_stmt", "call_exp",
+  "call_args_opt", "call_args_tail", "expression", "or_exp", "and_exp",
+  "not_exp", "rel_exp", "add_exp", "mult_exp", "exp_exp", "unary_exp",
+  "primary_exp", "var", "ref_var", "deref_var", "literal", "bool_literal",
+  "type", YY_NULLPTR
 };
 
 static const char *
@@ -673,7 +675,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-129)
+#define YYPACT_NINF (-141)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -687,25 +689,25 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     -14,    19,    39,    30,  -129,    11,    62,    68,    77,    60,
-      27,  -129,  -129,  -129,    23,  -129,    31,  -129,    11,  -129,
-      63,    26,    92,    27,  -129,    38,    37,  -129,  -129,  -129,
-    -129,    65,    92,    41,    44,    51,  -129,    63,   109,    12,
-    -129,    52,    53,    63,  -129,    92,  -129,    76,    71,    80,
-    -129,  -129,  -129,  -129,  -129,  -129,   138,    81,    82,    12,
-      24,    12,  -129,  -129,   101,   103,  -129,    79,   -38,   -29,
-    -129,    93,  -129,   -12,  -129,  -129,  -129,  -129,    86,    92,
-    -129,  -129,    51,  -129,   108,    12,  -129,     3,   147,  -129,
-    -129,    88,    12,    12,    24,    24,    24,    24,    24,    24,
-      24,    24,    24,    24,    24,   149,    12,    63,   131,    53,
-    -129,    63,    91,    94,  -129,    -9,    96,    10,  -129,   103,
-    -129,   -38,   -38,   -38,   -38,   -38,   -38,   -29,   -29,  -129,
-    -129,  -129,  -129,    87,  -129,    11,  -129,  -129,  -129,  -129,
-      12,  -129,  -129,  -129,  -129,  -129,    27,     6,    94,   128,
-      12,    12,    12,   134,   100,  -129,  -129,  -129,  -129,  -129,
-       2,   119,  -129,  -129,   133,   130,  -129,  -129,  -129,     6,
-    -129,    12,    12,     6,     6,   100,  -129,  -129,   135,   132,
-    -129,     6,   136,  -129,  -129,  -129
+     -15,     8,    45,    26,  -141,    73,    50,    52,    60,    43,
+      29,  -141,  -141,  -141,    16,  -141,    38,  -141,    73,  -141,
+       0,    42,   103,    29,  -141,    49,    39,  -141,  -141,  -141,
+    -141,    70,   103,    54,    56,    76,  -141,     0,   111,    13,
+    -141,    74,    75,     0,  -141,   103,  -141,    77,    69,    80,
+    -141,  -141,  -141,  -141,  -141,  -141,   138,    81,    82,    13,
+      24,    13,  -141,  -141,   101,   104,  -141,    79,   -37,   -29,
+    -141,    91,  -141,     4,  -141,  -141,  -141,  -141,    87,   103,
+    -141,  -141,    76,  -141,   108,    13,  -141,     2,   147,  -141,
+    -141,    88,    13,    13,    24,    24,    24,    24,    24,    24,
+      24,    24,    24,    24,    24,   149,    13,     0,   131,    75,
+    -141,     0,    92,    90,  -141,     1,    93,    20,  -141,   104,
+    -141,   -37,   -37,   -37,   -37,   -37,   -37,   -29,   -29,  -141,
+    -141,  -141,  -141,    89,  -141,    73,  -141,  -141,  -141,  -141,
+      13,  -141,  -141,  -141,  -141,  -141,    29,     9,    90,   130,
+      13,    13,    13,   136,   100,  -141,  -141,  -141,  -141,  -141,
+    -141,    12,   119,  -141,  -141,   133,   132,  -141,  -141,  -141,
+       9,  -141,    13,    13,     9,     9,   100,  -141,  -141,   134,
+     129,  -141,     9,   135,  -141,  -141,  -141
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -715,43 +717,43 @@ static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     0,     1,     3,     0,     0,     0,     0,
        5,     7,     8,     9,     0,    13,     0,     2,     0,     4,
-       0,     0,    25,     5,   101,     0,     0,    97,    98,    99,
-     100,    11,    15,     0,     0,    27,     6,     0,     0,     0,
-      10,     0,    17,     0,    24,     0,    26,     0,     0,    84,
-      90,    91,    92,    95,    96,    94,     0,     0,     0,     0,
-       0,     0,    78,    12,    53,    55,    57,    59,    66,    69,
-      72,    74,    76,    80,    81,    82,    77,    93,    19,     0,
-      16,    29,    27,   102,     0,    49,    79,     0,     0,    58,
-      75,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    25,     5,   102,     0,     0,    98,    99,   100,
+     101,    11,    15,     0,     0,    27,     6,     0,     0,     0,
+      10,     0,    17,     0,    24,     0,    26,     0,     0,    85,
+      91,    92,    93,    96,    97,    95,     0,     0,     0,     0,
+       0,     0,    79,    12,    54,    56,    58,    60,    67,    70,
+      73,    75,    77,    81,    82,    83,    78,    94,    19,     0,
+      16,    29,    27,   103,     0,    50,    80,     0,     0,    59,
+      76,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,    17,
-      28,     0,     0,    51,    84,     0,     0,     0,    83,    54,
-      56,    60,    61,    62,    63,    64,    65,    67,    68,    70,
-      71,    73,    85,     0,    20,    22,    14,    18,   103,    48,
-       0,    50,    88,    89,    87,    86,     5,    30,    51,     0,
+      28,     0,     0,    52,    85,     0,     0,     0,    84,    55,
+      57,    61,    62,    63,    64,    65,    66,    68,    69,    71,
+      72,    74,    86,     0,    20,    22,    14,    18,   104,    49,
+       0,    51,    89,    90,    88,    87,     5,    30,    52,     0,
        0,     0,    46,     0,    32,    34,    35,    36,    37,    38,
-       0,     0,    52,    23,     0,     0,    45,    47,    21,     0,
-      31,     0,     0,    30,    30,    32,    39,    40,    42,     0,
-      33,    30,     0,    44,    43,    41
+      48,     0,     0,    53,    23,     0,     0,    45,    47,    21,
+       0,    31,     0,     0,    30,    30,    32,    39,    40,    42,
+       0,    33,    30,     0,    44,    43,    41
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-    -129,  -129,  -129,   -23,   -17,  -129,  -129,  -129,  -129,  -129,
-      55,  -129,  -129,  -129,  -129,  -129,    89,   -22,  -128,    -7,
-       0,  -129,  -129,  -129,  -129,  -129,  -129,   -65,  -129,    22,
-     -59,  -129,    83,   -51,  -129,    36,   -33,    34,   112,  -129,
-     -84,  -129,   -75,  -129,  -129,   -32
+    -141,  -141,  -141,   -23,   -17,  -141,  -141,  -141,  -141,  -141,
+      58,  -141,  -141,  -141,  -141,  -141,    86,    -9,  -140,    -7,
+       3,  -141,  -141,  -141,  -141,  -141,  -141,  -141,   -65,  -141,
+      22,   -59,  -141,    83,   -50,  -141,    36,   -16,    17,   112,
+    -141,   -80,  -141,   -74,  -141,  -141,   -33
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_uint8 yydefgoto[] =
 {
        0,     2,     9,    19,    10,    11,    40,    21,    12,    41,
-      80,   108,   136,   147,    13,    34,    46,    35,   153,   170,
-     154,   155,   156,   182,   157,   158,   166,    62,   112,   141,
-      63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
-      73,    74,    75,    76,    77,    31
+      80,   108,   136,   147,    13,    34,    46,    35,   153,   171,
+     154,   155,   156,   183,   157,   158,   167,   159,    62,   112,
+     141,    63,    64,    65,    66,    67,    68,    69,    70,    71,
+      72,    73,    74,    75,    76,    77,    31
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -759,46 +761,46 @@ static const yytype_uint8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      36,    23,    91,   115,   117,    47,   114,     1,    89,    49,
-      42,    81,   116,   100,   101,    49,    50,    51,    52,    53,
-      54,    55,     3,    82,   102,   103,   113,    49,    50,    51,
-      52,    53,    54,    55,   150,     6,     7,     8,   151,     4,
-      57,   152,   120,    57,   171,   178,   179,   133,    56,    57,
-      58,    59,     5,   184,   142,   105,   106,   109,   105,   106,
-      56,    57,    58,   160,    60,    14,    24,   127,   128,   105,
-     106,    15,   161,   144,    61,   134,    60,   105,   106,   138,
-      16,   148,   159,    17,    20,   160,    61,    18,    32,   160,
-     160,   164,   165,   167,   161,    33,    22,   160,   161,   161,
-      37,    25,    43,    26,   159,    38,   161,    39,   159,   159,
-      44,    45,   176,   177,    48,    78,   159,    79,   146,    27,
-      28,    29,    30,   149,    94,    95,    96,    97,    98,    99,
-     121,   122,   123,   124,   125,   126,   129,   130,   131,    83,
-      84,    86,    85,    87,    88,    92,    93,   107,   104,   111,
-     114,   118,   132,   135,   139,   163,   145,   168,   140,   143,
-     169,   172,   173,   174,   137,   181,   183,   185,   180,   175,
-     162,   110,    90,     0,     0,   119
+      36,    23,    91,    24,    47,   114,     1,   115,   117,    89,
+      81,     3,    49,   116,   100,   101,    49,    50,    51,    52,
+      53,    54,    55,    42,   102,   103,   113,    49,    50,    51,
+      52,    53,    54,    55,   179,   180,    82,   150,    25,    57,
+      26,   151,   185,   120,   152,     4,    57,   133,     5,    56,
+      57,    58,    59,    14,   172,    15,    27,    28,    29,    30,
+      56,    57,    58,    16,   142,    60,    17,   161,   105,   106,
+     109,   105,   106,   162,   134,    61,    60,    20,   138,   105,
+     106,   148,   160,   144,   127,   128,    61,   105,   106,    18,
+     161,   165,   166,   168,   161,   161,   162,     6,     7,     8,
+     162,   162,   161,    22,    32,   160,    33,    38,   162,   160,
+     160,    37,    39,   177,   178,    43,    48,   160,   146,   129,
+     130,   131,    44,   149,    94,    95,    96,    97,    98,    99,
+     121,   122,   123,   124,   125,   126,    45,    78,    84,    79,
+      83,    86,    85,    87,    88,    92,   104,    93,   107,   111,
+     114,   118,   132,   135,   140,   139,   143,   164,   145,   169,
+     170,   173,   174,   184,   182,   175,   186,   137,   110,   181,
+     163,     0,    90,   176,     0,   119
 };
 
 static const yytype_int16 yycheck[] =
 {
-      23,    18,    61,    87,    88,    37,     3,    21,    59,     3,
-      32,    43,    87,    51,    52,     3,     4,     5,     6,     7,
-       8,     9,     3,    45,    53,    54,    85,     3,     4,     5,
-       6,     7,     8,     9,    28,    24,    25,    26,    32,     0,
-      37,    35,    93,    37,    42,   173,   174,   106,    36,    37,
-      38,    39,    22,   181,    63,    67,    68,    79,    67,    68,
-      36,    37,    38,   147,    52,     3,     3,   100,   101,    67,
-      68,     3,   147,    63,    62,   107,    52,    67,    68,   111,
-       3,   140,   147,    23,    61,   169,    62,    60,    62,   173,
-     174,   150,   151,   152,   169,     3,    65,   181,   173,   174,
-      62,    38,    61,    40,   169,    68,   181,    42,   173,   174,
-      66,    60,   171,   172,     5,    63,   181,    64,   135,    56,
-      57,    58,    59,   146,    45,    46,    47,    48,    49,    50,
-      94,    95,    96,    97,    98,    99,   102,   103,   104,    63,
-      69,     3,    62,    62,    62,    44,    43,    61,    55,    41,
-       3,    63,     3,    22,    63,    27,    69,    23,    64,    63,
-      60,    42,    29,    33,   109,    30,    34,    31,   175,   169,
-     148,    82,    60,    -1,    -1,    92
+      23,    18,    61,     3,    37,     3,    21,    87,    88,    59,
+      43,     3,     3,    87,    51,    52,     3,     4,     5,     6,
+       7,     8,     9,    32,    53,    54,    85,     3,     4,     5,
+       6,     7,     8,     9,   174,   175,    45,    28,    38,    37,
+      40,    32,   182,    93,    35,     0,    37,   106,    22,    36,
+      37,    38,    39,     3,    42,     3,    56,    57,    58,    59,
+      36,    37,    38,     3,    63,    52,    23,   147,    67,    68,
+      79,    67,    68,   147,   107,    62,    52,    61,   111,    67,
+      68,   140,   147,    63,   100,   101,    62,    67,    68,    60,
+     170,   150,   151,   152,   174,   175,   170,    24,    25,    26,
+     174,   175,   182,    65,    62,   170,     3,    68,   182,   174,
+     175,    62,    42,   172,   173,    61,     5,   182,   135,   102,
+     103,   104,    66,   146,    45,    46,    47,    48,    49,    50,
+      94,    95,    96,    97,    98,    99,    60,    63,    69,    64,
+      63,     3,    62,    62,    62,    44,    55,    43,    61,    41,
+       3,    63,     3,    22,    64,    63,    63,    27,    69,    23,
+      60,    42,    29,    34,    30,    33,    31,   109,    82,   176,
+     148,    -1,    60,   170,    -1,    92
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -808,22 +810,22 @@ static const yytype_int8 yystos[] =
        0,    21,    71,     3,     0,    22,    24,    25,    26,    72,
       74,    75,    78,    84,     3,     3,     3,    23,    60,    73,
       61,    77,    65,    74,     3,    38,    40,    56,    57,    58,
-      59,   115,    62,     3,    85,    87,    73,    62,    68,    42,
-      76,    79,    87,    61,    66,    60,    86,   115,     5,     3,
+      59,   116,    62,     3,    85,    87,    73,    62,    68,    42,
+      76,    79,    87,    61,    66,    60,    86,   116,     5,     3,
        4,     5,     6,     7,     8,     9,    36,    37,    38,    39,
-      52,    62,    97,   100,   101,   102,   103,   104,   105,   106,
-     107,   108,   109,   110,   111,   112,   113,   114,    63,    64,
-      80,   115,    87,    63,    69,    62,     3,    62,    62,   103,
-     108,   100,    44,    43,    45,    46,    47,    48,    49,    50,
+      52,    62,    98,   101,   102,   103,   104,   105,   106,   107,
+     108,   109,   110,   111,   112,   113,   114,   115,    63,    64,
+      80,   116,    87,    63,    69,    62,     3,    62,    62,   104,
+     109,   101,    44,    43,    45,    46,    47,    48,    49,    50,
       51,    52,    53,    54,    55,    67,    68,    61,    81,    87,
-      86,    41,    98,   100,     3,   110,   112,   110,    63,   102,
-     103,   105,   105,   105,   105,   105,   105,   106,   106,   107,
-     107,   107,     3,   100,   115,    22,    82,    80,   115,    63,
-      64,    99,    63,    63,    63,    69,    74,    83,   100,    73,
+      86,    41,    99,   101,     3,   111,   113,   111,    63,   103,
+     104,   106,   106,   106,   106,   106,   106,   107,   107,   108,
+     108,   108,     3,   101,   116,    22,    82,    80,   116,    63,
+      64,   100,    63,    63,    63,    69,    74,    83,   101,    73,
       28,    32,    35,    88,    90,    91,    92,    94,    95,    97,
-     110,   112,    99,    27,   100,   100,    96,   100,    23,    60,
-      89,    42,    42,    29,    33,    90,   100,   100,    88,    88,
-      89,    30,    93,    34,    88,    31
+      98,   111,   113,   100,    27,   101,   101,    96,   101,    23,
+      60,    89,    42,    42,    29,    33,    90,   101,   101,    88,
+      88,    89,    30,    93,    34,    88,    31
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -834,12 +836,12 @@ static const yytype_int8 yyr1[] =
       81,    82,    83,    83,    84,    85,    85,    86,    86,    87,
       88,    88,    89,    89,    90,    90,    90,    90,    90,    91,
       91,    92,    93,    93,    94,    95,    96,    96,    97,    98,
-      98,    99,    99,   100,   101,   101,   102,   102,   103,   103,
-     104,   104,   104,   104,   104,   104,   104,   105,   105,   105,
-     106,   106,   106,   107,   107,   108,   108,   109,   109,   109,
-     109,   109,   109,   109,   110,   110,   110,   111,   112,   112,
-     113,   113,   113,   113,   113,   114,   114,   115,   115,   115,
-     115,   115,   115,   115
+      99,    99,   100,   100,   101,   102,   102,   103,   103,   104,
+     104,   105,   105,   105,   105,   105,   105,   105,   106,   106,
+     106,   107,   107,   107,   108,   108,   109,   109,   110,   110,
+     110,   110,   110,   110,   110,   111,   111,   111,   112,   113,
+     113,   114,   114,   114,   114,   114,   115,   115,   116,   116,
+     116,   116,   116,   116,   116
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -849,13 +851,13 @@ static const yytype_int8 yyr2[] =
        5,     0,     2,     0,     8,     0,     2,     0,     3,     0,
        2,     4,     0,     3,     5,     0,     2,     0,     3,     3,
        0,     2,     0,     3,     1,     1,     1,     1,     1,     3,
-       3,     6,     0,     2,     5,     2,     0,     1,     4,     0,
-       2,     0,     3,     1,     3,     1,     3,     1,     2,     1,
-       3,     3,     3,     3,     3,     3,     1,     3,     3,     1,
-       3,     3,     1,     3,     1,     2,     1,     1,     1,     2,
-       1,     1,     1,     3,     1,     3,     4,     4,     4,     4,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     4,     6
+       3,     6,     0,     2,     5,     2,     0,     1,     1,     4,
+       0,     2,     0,     3,     1,     3,     1,     3,     1,     2,
+       1,     3,     3,     3,     3,     3,     3,     1,     3,     3,
+       1,     3,     3,     1,     3,     1,     2,     1,     1,     1,
+       2,     1,     1,     1,     3,     1,     3,     4,     4,     4,
+       4,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     4,     6
 };
 
 
@@ -1319,575 +1321,957 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: PROGRAM NAME BEGIN_TOK opt_decls END  */
-#line 63 "parser.y"
+#line 61 "parser.y"
     {
         std::string program_name = *(yyvsp[-3].sval);
         delete (yyvsp[-3].sval);
+        
         (yyval.b_attr) = new BoolAttr();
         (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok;
-        if((yyval.b_attr)->ok) {
+        
+        if ((yyval.b_attr)->ok) {
             printf("Análise sintática concluída com sucesso para o programa '%s'!\n", program_name.c_str());
         } else {
-            // A mensagem de erro específica já foi impressa pela regra que falhou.
             printf("Análise sintática encerrada devido a erro no programa '%s'.\n", program_name.c_str());
         }
         delete (yyvsp[-1].b_attr);
     }
-#line 1337 "parser.tab.c"
+#line 1340 "parser.tab.c"
     break;
 
   case 3: /* opt_decls: %empty  */
 #line 79 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1343 "parser.tab.c"
-    break;
-
-  case 4: /* opt_decls: decl decl_tail  */
-#line 80 "parser.y"
-                     { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok; delete (yyvsp[-1].b_attr); delete (yyvsp[0].b_attr); }
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
 #line 1349 "parser.tab.c"
     break;
 
-  case 5: /* decl_tail: %empty  */
+  case 4: /* opt_decls: decl decl_tail  */
 #line 84 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1355 "parser.tab.c"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok;
+        delete (yyvsp[-1].b_attr);
+        delete (yyvsp[0].b_attr);
+    }
+#line 1360 "parser.tab.c"
+    break;
+
+  case 5: /* decl_tail: %empty  */
+#line 94 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1369 "parser.tab.c"
     break;
 
   case 6: /* decl_tail: ';' decl decl_tail  */
-#line 85 "parser.y"
-                         { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok; delete (yyvsp[-1].b_attr); delete (yyvsp[0].b_attr); }
-#line 1361 "parser.tab.c"
+#line 99 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok;
+        delete (yyvsp[-1].b_attr);
+        delete (yyvsp[0].b_attr);
+    }
+#line 1380 "parser.tab.c"
     break;
 
   case 7: /* decl: var_decl  */
-#line 89 "parser.y"
+#line 108 "parser.y"
                 { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1367 "parser.tab.c"
+#line 1386 "parser.tab.c"
     break;
 
   case 8: /* decl: proc_decl  */
-#line 90 "parser.y"
+#line 109 "parser.y"
                 { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1373 "parser.tab.c"
+#line 1392 "parser.tab.c"
     break;
 
   case 9: /* decl: rec_decl  */
-#line 91 "parser.y"
+#line 110 "parser.y"
                 { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1379 "parser.tab.c"
+#line 1398 "parser.tab.c"
     break;
 
   case 10: /* var_decl: VAR NAME ':' type var_init_opt  */
-#line 96 "parser.y"
+#line 115 "parser.y"
     {
         (yyval.b_attr) = new BoolAttr();
         std::string var_name = *(yyvsp[-3].sval);
         bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, (yyvsp[-1].t_attr)->type, Tag::VAR));
-        if (!insert_ok) { std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl; YYABORT; (yyval.b_attr)->ok = false; }
-        else { (yyval.b_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].t_attr)->ok; }
-        delete (yyvsp[-3].sval); delete (yyvsp[-1].t_attr); delete (yyvsp[0].t_attr);
         
-        // ADICIONADO DE VOLTA: Imprime a tabela de símbolos após cada declaração de variável.
+        if (!insert_ok) {
+            std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
+            YYABORT;
+            (yyval.b_attr)->ok = false;
+        } else {
+            (yyval.b_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        }
+        delete (yyvsp[-3].sval);
+        delete (yyvsp[-1].t_attr);
+        delete (yyvsp[0].t_attr);
         SymbolTable::print_all();
     }
-#line 1395 "parser.tab.c"
+#line 1420 "parser.tab.c"
     break;
 
   case 11: /* var_init_opt: %empty  */
-#line 110 "parser.y"
-                  { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "void"; }
-#line 1401 "parser.tab.c"
+#line 136 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = true;
+        (yyval.t_attr)->type = "void";
+    }
+#line 1430 "parser.tab.c"
     break;
 
   case 12: /* var_init_opt: ASSIGN expression  */
-#line 111 "parser.y"
-                        { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1407 "parser.tab.c"
+#line 142 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 1441 "parser.tab.c"
     break;
 
   case 13: /* M_proc_scope_enter: %empty  */
-#line 115 "parser.y"
-                  { SymbolTable::enter_scope(); (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1413 "parser.tab.c"
+#line 152 "parser.y"
+    {
+        SymbolTable::enter_scope();
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1451 "parser.tab.c"
     break;
 
   case 14: /* proc_decl: PROCEDURE NAME M_proc_scope_enter '(' opt_param_list ')' opt_type block  */
-#line 120 "parser.y"
+#line 161 "parser.y"
     {
         (yyval.b_attr) = new BoolAttr();
         std::string proc_name = *(yyvsp[-6].sval);
         bool insert_ok = SymbolTable::insert(proc_name, TokenInfo(*(yyvsp[-3].param_types_list), (yyvsp[-1].t_attr)->type, Tag::PROC));
-        if (!insert_ok) { std::cout << "Erro: Redefinição do procedimento '" << proc_name << "'." << std::endl; YYABORT; (yyval.b_attr)->ok = false; }
-        else { (yyval.b_attr)->ok = (yyvsp[-5].b_attr)->ok && (yyvsp[-1].t_attr)->ok && (yyvsp[0].b_attr)->ok; }
-        delete (yyvsp[-6].sval); delete (yyvsp[-5].b_attr); delete (yyvsp[-3].param_types_list); delete (yyvsp[-1].t_attr); delete (yyvsp[0].b_attr);
-
-        // ADICIONADO DE VOLTA: Imprime a tabela de símbolos após cada declaração de procedimento.
+        
+        if (!insert_ok) {
+            std::cout << "Erro: Redefinição do procedimento '" << proc_name << "'." << std::endl;
+            YYABORT;
+            (yyval.b_attr)->ok = false;
+        } else {
+            (yyval.b_attr)->ok = (yyvsp[-5].b_attr)->ok && (yyvsp[-1].t_attr)->ok && (yyvsp[0].b_attr)->ok;
+        }
+        
+        delete (yyvsp[-6].sval);
+        delete (yyvsp[-5].b_attr);
+        delete (yyvsp[-3].param_types_list);
+        delete (yyvsp[-1].t_attr);
+        delete (yyvsp[0].b_attr);
         SymbolTable::print_all();
-    }
-#line 1429 "parser.tab.c"
-    break;
-
-  case 15: /* opt_param_list: %empty  */
-#line 134 "parser.y"
-                  { (yyval.param_types_list) = new std::vector<std::string>(); }
-#line 1435 "parser.tab.c"
-    break;
-
-  case 16: /* opt_param_list: paramfield_decl paramfield_tail  */
-#line 135 "parser.y"
-                                      { (yyval.param_types_list) = (yyvsp[0].param_types_list); if ((yyvsp[-1].t_attr)->ok) { (yyval.param_types_list)->insert((yyval.param_types_list)->begin(), (yyvsp[-1].t_attr)->type); } else { (yyval.param_types_list)->clear(); } delete (yyvsp[-1].t_attr); }
-#line 1441 "parser.tab.c"
-    break;
-
-  case 17: /* paramfield_tail: %empty  */
-#line 139 "parser.y"
-                  { (yyval.param_types_list) = new std::vector<std::string>(); }
-#line 1447 "parser.tab.c"
-    break;
-
-  case 18: /* paramfield_tail: ',' paramfield_decl paramfield_tail  */
-#line 140 "parser.y"
-                                          { (yyval.param_types_list) = (yyvsp[0].param_types_list); if ((yyvsp[-1].t_attr)->ok) { (yyval.param_types_list)->insert((yyval.param_types_list)->begin(), (yyvsp[-1].t_attr)->type); } else { (yyval.param_types_list)->clear(); } delete (yyvsp[-1].t_attr); }
-#line 1453 "parser.tab.c"
-    break;
-
-  case 19: /* opt_type: %empty  */
-#line 144 "parser.y"
-                  { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "void"; }
-#line 1459 "parser.tab.c"
-    break;
-
-  case 20: /* opt_type: ':' type  */
-#line 145 "parser.y"
-               { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1465 "parser.tab.c"
-    break;
-
-  case 21: /* block: BEGIN_TOK proc_body_opt stmt_list END  */
-#line 150 "parser.y"
-    {
-        (yyval.b_attr) = new BoolAttr();
-        (yyval.b_attr)->ok = (yyvsp[-2].b_attr)->ok && (yyvsp[-1].b_attr)->ok;
-        delete (yyvsp[-2].b_attr); delete (yyvsp[-1].b_attr);
-        SymbolTable::exit_scope();
     }
 #line 1476 "parser.tab.c"
     break;
 
+  case 15: /* opt_param_list: %empty  */
+#line 185 "parser.y"
+    {
+        (yyval.param_types_list) = new std::vector<std::string>();
+    }
+#line 1484 "parser.tab.c"
+    break;
+
+  case 16: /* opt_param_list: paramfield_decl paramfield_tail  */
+#line 189 "parser.y"
+    {
+        (yyval.param_types_list) = (yyvsp[0].param_types_list);
+        if ((yyvsp[-1].t_attr)->ok) {
+            (yyval.param_types_list)->insert((yyval.param_types_list)->begin(), (yyvsp[-1].t_attr)->type);
+        } else {
+            (yyval.param_types_list)->clear();
+        }
+        delete (yyvsp[-1].t_attr);
+    }
+#line 1498 "parser.tab.c"
+    break;
+
+  case 17: /* paramfield_tail: %empty  */
+#line 202 "parser.y"
+    {
+        (yyval.param_types_list) = new std::vector<std::string>();
+    }
+#line 1506 "parser.tab.c"
+    break;
+
+  case 18: /* paramfield_tail: ',' paramfield_decl paramfield_tail  */
+#line 206 "parser.y"
+    {
+        (yyval.param_types_list) = (yyvsp[0].param_types_list);
+        if ((yyvsp[-1].t_attr)->ok) {
+            (yyval.param_types_list)->insert((yyval.param_types_list)->begin(), (yyvsp[-1].t_attr)->type);
+        } else {
+            (yyval.param_types_list)->clear();
+        }
+        delete (yyvsp[-1].t_attr);
+    }
+#line 1520 "parser.tab.c"
+    break;
+
+  case 19: /* opt_type: %empty  */
+#line 219 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = true;
+        (yyval.t_attr)->type = "void";
+    }
+#line 1530 "parser.tab.c"
+    break;
+
+  case 20: /* opt_type: ':' type  */
+#line 225 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 1541 "parser.tab.c"
+    break;
+
+  case 21: /* block: BEGIN_TOK proc_body_opt stmt_list END  */
+#line 235 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-2].b_attr)->ok && (yyvsp[-1].b_attr)->ok;
+        delete (yyvsp[-2].b_attr);
+        delete (yyvsp[-1].b_attr);
+        SymbolTable::exit_scope();
+    }
+#line 1553 "parser.tab.c"
+    break;
+
   case 22: /* proc_body_opt: %empty  */
-#line 159 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1482 "parser.tab.c"
+#line 246 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1562 "parser.tab.c"
     break;
 
   case 23: /* proc_body_opt: decl decl_tail IN  */
-#line 160 "parser.y"
-                        { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-2].b_attr)->ok && (yyvsp[-1].b_attr)->ok; delete (yyvsp[-2].b_attr); delete (yyvsp[-1].b_attr); }
-#line 1488 "parser.tab.c"
+#line 251 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-2].b_attr)->ok && (yyvsp[-1].b_attr)->ok;
+        delete (yyvsp[-2].b_attr);
+        delete (yyvsp[-1].b_attr);
+    }
+#line 1573 "parser.tab.c"
     break;
 
   case 24: /* rec_decl: STRUCT NAME '{' opt_paramfield_decls '}'  */
-#line 165 "parser.y"
+#line 261 "parser.y"
     {
         (yyval.b_attr) = new BoolAttr();
         std::string struct_name = *(yyvsp[-3].sval);
         bool insert_ok = SymbolTable::insert(struct_name, TokenInfo({}, "STRUCT(" + struct_name + ")", Tag::STRUCT));
-        if (!insert_ok) { std::cout << "Erro: Struct '" << struct_name << "' já declarado." << std::endl; YYABORT; (yyval.b_attr)->ok = false; }
-        else { (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok; }
-        delete (yyvsp[-3].sval); delete (yyvsp[-1].b_attr);
+        
+        if (!insert_ok) {
+            std::cout << "Erro: Struct '" << struct_name << "' já declarado." << std::endl;
+            YYABORT;
+            (yyval.b_attr)->ok = false;
+        } else {
+            (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok;
+        }
+        delete (yyvsp[-3].sval);
+        delete (yyvsp[-1].b_attr);
     }
-#line 1501 "parser.tab.c"
+#line 1593 "parser.tab.c"
     break;
 
   case 25: /* opt_paramfield_decls: %empty  */
-#line 176 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1507 "parser.tab.c"
+#line 280 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1602 "parser.tab.c"
     break;
 
   case 26: /* opt_paramfield_decls: paramfield_decl paramfield_decl_tail  */
-#line 177 "parser.y"
-                                           { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].b_attr)->ok; delete (yyvsp[-1].t_attr); delete (yyvsp[0].b_attr); }
-#line 1513 "parser.tab.c"
+#line 285 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].b_attr)->ok;
+        delete (yyvsp[-1].t_attr);
+        delete (yyvsp[0].b_attr);
+    }
+#line 1613 "parser.tab.c"
     break;
 
   case 27: /* paramfield_decl_tail: %empty  */
-#line 181 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1519 "parser.tab.c"
+#line 295 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1622 "parser.tab.c"
     break;
 
   case 28: /* paramfield_decl_tail: ';' paramfield_decl paramfield_decl_tail  */
-#line 182 "parser.y"
-                                               { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].b_attr)->ok; delete (yyvsp[-1].t_attr); delete (yyvsp[0].b_attr); }
-#line 1525 "parser.tab.c"
+#line 300 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].b_attr)->ok;
+        delete (yyvsp[-1].t_attr);
+        delete (yyvsp[0].b_attr);
+    }
+#line 1633 "parser.tab.c"
     break;
 
   case 29: /* paramfield_decl: NAME ':' type  */
-#line 187 "parser.y"
+#line 310 "parser.y"
     {
         (yyval.t_attr) = new TypedAttr();
         std::string field_name = *(yyvsp[-2].sval);
         bool insert_ok = SymbolTable::insert(field_name, TokenInfo({}, (yyvsp[0].t_attr)->type, Tag::PROC_PARAM));
-        if (!insert_ok) { std::cout << "Erro: Parâmetro '" << field_name << "' já foi declarado." << std::endl; YYABORT; (yyval.t_attr)->ok = false; }
-        else { (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; }
+        
+        if (!insert_ok) {
+            std::cout << "Erro: Parâmetro '" << field_name << "' já foi declarado." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+        } else {
+            (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        }
+        
         (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
-        delete (yyvsp[-2].sval); delete (yyvsp[0].t_attr);
+        delete (yyvsp[-2].sval);
+        delete (yyvsp[0].t_attr);
     }
-#line 1539 "parser.tab.c"
+#line 1655 "parser.tab.c"
     break;
 
   case 30: /* stmt_list: %empty  */
-#line 199 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1545 "parser.tab.c"
+#line 331 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1664 "parser.tab.c"
     break;
 
   case 31: /* stmt_list: stmt stmt_tail  */
-#line 200 "parser.y"
-                     { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok; delete (yyvsp[-1].b_attr); delete (yyvsp[0].b_attr); }
-#line 1551 "parser.tab.c"
+#line 336 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok;
+        delete (yyvsp[-1].b_attr);
+        delete (yyvsp[0].b_attr);
+    }
+#line 1675 "parser.tab.c"
     break;
 
   case 32: /* stmt_tail: %empty  */
-#line 204 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1557 "parser.tab.c"
+#line 346 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1684 "parser.tab.c"
     break;
 
   case 33: /* stmt_tail: ';' stmt stmt_tail  */
-#line 205 "parser.y"
-                         { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok; delete (yyvsp[-1].b_attr); delete (yyvsp[0].b_attr); }
-#line 1563 "parser.tab.c"
-    break;
-
-  case 34: /* stmt: assign_stmt  */
-#line 209 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1569 "parser.tab.c"
-    break;
-
-  case 35: /* stmt: if_stmt  */
-#line 210 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1575 "parser.tab.c"
-    break;
-
-  case 36: /* stmt: while_stmt  */
-#line 211 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1581 "parser.tab.c"
-    break;
-
-  case 37: /* stmt: return_stmt  */
-#line 212 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].t_attr)->ok; delete (yyvsp[0].t_attr); }
-#line 1587 "parser.tab.c"
-    break;
-
-  case 38: /* stmt: call_stmt  */
-#line 213 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1593 "parser.tab.c"
-    break;
-
-  case 39: /* assign_stmt: var ASSIGN expression  */
-#line 217 "parser.y"
-                            { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
-#line 1599 "parser.tab.c"
-    break;
-
-  case 40: /* assign_stmt: deref_var ASSIGN expression  */
-#line 218 "parser.y"
-                                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
-#line 1605 "parser.tab.c"
-    break;
-
-  case 41: /* if_stmt: IF expression THEN stmt_list else_opt FI  */
-#line 223 "parser.y"
+#line 351 "parser.y"
     {
         (yyval.b_attr) = new BoolAttr();
-        if ((yyvsp[-4].t_attr)->type != "BOOL") { std::cout << "Erro de tipo: Condição do IF deve ser BOOL, mas foi '" << (yyvsp[-4].t_attr)->type << "'." << std::endl; YYABORT; (yyval.b_attr)->ok = false; }
-        else { (yyval.b_attr)->ok = (yyvsp[-4].t_attr)->ok && (yyvsp[-2].b_attr)->ok && (yyvsp[-1].b_attr)->ok; }
-        delete (yyvsp[-4].t_attr); delete (yyvsp[-2].b_attr); delete (yyvsp[-1].b_attr);
+        (yyval.b_attr)->ok = (yyvsp[-1].b_attr)->ok && (yyvsp[0].b_attr)->ok;
+        delete (yyvsp[-1].b_attr);
+        delete (yyvsp[0].b_attr);
     }
-#line 1616 "parser.tab.c"
-    break;
-
-  case 42: /* else_opt: %empty  */
-#line 232 "parser.y"
-                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = true; }
-#line 1622 "parser.tab.c"
-    break;
-
-  case 43: /* else_opt: ELSE stmt_list  */
-#line 233 "parser.y"
-                     { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
-#line 1628 "parser.tab.c"
-    break;
-
-  case 44: /* while_stmt: WHILE expression DO stmt_list OD  */
-#line 237 "parser.y"
-                                     { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[-3].t_attr)->ok && (yyvsp[-1].b_attr)->ok; delete (yyvsp[-3].t_attr); delete (yyvsp[-1].b_attr); }
-#line 1634 "parser.tab.c"
-    break;
-
-  case 45: /* return_stmt: RETURN return_exp_opt  */
-#line 241 "parser.y"
-                          { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1640 "parser.tab.c"
-    break;
-
-  case 46: /* return_exp_opt: %empty  */
-#line 245 "parser.y"
-                  { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "void"; }
-#line 1646 "parser.tab.c"
-    break;
-
-  case 47: /* return_exp_opt: expression  */
-#line 246 "parser.y"
-                 { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1652 "parser.tab.c"
-    break;
-
-  case 48: /* call_stmt: NAME '(' call_args_opt ')'  */
-#line 251 "parser.y"
-    {
-        (yyval.b_attr) = new BoolAttr();
-        std::string func_name = *(yyvsp[-3].sval);
-        auto lookup_result = SymbolTable::lookup(func_name);
-        if (!lookup_result || lookup_result->tag != Tag::PROC) { std::cout << "Erro: Procedimento '" << func_name << "' não declarado." << std::endl; YYABORT; (yyval.b_attr)->ok = false; }
-        else { (yyval.b_attr)->ok = (yyvsp[-1].t_attr)->ok; }
-        delete (yyvsp[-3].sval); delete (yyvsp[-1].t_attr);
-    }
-#line 1665 "parser.tab.c"
-    break;
-
-  case 49: /* call_args_opt: %empty  */
-#line 262 "parser.y"
-                  { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "void"; }
-#line 1671 "parser.tab.c"
-    break;
-
-  case 50: /* call_args_opt: expression call_args_tail  */
-#line 263 "parser.y"
-                                { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = "void"; delete (yyvsp[-1].t_attr); delete (yyvsp[0].t_attr); }
-#line 1677 "parser.tab.c"
-    break;
-
-  case 51: /* call_args_tail: %empty  */
-#line 267 "parser.y"
-                  { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "void"; }
-#line 1683 "parser.tab.c"
-    break;
-
-  case 52: /* call_args_tail: ',' expression call_args_tail  */
-#line 268 "parser.y"
-                                    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = "void"; delete (yyvsp[-1].t_attr); delete (yyvsp[0].t_attr); }
-#line 1689 "parser.tab.c"
-    break;
-
-  case 53: /* expression: or_exp  */
-#line 273 "parser.y"
-    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
 #line 1695 "parser.tab.c"
     break;
 
-  case 54: /* or_exp: or_exp OR and_exp  */
-#line 276 "parser.y"
-    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && (yyvsp[-2].t_attr)->type == "BOOL" && (yyvsp[0].t_attr)->type == "BOOL") { (yyval.t_attr)->type = "BOOL"; } else { std::cout << "Erro de tipo: Operandos de OR devem ser BOOLEAN." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
+  case 34: /* stmt: assign_stmt  */
+#line 360 "parser.y"
+                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
 #line 1701 "parser.tab.c"
     break;
 
-  case 55: /* or_exp: and_exp  */
-#line 276 "parser.y"
-                                                                                                                                                                                                                                                                                                          { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
+  case 35: /* stmt: if_stmt  */
+#line 361 "parser.y"
+                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
 #line 1707 "parser.tab.c"
     break;
 
-  case 56: /* and_exp: and_exp AND not_exp  */
-#line 279 "parser.y"
-    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && (yyvsp[-2].t_attr)->type == "BOOL" && (yyvsp[0].t_attr)->type == "BOOL") { (yyval.t_attr)->type = "BOOL"; } else { std::cout << "Erro de tipo: Operandos de AND devem ser BOOLEAN." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
+  case 36: /* stmt: while_stmt  */
+#line 362 "parser.y"
+                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
 #line 1713 "parser.tab.c"
     break;
 
-  case 57: /* and_exp: not_exp  */
-#line 279 "parser.y"
-                                                                                                                                                                                                                                                                                                           { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
+  case 37: /* stmt: return_stmt  */
+#line 363 "parser.y"
+                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].t_attr)->ok; delete (yyvsp[0].t_attr); }
 #line 1719 "parser.tab.c"
     break;
 
-  case 58: /* not_exp: NOT not_exp  */
-#line 282 "parser.y"
-    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && (yyvsp[0].t_attr)->type == "BOOL") { (yyval.t_attr)->type = "BOOL"; } else { std::cout << "Erro de tipo: Operando de NOT deve ser BOOLEAN." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[0].t_attr); }
+  case 38: /* stmt: call_stmt  */
+#line 364 "parser.y"
+                  { (yyval.b_attr) = new BoolAttr(); (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok; delete (yyvsp[0].b_attr); }
 #line 1725 "parser.tab.c"
     break;
 
-  case 59: /* not_exp: rel_exp  */
-#line 282 "parser.y"
-                                                                                                                                                                                                                                                              { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1731 "parser.tab.c"
+  case 39: /* assign_stmt: var ASSIGN expression  */
+#line 369 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 1736 "parser.tab.c"
     break;
 
-  case 65: /* rel_exp: rel_exp NE add_exp  */
-#line 290 "parser.y"
-    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && (yyvsp[-2].t_attr)->type == (yyvsp[0].t_attr)->type) { (yyval.t_attr)->type = "BOOL"; } else { std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
-#line 1737 "parser.tab.c"
+  case 40: /* assign_stmt: deref_var ASSIGN expression  */
+#line 376 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 1747 "parser.tab.c"
     break;
 
-  case 66: /* rel_exp: add_exp  */
-#line 290 "parser.y"
-                                                                                                                                                                                                                                                                                          { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1743 "parser.tab.c"
+  case 41: /* if_stmt: IF expression THEN stmt_list else_opt FI  */
+#line 386 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        if ((yyvsp[-4].t_attr)->type != "BOOL") {
+            std::cout << "Erro de tipo: Condição do IF deve ser BOOL, mas foi '" << (yyvsp[-4].t_attr)->type << "'." << std::endl;
+            YYABORT;
+            (yyval.b_attr)->ok = false;
+        } else {
+            (yyval.b_attr)->ok = (yyvsp[-4].t_attr)->ok && (yyvsp[-2].b_attr)->ok && (yyvsp[-1].b_attr)->ok;
+        }
+        delete (yyvsp[-4].t_attr);
+        delete (yyvsp[-2].b_attr);
+        delete (yyvsp[-1].b_attr);
+    }
+#line 1765 "parser.tab.c"
     break;
 
-  case 68: /* add_exp: add_exp MINUS mult_exp  */
-#line 294 "parser.y"
-    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && ((yyvsp[-2].t_attr)->type == "INT" || (yyvsp[-2].t_attr)->type == "FLOAT") && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) { (yyval.t_attr)->type = ((yyvsp[-2].t_attr)->type == "FLOAT" || (yyvsp[0].t_attr)->type == "FLOAT") ? "FLOAT" : "INT"; } else { std::cout << "Erro de tipo: Operandos de adição/subtração devem ser numéricos." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
-#line 1749 "parser.tab.c"
+  case 42: /* else_opt: %empty  */
+#line 403 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = true;
+    }
+#line 1774 "parser.tab.c"
     break;
 
-  case 69: /* add_exp: mult_exp  */
-#line 294 "parser.y"
-                                                                                                                                                                                                                                                                                                                                                                                                                                   { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1755 "parser.tab.c"
+  case 43: /* else_opt: ELSE stmt_list  */
+#line 408 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[0].b_attr)->ok;
+        delete (yyvsp[0].b_attr);
+    }
+#line 1784 "parser.tab.c"
     break;
 
-  case 71: /* mult_exp: mult_exp DIV exp_exp  */
-#line 298 "parser.y"
-    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && ((yyvsp[-2].t_attr)->type == "INT" || (yyvsp[-2].t_attr)->type == "FLOAT") && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) { (yyval.t_attr)->type = ((yyvsp[-2].t_attr)->type == "FLOAT" || (yyvsp[0].t_attr)->type == "FLOAT") ? "FLOAT" : "INT"; } else { std::cout << "Erro de tipo: Operandos de multiplicação/divisão devem ser numéricos." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
-#line 1761 "parser.tab.c"
+  case 44: /* while_stmt: WHILE expression DO stmt_list OD  */
+#line 417 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[-3].t_attr)->ok && (yyvsp[-1].b_attr)->ok;
+        delete (yyvsp[-3].t_attr);
+        delete (yyvsp[-1].b_attr);
+    }
+#line 1795 "parser.tab.c"
     break;
 
-  case 72: /* mult_exp: exp_exp  */
-#line 298 "parser.y"
-                                                                                                                                                                                                                                                                                                                                                                                                                                       { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1767 "parser.tab.c"
+  case 45: /* return_stmt: RETURN return_exp_opt  */
+#line 427 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 1806 "parser.tab.c"
     break;
 
-  case 73: /* exp_exp: unary_exp EXP_OP exp_exp  */
-#line 300 "parser.y"
-                             { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && ((yyvsp[-2].t_attr)->type == "INT" || (yyvsp[-2].t_attr)->type == "FLOAT") && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) { (yyval.t_attr)->type = ((yyvsp[-2].t_attr)->type == "FLOAT" || (yyvsp[0].t_attr)->type == "FLOAT") ? "FLOAT" : "INT"; } else { std::cout << "Erro de tipo: Operandos de exponenciação devem ser numéricos." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-2].t_attr); delete (yyvsp[0].t_attr); }
-#line 1773 "parser.tab.c"
+  case 46: /* return_exp_opt: %empty  */
+#line 437 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = true;
+        (yyval.t_attr)->type = "void";
+    }
+#line 1816 "parser.tab.c"
     break;
 
-  case 74: /* exp_exp: unary_exp  */
-#line 300 "parser.y"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1779 "parser.tab.c"
-    break;
-
-  case 75: /* unary_exp: MINUS unary_exp  */
-#line 302 "parser.y"
-                    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) { (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; } else { std::cout << "Erro de tipo: Operando unário '-' deve ser numérico." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[0].t_attr); }
-#line 1785 "parser.tab.c"
-    break;
-
-  case 76: /* unary_exp: primary_exp  */
-#line 302 "parser.y"
-                                                                                                                                                                                                                                                                                                                 { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1791 "parser.tab.c"
-    break;
-
-  case 77: /* primary_exp: literal  */
-#line 305 "parser.y"
-              { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1797 "parser.tab.c"
-    break;
-
-  case 78: /* primary_exp: call_stmt  */
-#line 306 "parser.y"
-                { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].b_attr)->ok; (yyval.t_attr)->type = "void"; delete (yyvsp[0].b_attr); }
-#line 1803 "parser.tab.c"
-    break;
-
-  case 79: /* primary_exp: NEW NAME  */
-#line 307 "parser.y"
-               { (yyval.t_attr) = new TypedAttr(); std::string type_name = *(yyvsp[0].sval); auto lookup_result = SymbolTable::lookup(type_name); if (!lookup_result || lookup_result->tag != Tag::STRUCT) { std::cout << "Erro: Tipo '" << type_name << "' não é um struct para 'NEW'." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } else { (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "REF(" + type_name + ")"; } delete (yyvsp[0].sval); }
-#line 1809 "parser.tab.c"
-    break;
-
-  case 80: /* primary_exp: var  */
-#line 308 "parser.y"
-          { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1815 "parser.tab.c"
-    break;
-
-  case 81: /* primary_exp: ref_var  */
-#line 309 "parser.y"
-              { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1821 "parser.tab.c"
-    break;
-
-  case 82: /* primary_exp: deref_var  */
-#line 310 "parser.y"
-                { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
+  case 47: /* return_exp_opt: expression  */
+#line 443 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
 #line 1827 "parser.tab.c"
     break;
 
-  case 83: /* primary_exp: '(' expression ')'  */
-#line 311 "parser.y"
-                         { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[-1].t_attr)->type; delete (yyvsp[-1].t_attr); }
-#line 1833 "parser.tab.c"
+  case 48: /* call_stmt: call_exp  */
+#line 453 "parser.y"
+    {
+        (yyval.b_attr) = new BoolAttr();
+        (yyval.b_attr)->ok = (yyvsp[0].t_attr)->ok;
+        delete (yyvsp[0].t_attr);
+    }
+#line 1837 "parser.tab.c"
     break;
 
-  case 84: /* var: NAME  */
-#line 316 "parser.y"
+  case 49: /* call_exp: NAME '(' call_args_opt ')'  */
+#line 462 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        std::string func_name = *(yyvsp[-3].sval);
+        delete (yyvsp[-3].sval);
+
+        auto lookup_result = SymbolTable::lookup(func_name);
+        if (!lookup_result || lookup_result->tag != Tag::PROC) {
+            std::cout << "Erro: Função ou procedimento '" << func_name << "' não declarado." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        } else {
+            (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok;
+            (yyval.t_attr)->type = lookup_result->type;
+        }
+        delete (yyvsp[-1].t_attr);
+    }
+#line 1859 "parser.tab.c"
+    break;
+
+  case 50: /* call_args_opt: %empty  */
+#line 483 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = true;
+        (yyval.t_attr)->type = "void";
+    }
+#line 1869 "parser.tab.c"
+    break;
+
+  case 51: /* call_args_opt: expression call_args_tail  */
+#line 489 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = "void";
+        delete (yyvsp[-1].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 1881 "parser.tab.c"
+    break;
+
+  case 52: /* call_args_tail: %empty  */
+#line 500 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = true;
+        (yyval.t_attr)->type = "void";
+    }
+#line 1891 "parser.tab.c"
+    break;
+
+  case 53: /* call_args_tail: ',' expression call_args_tail  */
+#line 506 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = "void";
+        delete (yyvsp[-1].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 1903 "parser.tab.c"
+    break;
+
+  case 54: /* expression: or_exp  */
+#line 517 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 1914 "parser.tab.c"
+    break;
+
+  case 55: /* or_exp: or_exp OR and_exp  */
+#line 527 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && (yyvsp[-2].t_attr)->type == "BOOL" && (yyvsp[0].t_attr)->type == "BOOL") {
+            (yyval.t_attr)->type = "BOOL";
+        } else {
+            std::cout << "Erro de tipo: Operandos de OR devem ser BOOLEAN." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 1933 "parser.tab.c"
+    break;
+
+  case 56: /* or_exp: and_exp  */
+#line 542 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 1944 "parser.tab.c"
+    break;
+
+  case 57: /* and_exp: and_exp AND not_exp  */
+#line 552 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && (yyvsp[-2].t_attr)->type == "BOOL" && (yyvsp[0].t_attr)->type == "BOOL") {
+            (yyval.t_attr)->type = "BOOL";
+        } else {
+            std::cout << "Erro de tipo: Operandos de AND devem ser BOOLEAN." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 1963 "parser.tab.c"
+    break;
+
+  case 58: /* and_exp: not_exp  */
+#line 567 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 1974 "parser.tab.c"
+    break;
+
+  case 59: /* not_exp: NOT not_exp  */
+#line 577 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && (yyvsp[0].t_attr)->type == "BOOL") {
+            (yyval.t_attr)->type = "BOOL";
+        } else {
+            std::cout << "Erro de tipo: Operando de NOT deve ser BOOLEAN." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[0].t_attr);
+    }
+#line 1992 "parser.tab.c"
+    break;
+
+  case 60: /* not_exp: rel_exp  */
+#line 591 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 2003 "parser.tab.c"
+    break;
+
+  case 66: /* rel_exp: rel_exp NE add_exp  */
+#line 606 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && (yyvsp[-2].t_attr)->type == (yyvsp[0].t_attr)->type) {
+            (yyval.t_attr)->type = "BOOL";
+        } else {
+            std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 2022 "parser.tab.c"
+    break;
+
+  case 67: /* rel_exp: add_exp  */
+#line 621 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 2033 "parser.tab.c"
+    break;
+
+  case 69: /* add_exp: add_exp MINUS mult_exp  */
+#line 632 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && ((yyvsp[-2].t_attr)->type == "INT" || (yyvsp[-2].t_attr)->type == "FLOAT") && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) {
+            (yyval.t_attr)->type = ((yyvsp[-2].t_attr)->type == "FLOAT" || (yyvsp[0].t_attr)->type == "FLOAT") ? "FLOAT" : "INT";
+        } else {
+            std::cout << "Erro de tipo: Operandos de adição/subtração devem ser numéricos." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 2052 "parser.tab.c"
+    break;
+
+  case 70: /* add_exp: mult_exp  */
+#line 647 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 2063 "parser.tab.c"
+    break;
+
+  case 72: /* mult_exp: mult_exp DIV exp_exp  */
+#line 658 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && ((yyvsp[-2].t_attr)->type == "INT" || (yyvsp[-2].t_attr)->type == "FLOAT") && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) {
+            (yyval.t_attr)->type = ((yyvsp[-2].t_attr)->type == "FLOAT" || (yyvsp[0].t_attr)->type == "FLOAT") ? "FLOAT" : "INT";
+        } else {
+            std::cout << "Erro de tipo: Operandos de multiplicação/divisão devem ser numéricos." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 2082 "parser.tab.c"
+    break;
+
+  case 73: /* mult_exp: exp_exp  */
+#line 673 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 2093 "parser.tab.c"
+    break;
+
+  case 74: /* exp_exp: unary_exp EXP_OP exp_exp  */
+#line 683 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok && (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && ((yyvsp[-2].t_attr)->type == "INT" || (yyvsp[-2].t_attr)->type == "FLOAT") && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) {
+            (yyval.t_attr)->type = ((yyvsp[-2].t_attr)->type == "FLOAT" || (yyvsp[0].t_attr)->type == "FLOAT") ? "FLOAT" : "INT";
+        } else {
+            std::cout << "Erro de tipo: Operandos de exponenciação devem ser numéricos." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-2].t_attr);
+        delete (yyvsp[0].t_attr);
+    }
+#line 2112 "parser.tab.c"
+    break;
+
+  case 75: /* exp_exp: unary_exp  */
+#line 698 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 2123 "parser.tab.c"
+    break;
+
+  case 76: /* unary_exp: MINUS unary_exp  */
+#line 708 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok && ((yyvsp[0].t_attr)->type == "INT" || (yyvsp[0].t_attr)->type == "FLOAT")) {
+            (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        } else {
+            std::cout << "Erro de tipo: Operando unário '-' deve ser numérico." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[0].t_attr);
+    }
+#line 2141 "parser.tab.c"
+    break;
+
+  case 77: /* unary_exp: primary_exp  */
+#line 722 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        (yyval.t_attr)->type = (yyvsp[0].t_attr)->type;
+        delete (yyvsp[0].t_attr);
+    }
+#line 2152 "parser.tab.c"
+    break;
+
+  case 78: /* primary_exp: literal  */
+#line 731 "parser.y"
+                        { (yyval.t_attr) = (yyvsp[0].t_attr); }
+#line 2158 "parser.tab.c"
+    break;
+
+  case 79: /* primary_exp: call_exp  */
+#line 732 "parser.y"
+                        { (yyval.t_attr) = (yyvsp[0].t_attr); }
+#line 2164 "parser.tab.c"
+    break;
+
+  case 80: /* primary_exp: NEW NAME  */
+#line 734 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        std::string type_name = *(yyvsp[0].sval);
+        auto lookup_result = SymbolTable::lookup(type_name);
+        if (!lookup_result || lookup_result->tag != Tag::STRUCT) {
+            std::cout << "Erro: Tipo '" << type_name << "' não é um struct para 'NEW'." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        } else {
+            (yyval.t_attr)->ok = true;
+            (yyval.t_attr)->type = "REF(" + type_name + ")";
+        }
+        delete (yyvsp[0].sval);
+    }
+#line 2184 "parser.tab.c"
+    break;
+
+  case 81: /* primary_exp: var  */
+#line 749 "parser.y"
+                        { (yyval.t_attr) = (yyvsp[0].t_attr); }
+#line 2190 "parser.tab.c"
+    break;
+
+  case 82: /* primary_exp: ref_var  */
+#line 750 "parser.y"
+                        { (yyval.t_attr) = (yyvsp[0].t_attr); }
+#line 2196 "parser.tab.c"
+    break;
+
+  case 83: /* primary_exp: deref_var  */
+#line 751 "parser.y"
+                        { (yyval.t_attr) = (yyvsp[0].t_attr); }
+#line 2202 "parser.tab.c"
+    break;
+
+  case 84: /* primary_exp: '(' expression ')'  */
+#line 752 "parser.y"
+                        { (yyval.t_attr) = (yyvsp[-1].t_attr); }
+#line 2208 "parser.tab.c"
+    break;
+
+  case 85: /* var: NAME  */
+#line 757 "parser.y"
     {
         (yyval.t_attr) = new TypedAttr();
         std::string var_base_name = *(yyvsp[0].sval);
         delete (yyvsp[0].sval);
+
         auto lookup_result = SymbolTable::lookup(var_base_name);
         if (!lookup_result || (lookup_result->tag != Tag::VAR && lookup_result->tag != Tag::PROC_PARAM)) {
             std::cout << "Erro: Variável '" << var_base_name << "' não declarada." << std::endl;
             YYABORT;
-            (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR";
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
         } else {
-            (yyval.t_attr)->ok = true; (yyval.t_attr)->type = lookup_result->type;
+            (yyval.t_attr)->ok = true;
+            (yyval.t_attr)->type = lookup_result->type;
         }
     }
-#line 1851 "parser.tab.c"
+#line 2229 "parser.tab.c"
     break;
 
-  case 85: /* var: var '.' NAME  */
-#line 330 "parser.y"
+  case 86: /* var: var '.' NAME  */
+#line 774 "parser.y"
     {
         (yyval.t_attr) = new TypedAttr();
         (yyval.t_attr)->ok = (yyvsp[-2].t_attr)->ok;
         (yyval.t_attr)->type = "ERR";
+
         if ((yyval.t_attr)->ok) {
             std::string base_type = (yyvsp[-2].t_attr)->type;
             std::string field_name = *(yyvsp[0].sval);
             delete (yyvsp[0].sval);
+
             if (base_type == "INT" || base_type == "FLOAT" || base_type == "STRING" || base_type == "BOOL") {
                 std::cout << "Erro de tipo: Tentativa de acessar o campo '" << field_name << "' em um tipo primitivo ('" << base_type << "')." << std::endl;
                 YYABORT;
                 (yyval.t_attr)->ok = false;
             } else {
                 std::cout << "AVISO: Verificação semântica para o campo '" << field_name << "' não está totalmente implementada." << std::endl;
-                (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "any";
+                (yyval.t_attr)->ok = true;
+                (yyval.t_attr)->type = "any";
             }
         }
         delete (yyvsp[-2].t_attr);
     }
-#line 1875 "parser.tab.c"
+#line 2256 "parser.tab.c"
     break;
 
-  case 86: /* var: var '[' expression ']'  */
-#line 350 "parser.y"
+  case 87: /* var: var '[' expression ']'  */
+#line 797 "parser.y"
     {
         (yyval.t_attr) = new TypedAttr();
         (yyval.t_attr)->ok = (yyvsp[-3].t_attr)->ok && (yyvsp[-1].t_attr)->ok;
         (yyval.t_attr)->type = "ERR";
+
         if ((yyval.t_attr)->ok) {
             std::string base_type = (yyvsp[-3].t_attr)->type;
             std::string index_type = (yyvsp[-1].t_attr)->type;
+
             if (index_type != "INT") {
                 std::cout << "Erro de tipo: O índice de um array deve ser um inteiro, mas foi '" << index_type << "'." << std::endl;
                 YYABORT;
                 (yyval.t_attr)->ok = false;
             }
+
             if ((yyval.t_attr)->ok) {
                 if (base_type.rfind("ARRAY(", 0) == 0) {
                     (yyval.t_attr)->type = base_type.substr(6, base_type.length() - 7);
@@ -1898,115 +2282,183 @@ yyreduce:
                 }
             }
         }
-        delete (yyvsp[-3].t_attr); delete (yyvsp[-1].t_attr);
+        delete (yyvsp[-3].t_attr);
+        delete (yyvsp[-1].t_attr);
     }
-#line 1904 "parser.tab.c"
+#line 2289 "parser.tab.c"
     break;
 
-  case 87: /* ref_var: REF '(' var ')'  */
-#line 377 "parser.y"
-                    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok; if ((yyval.t_attr)->ok) { (yyval.t_attr)->type = "REF(" + (yyvsp[-1].t_attr)->type + ")"; } else { (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-1].t_attr); }
-#line 1910 "parser.tab.c"
+  case 88: /* ref_var: REF '(' var ')'  */
+#line 829 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok;
+        if ((yyval.t_attr)->ok) {
+            (yyval.t_attr)->type = "REF(" + (yyvsp[-1].t_attr)->type + ")";
+        } else {
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-1].t_attr);
+    }
+#line 2304 "parser.tab.c"
     break;
 
-  case 88: /* deref_var: DEREF '(' var ')'  */
-#line 381 "parser.y"
-                      { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok; if ((yyval.t_attr)->ok && (yyvsp[-1].t_attr)->type.rfind("REF(", 0) == 0) { (yyval.t_attr)->type = (yyvsp[-1].t_attr)->type.substr(4, (yyvsp[-1].t_attr)->type.length() - 5); } else { std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-1].t_attr); }
-#line 1916 "parser.tab.c"
+  case 89: /* deref_var: DEREF '(' var ')'  */
+#line 843 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok;
+        if ((yyval.t_attr)->ok && (yyvsp[-1].t_attr)->type.rfind("REF(", 0) == 0) {
+            (yyval.t_attr)->type = (yyvsp[-1].t_attr)->type.substr(4, (yyvsp[-1].t_attr)->type.length() - 5);
+        } else {
+            std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-1].t_attr);
+    }
+#line 2322 "parser.tab.c"
     break;
 
-  case 89: /* deref_var: DEREF '(' deref_var ')'  */
-#line 382 "parser.y"
-                              { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok; if ((yyval.t_attr)->ok && (yyvsp[-1].t_attr)->type.rfind("REF(", 0) == 0) { (yyval.t_attr)->type = (yyvsp[-1].t_attr)->type.substr(4, (yyvsp[-1].t_attr)->type.length() - 5); } else { std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-1].t_attr); }
-#line 1922 "parser.tab.c"
+  case 90: /* deref_var: DEREF '(' deref_var ')'  */
+#line 857 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok;
+        if ((yyval.t_attr)->ok && (yyvsp[-1].t_attr)->type.rfind("REF(", 0) == 0) {
+            (yyval.t_attr)->type = (yyvsp[-1].t_attr)->type.substr(4, (yyvsp[-1].t_attr)->type.length() - 5);
+        } else {
+            std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-1].t_attr);
+    }
+#line 2340 "parser.tab.c"
     break;
 
-  case 90: /* literal: FLOAT_LITERAL  */
-#line 386 "parser.y"
-                    { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "FLOAT"; delete (yyvsp[0].sval); }
-#line 1928 "parser.tab.c"
+  case 91: /* literal: FLOAT_LITERAL  */
+#line 873 "parser.y"
+                      { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "FLOAT"; delete (yyvsp[0].sval); }
+#line 2346 "parser.tab.c"
     break;
 
-  case 91: /* literal: INT_LITERAL  */
-#line 387 "parser.y"
-                  { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "INT"; delete (yyvsp[0].sval); }
-#line 1934 "parser.tab.c"
+  case 92: /* literal: INT_LITERAL  */
+#line 874 "parser.y"
+                      { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "INT"; delete (yyvsp[0].sval); }
+#line 2352 "parser.tab.c"
     break;
 
-  case 92: /* literal: STRING_LITERAL  */
-#line 388 "parser.y"
-                     { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "STRING"; delete (yyvsp[0].sval); }
-#line 1940 "parser.tab.c"
+  case 93: /* literal: STRING_LITERAL  */
+#line 875 "parser.y"
+                      { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "STRING"; delete (yyvsp[0].sval); }
+#line 2358 "parser.tab.c"
     break;
 
-  case 93: /* literal: bool_literal  */
-#line 389 "parser.y"
-                   { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; (yyval.t_attr)->type = (yyvsp[0].t_attr)->type; delete (yyvsp[0].t_attr); }
-#line 1946 "parser.tab.c"
+  case 94: /* literal: bool_literal  */
+#line 876 "parser.y"
+                      { (yyval.t_attr) = (yyvsp[0].t_attr); }
+#line 2364 "parser.tab.c"
     break;
 
-  case 94: /* literal: NULL_LIT  */
-#line 390 "parser.y"
-               { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "NULL"; }
-#line 1952 "parser.tab.c"
+  case 95: /* literal: NULL_LIT  */
+#line 877 "parser.y"
+                      { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "NULL"; }
+#line 2370 "parser.tab.c"
     break;
 
-  case 95: /* bool_literal: TRUE  */
-#line 394 "parser.y"
+  case 96: /* bool_literal: TRUE  */
+#line 881 "parser.y"
             { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "BOOL"; }
-#line 1958 "parser.tab.c"
+#line 2376 "parser.tab.c"
     break;
 
-  case 96: /* bool_literal: FALSE  */
-#line 395 "parser.y"
+  case 97: /* bool_literal: FALSE  */
+#line 882 "parser.y"
             { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "BOOL"; }
-#line 1964 "parser.tab.c"
+#line 2382 "parser.tab.c"
     break;
 
-  case 97: /* type: FLOAT_T  */
-#line 399 "parser.y"
-               { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "FLOAT"; }
-#line 1970 "parser.tab.c"
+  case 98: /* type: FLOAT_T  */
+#line 886 "parser.y"
+                { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "FLOAT"; }
+#line 2388 "parser.tab.c"
     break;
 
-  case 98: /* type: INT_T  */
-#line 400 "parser.y"
-               { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "INT"; }
-#line 1976 "parser.tab.c"
+  case 99: /* type: INT_T  */
+#line 887 "parser.y"
+                { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "INT"; }
+#line 2394 "parser.tab.c"
     break;
 
-  case 99: /* type: STRING_T  */
-#line 401 "parser.y"
-               { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "STRING"; }
-#line 1982 "parser.tab.c"
+  case 100: /* type: STRING_T  */
+#line 888 "parser.y"
+                { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "STRING"; }
+#line 2400 "parser.tab.c"
     break;
 
-  case 100: /* type: BOOL_T  */
-#line 402 "parser.y"
-               { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "BOOL"; }
-#line 1988 "parser.tab.c"
+  case 101: /* type: BOOL_T  */
+#line 889 "parser.y"
+                { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = true; (yyval.t_attr)->type = "BOOL"; }
+#line 2406 "parser.tab.c"
     break;
 
-  case 101: /* type: NAME  */
-#line 403 "parser.y"
-           { (yyval.t_attr) = new TypedAttr(); std::string type_name = *(yyvsp[0].sval); auto lookup_result = SymbolTable::lookup(type_name); if (lookup_result && lookup_result->tag == Tag::STRUCT) { (yyval.t_attr)->ok = true; (yyval.t_attr)->type = lookup_result->type; } else { std::cout << "Erro: '" << type_name << "' não é um tipo válido ou struct declarado." << std::endl; YYABORT; (yyval.t_attr)->ok = false; (yyval.t_attr)->type = "ERR"; } delete (yyvsp[0].sval); }
-#line 1994 "parser.tab.c"
+  case 102: /* type: NAME  */
+#line 891 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        std::string type_name = *(yyvsp[0].sval);
+        auto lookup_result = SymbolTable::lookup(type_name);
+        
+        if (lookup_result && lookup_result->tag == Tag::STRUCT) {
+            (yyval.t_attr)->ok = true;
+            (yyval.t_attr)->type = lookup_result->type;
+        } else {
+            std::cout << "Erro: '" << type_name << "' não é um tipo válido ou struct declarado." << std::endl;
+            YYABORT;
+            (yyval.t_attr)->ok = false;
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[0].sval);
+    }
+#line 2427 "parser.tab.c"
     break;
 
-  case 102: /* type: REF '(' type ')'  */
-#line 404 "parser.y"
-                       { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok; if ((yyval.t_attr)->ok) { (yyval.t_attr)->type = "REF(" + (yyvsp[-1].t_attr)->type + ")"; } else { (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-1].t_attr); }
-#line 2000 "parser.tab.c"
+  case 103: /* type: REF '(' type ')'  */
+#line 908 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[-1].t_attr)->ok;
+        if ((yyval.t_attr)->ok) {
+            (yyval.t_attr)->type = "REF(" + (yyvsp[-1].t_attr)->type + ")";
+        } else {
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-1].t_attr);
+    }
+#line 2442 "parser.tab.c"
     break;
 
-  case 103: /* type: ARRAY '[' INT_LITERAL ']' OF type  */
-#line 405 "parser.y"
-                                        { (yyval.t_attr) = new TypedAttr(); (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok; if ((yyval.t_attr)->ok) { (yyval.t_attr)->type = "ARRAY(" + (yyvsp[0].t_attr)->type + ")"; } else { (yyval.t_attr)->type = "ERR"; } delete (yyvsp[-3].sval); delete (yyvsp[0].t_attr); }
-#line 2006 "parser.tab.c"
+  case 104: /* type: ARRAY '[' INT_LITERAL ']' OF type  */
+#line 919 "parser.y"
+    {
+        (yyval.t_attr) = new TypedAttr();
+        (yyval.t_attr)->ok = (yyvsp[0].t_attr)->ok;
+        if ((yyval.t_attr)->ok) {
+            (yyval.t_attr)->type = "ARRAY(" + (yyvsp[0].t_attr)->type + ")";
+        } else {
+            (yyval.t_attr)->type = "ERR";
+        }
+        delete (yyvsp[-3].sval);
+        delete (yyvsp[0].t_attr);
+    }
+#line 2458 "parser.tab.c"
     break;
 
 
-#line 2010 "parser.tab.c"
+#line 2462 "parser.tab.c"
 
       default: break;
     }
@@ -2199,7 +2651,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 408 "parser.y"
+#line 932 "parser.y"
 
 
 void yyerror(const char *s) {
@@ -2209,11 +2661,11 @@ void yyerror(const char *s) {
 
 int main(void) {
     SymbolTable::enter_scope();
-    int parse_result = yyparse();
-    // A impressão final pode não ser alcançada se YYABORT for chamado.
-    // Isso é esperado quando um erro de tipo é encontrado.
+    yyparse();
+    
     std::cout << "\n--- Conteúdo Final da Tabela de Símbolos ---" << std::endl;
     SymbolTable::print_all();
     SymbolTable::exit_scope();
-    return parse_result;
+    
+    return 0;
 }
