@@ -117,16 +117,45 @@ var_decl:
     VAR NAME ':' type var_init_opt
     {
         $$ = new BoolAttr();
-        std::string var_name = *$2;
-        bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, $4->type, Tag::VAR));
-        
-        if (!insert_ok) {
-            std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
+        $$->ok = false; 
+        if (!$4->ok || !$5->ok) {
             YYABORT;
-            $$->ok = false;
-        } else {
-            $$->ok = $4->ok && $5->ok;
         }
+
+        std::string var_name = *$2;
+        std::string declared_type = $4->type;
+        std::string init_type = $5->type;
+
+        bool has_initializer = (init_type != "void");
+
+        if (has_initializer) {
+            bool is_compatible = (declared_type == init_type) || 
+                                 (init_type == "NULL" && declared_type.rfind("REF(", 0) == 0);
+
+            if (!is_compatible) {
+                std::cout << "Erro de Tipo: Incompatibilidade na inicialização da variável '" << var_name
+                          << "'. O tipo declarado é '" << declared_type
+                          << "', mas a expressão de inicialização é do tipo '" << init_type << "'." << std::endl;
+                YYABORT;
+            } else {
+                bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
+                if (!insert_ok) {
+                    std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
+                    YYABORT;
+                } else {
+                    $$->ok = true; 
+                }
+            }
+        } else {
+            bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
+            if (!insert_ok) {
+                std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
+                YYABORT;
+            } else {
+                $$->ok = true; // Sucesso
+            }
+        }
+        
         delete $2;
         delete $4;
         delete $5;
