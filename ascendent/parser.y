@@ -368,14 +368,45 @@ assign_stmt:
       var ASSIGN expression
     {
         $$ = new BoolAttr();
-        $$->ok = $1->ok && $3->ok;
+        
+        if (!$1->ok || !$3->ok) {
+            $$->ok = false;
+        } else {
+            bool is_compatible = ($1->type == $3->type) || 
+                                 ($3->type == "NULL" && $1->type.rfind("REF(", 0) == 0);
+
+            if (!is_compatible) {
+                std::cout << "Erro de Tipo: Incompatibilidade na atribuição. "
+                          << "Não é possível atribuir uma expressão do tipo '" << $3->type
+                          << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
+                YYABORT;
+                $$->ok = false;
+            } else {
+                $$->ok = true;
+            }
+        }
+
         delete $1;
         delete $3;
     }
     | deref_var ASSIGN expression
     {
         $$ = new BoolAttr();
-        $$->ok = $1->ok && $3->ok;
+        
+        if (!$1->ok || !$3->ok) {
+            $$->ok = false;
+        } else {
+            if ($1->type != $3->type) {
+                std::cout << "Erro de Tipo: Incompatibilidade na atribuição. "
+                          << "Não é possível atribuir uma expressão do tipo '" << $3->type
+                          << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
+                YYABORT;
+                $$->ok = false;
+            } else {
+                $$->ok = true;
+            }
+        }
+
         delete $1;
         delete $3;
     }
