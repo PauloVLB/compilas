@@ -44,6 +44,12 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 1 "parser.y"
+
+    #include <unordered_map>
+
+#line 53 "parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -119,14 +125,15 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 18 "parser.y"
+#line 20 "parser.y"
 
     std::string* sval;
     BoolAttr* b_attr;
     TypedAttr* t_attr;
     std::vector<std::string>* param_types_list;
+    std::unordered_map<std::string, std::string>* member_map;
 
-#line 130 "parser.tab.h"
+#line 137 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

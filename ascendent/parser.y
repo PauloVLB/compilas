@@ -909,7 +909,7 @@ primary_exp:
             $$->type = "ERR";
         } else {
             $$->ok = true;
-            $$->type = "REF(" + type_name + ")";
+            $$->type =  type_name ;
         }
         delete $2;
     }
