@@ -49,12 +49,13 @@ void yyerror(const char *s);
 %type <b_attr> M_proc_scope_enter
 %type <member_map> opt_struct_members struct_member_tail struct_member_decl
 
-%type <t_attr> var_init_opt opt_type return_stmt return_exp_opt call_args_opt call_args_tail call_exp
+%type <t_attr> var_init_opt opt_type return_stmt return_exp_opt call_exp
 %type <t_attr> expression or_exp and_exp not_exp rel_exp add_exp mult_exp exp_exp unary_exp primary_exp
 %type <t_attr> var ref_var deref_var literal bool_literal type
 %type <t_attr> paramfield_decl
 
 %type <param_types_list> opt_param_list paramfield_tail
+%type <param_types_list> call_args_opt call_args_tail
 
 
 %%
@@ -575,8 +576,36 @@ call_exp:
             $$->ok = false;
             $$->type = "ERR";
         } else {
-            $$->ok = $3->ok;
-            $$->type = lookup_result->type;
+            const auto& declared_params = lookup_result->paramList;
+            const auto& provided_args = *$3;
+
+            if (declared_params.size() != provided_args.size()) {
+                std::cout << "Erro: Função '" << func_name << "' espera " << declared_params.size() 
+                          << " argumentos, mas recebeu " << provided_args.size() << "." << std::endl;
+                YYABORT;
+                $$->ok = false;
+                $$->type = "ERR";
+            } else {
+                bool types_match = true;
+                for (size_t i = 0; i < declared_params.size(); ++i) {
+                    if (declared_params[i] != provided_args[i]) {
+                        std::cout << "Erro: Incompatibilidade de tipo no argumento " << i + 1 
+                                  << " da chamada para '" << func_name << "'. Esperado '" 
+                                  << declared_params[i] << "', mas recebeu '" << provided_args[i] << "'." << std::endl;
+                        YYABORT;
+                        types_match = false;
+                        break;
+                    }
+                }
+
+                if (types_match) {
+                    $$->ok = true;
+                    $$->type = lookup_result->type;
+                } else {
+                    $$->ok = false;
+                    $$->type = "ERR";
+                }
+            }
         }
         delete $3;
     }
@@ -585,34 +614,30 @@ call_exp:
 call_args_opt:
       /* vazio */
     {
-        $$ = new TypedAttr();
-        $$->ok = true;
-        $$->type = "void";
+        $$ = new std::vector<std::string>();
     }
     | expression call_args_tail
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $2->ok;
-        $$->type = "void";
+        $$ = $2;
+        if ($1->ok) {
+            $$->insert($$->begin(), $1->type);
+        }
         delete $1;
-        delete $2;
     }
     ;
 
 call_args_tail:
       /* vazio */
     {
-        $$ = new TypedAttr();
-        $$->ok = true;
-        $$->type = "void";
+        $$ = new std::vector<std::string>();
     }
     | ',' expression call_args_tail
     {
-        $$ = new TypedAttr();
-        $$->ok = $2->ok && $3->ok;
-        $$->type = "void";
+        $$ = $3;
+        if ($2->ok) {
+            $$->insert($$->begin(), $2->type);
+        }
         delete $2;
-        delete $3;
     }
     ;
 
