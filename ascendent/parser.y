@@ -212,6 +212,31 @@ var_decl:
         delete $5;
         SymbolTable::print_all();
     }
+    | VAR NAME ASSIGN expression
+    {
+        $$ = new BoolAttr();
+        $$->ok = false; 
+
+        std::string var_name = *$2;
+        delete $2;
+
+        if (!$4->ok) {
+            YYABORT;
+        }
+
+        std::string init_type = $4->type;
+
+        bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, init_type, Tag::VAR));
+        if (!insert_ok) {
+            std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
+            YYABORT;
+        } else {
+            $$->ok = true; // Sucesso
+        }
+
+        delete $4;
+        SymbolTable::print_all();
+    }
     ;
 
 var_init_opt:

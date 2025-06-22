@@ -37,8 +37,10 @@ begin
         var point_array : array [4] of Point;
 
         var x_ref       : ref(int);
+        var init := 2.0;
         var temp        : int
     in
+        init := 2;
         // 1. Testes de Atribuição e Conversão Implícita
         float_val := int_val; // Válido: float = int
 
@@ -54,7 +56,7 @@ begin
         // 4. Testes Relacionais e Lógicos
         bool_val := int_val < float_val; // Válido: comparação entre numéricos
         bool_val := (p1 = p2) || (10 > 5); // Válido
-        check(bool_val,"testerelacional", 2 > 4);
+        check(bool_val,"testerelacional", 2);
 
         // 5. Testes de Struct
         p1.x := 1.0;
