@@ -1,0 +1,78 @@
+program TestSuite
+begin
+
+    // Definição de Tipos Complexos
+    struct Point {
+        x : float;
+        y : float
+    };
+
+    struct Line {
+        start : Point;
+        finish : Point;
+        name : string
+    };
+
+
+    // Declaração de Procedimentos
+    procedure check(value: bool, name: string, num: float)
+    begin
+        // Este procedimento serve apenas para testar chamadas com parâmetros.
+        // O corpo pode ser vazio.
+    end;
+
+
+    // Procedimento Principal
+    procedure main()
+    begin
+        // Declaração de Variáveis Locais
+        var p1          : Point;
+        var p2          : Point;
+        var road        : Line;
+        var int_val     : int       := 10;
+        var float_val   : float     := 2.5;
+        var bool_val    : bool      := true;
+        var int_array   : array [5] of int;
+        var matrix      : array [2] of array [3] of int;
+        var point_array : array [4] of Point;
+
+        var x_ref       : ref(int);
+        var temp        : int
+    in
+        // 1. Testes de Atribuição e Conversão Implícita
+        float_val := int_val; // Válido: float = int
+
+        // 2. Testes Aritméticos com Tipos Mistos
+        float_val := int_val + 2.5;     // int + float -> float
+        float_val := 2 * float_val;     // int * float -> float
+        float_val := (int_val / 2) + 1.0; // (int / int) + float -> float
+        
+        // 3. Teste de Exponenciação (deve resultar em FLOAT)
+        float_val := int_val ^ 2;       // int ^ int -> float
+        float_val := 2.0 ^ int_val;     // float ^ int -> float
+
+        // 4. Testes Relacionais e Lógicos
+        bool_val := int_val < float_val; // Válido: comparação entre numéricos
+        bool_val := (p1 = p2) || (10 > 5); // Válido
+        check(bool_val,"testerelacional", 2 > 4);
+
+        // 5. Testes de Struct
+        p1.x := 1.0;
+        p1.y := float_val;
+        road.start := p1;
+        road.finish.x := road.start.x + 10.0;
+        road.name := "Main Street";
+        
+        // 6. Testes de Array
+        int_array[0] := 100;
+        int_array[1] := int_val * 2;
+        matrix[0][2] := 50;
+        point_array[3].y := p1.y;
+
+        // 7. Testes de Referência
+        x_ref := ref(int_array[0]);
+        temp := deref(x_ref);
+        deref(x_ref) := temp + 1 // int_array[0] agora seria 101
+    end
+
+end

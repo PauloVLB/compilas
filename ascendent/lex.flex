@@ -132,7 +132,7 @@ false {update_token(yytext); return FALSE;}
 ":" {update_token(yytext); return ':';}
 "." {update_token(yytext); return '.';}
 "," {update_token(yytext); return ',';}
-"^" {update_token(yytext); return '^';}
+"^" {update_token(yytext); return EXP_OP;}
 "<>" {update_token(yytext);return NE;}
 
 "=" {update_token(yytext);return EQ;}

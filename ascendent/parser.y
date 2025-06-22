@@ -10,11 +10,62 @@
 #include <iostream>
 #include <vector>
 #include <optional>
+#include <functional>
 #include "types/attrs.hpp"
 #include "symbol_table/symbol_table.hpp"
 
 extern int yylex();
 void yyerror(const char *s);
+
+bool is_numeric(const std::string& type) {
+    return type == "INT" || type == "FLOAT";
+}
+
+std::string resolve_arithmetic_type(const std::string& t1, const std::string& t2) {
+    if (t1 == "FLOAT" || t2 == "FLOAT") {
+        return "FLOAT";
+    }
+    return "INT";
+}
+
+bool check_compatible(const std::string& tvar, const std::string& texp) {
+    return (tvar == texp) || 
+                        (texp == "NULL" && tvar.rfind("REF(", 0) == 0) || 
+                        (tvar == "FLOAT" && texp == "INT");
+}
+
+bool handle_binary_op(
+    TypedAttr*& $$ /* Atributo de resultado */,
+    TypedAttr* left /* Operando esquerdo */,
+    TypedAttr* right /* Operando direito */,
+    const std::string& op_name /* Nome do operador para erros */,
+    // Função que define se os tipos são válidos para a operação
+    std::function<bool(const std::string&, const std::string&)> are_types_valid,
+    // Função que calcula o tipo do resultado
+    std::function<std::string(const std::string&, const std::string&)> resolve_result_type)
+{
+    $$ = new TypedAttr();
+    $$->ok = left->ok && right->ok;
+    
+    if ($$->ok) {
+        if (are_types_valid(left->type, right->type)) {
+            $$->type = resolve_result_type(left->type, right->type);
+        } else {
+            std::cout << "Erro de tipo: Operandos inválidos para o operador '" << op_name << "'. "
+                      << "Recebeu '" << left->type << "' e '" << right->type << "'." << std::endl;
+            $$->ok = false;
+            $$->type = "ERR";
+            return false;
+        }
+    } else {
+        $$->type = "ERR";
+    }
+
+    delete left;
+    delete right;
+    return true;
+}
+
 %}
 
 %union {
@@ -130,15 +181,14 @@ var_decl:
         bool has_initializer = (init_type != "void");
 
         if (has_initializer) {
-            bool is_compatible = (declared_type == init_type) || 
-                                 (init_type == "NULL" && declared_type.rfind("REF(", 0) == 0);
 
-            if (!is_compatible) {
+            if(!check_compatible(declared_type, init_type)) {
                 std::cout << "Erro de Tipo: Incompatibilidade na inicialização da variável '" << var_name
                           << "'. O tipo declarado é '" << declared_type
                           << "', mas a expressão de inicialização é do tipo '" << init_type << "'." << std::endl;
                 YYABORT;
-            } else {
+            } 
+            else {
                 bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
                 if (!insert_ok) {
                     std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
@@ -440,10 +490,7 @@ assign_stmt:
         if (!$1->ok || !$3->ok) {
             $$->ok = false;
         } else {
-            bool is_compatible = ($1->type == $3->type) || 
-                                 ($3->type == "NULL" && $1->type.rfind("REF(", 0) == 0);
-
-            if (!is_compatible) {
+            if (!check_compatible($1->type, $3->type)) {
                 std::cout << "Erro de Tipo: Incompatibilidade na atribuição. "
                           << "Não é possível atribuir uma expressão do tipo '" << $3->type
                           << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
@@ -588,7 +635,7 @@ call_exp:
             } else {
                 bool types_match = true;
                 for (size_t i = 0; i < declared_params.size(); ++i) {
-                    if (declared_params[i] != provided_args[i]) {
+                    if (!check_compatible(declared_params[i], provided_args[i])) {
                         std::cout << "Erro: Incompatibilidade de tipo no argumento " << i + 1 
                                   << " da chamada para '" << func_name << "'. Esperado '" 
                                   << declared_params[i] << "', mas recebeu '" << provided_args[i] << "'." << std::endl;
@@ -654,51 +701,21 @@ expression:
 or_exp:
       or_exp OR and_exp
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && $1->type == "BOOL" && $3->type == "BOOL") {
-            $$->type = "BOOL";
-        } else {
-            std::cout << "Erro de tipo: Operandos de OR devem ser BOOLEAN." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
+        if(!handle_binary_op($$, $1, $3, "OR", 
+            [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
+            [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
     }
-    | and_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | and_exp { $$ = $1; }
     ;
 
 and_exp:
       and_exp AND not_exp
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && $1->type == "BOOL" && $3->type == "BOOL") {
-            $$->type = "BOOL";
-        } else {
-            std::cout << "Erro de tipo: Operandos de AND devem ser BOOLEAN." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
+        if(!handle_binary_op($$, $1, $3, "AND",
+            [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
+            [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
     }
-    | not_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | not_exp { $$ = $1; }
     ;
 
 not_exp:
@@ -716,212 +733,95 @@ not_exp:
         }
         delete $2;
     }
-    | rel_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | rel_exp { $$ = $1; }
     ;
 
 rel_exp: rel_exp LT add_exp {
-  $$ = new TypedAttr();
-  $$->ok = $1->ok && $3->ok;
-  if ($$->ok && $1->type == $3->type) {
-    $$->type = "BOOL";
-  } else {
-    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
-    YYABORT;
-    $$->ok = false;
-    $$->type = "ERR";
-  }
-  delete $1;
-  delete $3;
+    if(!handle_binary_op($$, $1, $3, "<",
+        [](const auto& t1, const auto& t2) { 
+            return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
+        },
+        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
 }
 | rel_exp LE add_exp {
-  $$ = new TypedAttr();
-  $$->ok = $1->ok && $3->ok;
-  if ($$->ok && $1->type == $3->type) {
-    $$->type = "BOOL";
-  } else {
-    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
-    YYABORT;
-    $$->ok = false;
-    $$->type = "ERR";
-  }
-  delete $1;
-  delete $3;
+    if(!handle_binary_op($$, $1, $3, "<=",
+        [](const auto& t1, const auto& t2) { 
+            return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
+        },
+        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
 }
 | rel_exp GT add_exp{
-  $$ = new TypedAttr();
-  $$->ok = $1->ok && $3->ok;
-  if ($$->ok && $1->type == $3->type) {
-    $$->type = "BOOL";
-  } else {
-    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
-    YYABORT;
-    $$->ok = false;
-    $$->type = "ERR";
-  }
-  delete $1;
-  delete $3;
+    if(!handle_binary_op($$, $1, $3, ">",
+        [](const auto& t1, const auto& t2) { 
+            return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
+        },
+        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
 }
 | rel_exp GE add_exp {
-  $$ = new TypedAttr();
-  $$->ok = $1->ok && $3->ok;
-  if ($$->ok && $1->type == $3->type) {
-    $$->type = "BOOL";
-  } else {
-    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
-    YYABORT;
-    $$->ok = false;
-    $$->type = "ERR";
-  }
-  delete $1;
-  delete $3;
+    if(!handle_binary_op($$, $1, $3, ">=",
+        [](const auto& t1, const auto& t2) { 
+            return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
+        },
+        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
 }
 | rel_exp EQ add_exp {
-  $$ = new TypedAttr();
-  $$->ok = $1->ok && $3->ok;
-  if ($$->ok && $1->type == $3->type) {
-    $$->type = "BOOL";
-  } else {
-    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
-    YYABORT;
-    $$->ok = false;
-    $$->type = "ERR";
-  }
-  delete $1;
-  delete $3;
+    if(!handle_binary_op($$, $1, $3, "=",
+        [](const auto& t1, const auto& t2) { 
+            return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
+        },
+        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
 }
 | rel_exp NE add_exp {
-  $$ = new TypedAttr();
-  $$->ok = $1->ok && $3->ok;
-  if ($$->ok && $1->type == $3->type) {
-    $$->type = "BOOL";
-  } else {
-    std::cout << "Erro de tipo: Operandos de comparação incompatíveis." << std::endl;
-    YYABORT;
-    $$->ok = false;
-    $$->type = "ERR";
-  }
-  delete $1;
-  delete $3;
+    if(!handle_binary_op($$, $1, $3, "<>",
+        [](const auto& t1, const auto& t2) { 
+            return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
+        },
+        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
 }
-| add_exp {
-  $$ = new TypedAttr();
- 
-  $$->ok = $1->ok;
-  $$->type = $1->type;
-  delete $1;
-}
+| add_exp { $$ = $1; }
 ;
 
 
 add_exp:
       add_exp PLUS mult_exp
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && ($1->type == "INT" || $1->type == "FLOAT") && ($3->type == "INT" || $3->type == "FLOAT")) {
-            $$->type = ($1->type == "FLOAT" || $3->type == "FLOAT") ? "FLOAT" : "INT";
-        } else {
-            std::cout << "Erro de tipo: Operandos de adição/subtração devem ser numéricos." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
+        if(!handle_binary_op($$, $1, $3, "+",
+            [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
+            resolve_arithmetic_type)){YYABORT;};
     }
     | add_exp MINUS mult_exp
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && ($1->type == "INT" || $1->type == "FLOAT") && ($3->type == "INT" || $3->type == "FLOAT")) {
-            $$->type = ($1->type == "FLOAT" || $3->type == "FLOAT") ? "FLOAT" : "INT";
-        } else {
-            std::cout << "Erro de tipo: Operandos de adição/subtração devem ser numéricos." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
+        if(!handle_binary_op($$, $1, $3, "-",
+            [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
+            resolve_arithmetic_type)){YYABORT;};
     }
-    | mult_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | mult_exp { $$ = $1; }
     ;
 
 mult_exp:
       mult_exp MULT exp_exp
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && ($1->type == "INT" || $1->type == "FLOAT") && ($3->type == "INT" || $3->type == "FLOAT")) {
-            $$->type = ($1->type == "FLOAT" || $3->type == "FLOAT") ? "FLOAT" : "INT";
-        } else {
-            std::cout << "Erro de tipo: Operandos de multiplicação/divisão devem ser numéricos." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
+        if(!handle_binary_op($$, $1, $3, "*", 
+        [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); }, 
+        resolve_arithmetic_type)){YYABORT;};
     }
     | mult_exp DIV exp_exp
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && ($1->type == "INT" || $1->type == "FLOAT") && ($3->type == "INT" || $3->type == "FLOAT")) {
-            $$->type = ($1->type == "FLOAT" || $3->type == "FLOAT") ? "FLOAT" : "INT";
-        } else {
-            std::cout << "Erro de tipo: Operandos de multiplicação/divisão devem ser numéricos." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
+        if(!handle_binary_op($$, $1, $3, "/", 
+        [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); }, 
+        resolve_arithmetic_type)){YYABORT;};
     }
-    | exp_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | exp_exp { $$ = $1; }
     ;
 
 exp_exp:
       unary_exp EXP_OP exp_exp
     {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
-        if ($$->ok && ($1->type == "INT" || $1->type == "FLOAT") && ($3->type == "INT" || $3->type == "FLOAT")) {
-            $$->type = ($1->type == "FLOAT" || $3->type == "FLOAT") ? "FLOAT" : "INT";
-        } else {
-            std::cout << "Erro de tipo: Operandos de exponenciação devem ser numéricos." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        }
-        delete $1;
-        delete $3;
+        if(!handle_binary_op($$, $1, $3, "^",
+            [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
+            [](const auto& t1, const auto& t2) { return "FLOAT"; })){YYABORT;};
     }
-    | unary_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | unary_exp { $$ = $1; }
     ;
 
 unary_exp:
@@ -939,13 +839,7 @@ unary_exp:
         }
         delete $2;
     }
-    | primary_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | primary_exp { $$ = $1; }
     ;
 
 primary_exp:
