@@ -95,7 +95,7 @@ bool handle_binary_op(
 %left MULT DIV
 %right EXP_OP
 
-%type <b_attr> program opt_decls decl_tail decl var_decl proc_decl rec_decl block proc_body_opt
+%type <b_attr> program opt_decls decl_tail decl var_decl proc_decl proc_header rec_decl block proc_body_opt
 %type <b_attr> stmt_list stmt_tail stmt assign_stmt if_stmt else_opt while_stmt call_stmt
 %type <b_attr> M_proc_scope_enter
 %type <member_map> opt_struct_members struct_member_tail struct_member_decl
@@ -265,26 +265,37 @@ M_proc_scope_enter:
     ;
 
 proc_decl:
-    PROCEDURE NAME M_proc_scope_enter '(' opt_param_list ')' opt_type block
+    proc_header block
+    {
+        $$ = new BoolAttr();
+        $$->ok = $1->ok && $2->ok;
+        
+        delete $1;
+        delete $2;
+        SymbolTable::print_all();
+    }
+    ;
+
+proc_header:
+    PROCEDURE NAME '(' opt_param_list ')' opt_type
     {
         $$ = new BoolAttr();
         std::string proc_name = *$2;
-        bool insert_ok = SymbolTable::insert(proc_name, TokenInfo(*$5, $7->type, Tag::PROC));
-        
+        delete $2;
+
+        bool insert_ok = SymbolTable::insert(proc_name, TokenInfo(*$4, $6->type, Tag::PROC));
+        SymbolTable::enter_scope(proc_name);
+
         if (!insert_ok) {
             std::cout << "Erro: Redefinição do procedimento '" << proc_name << "'." << std::endl;
             YYABORT;
             $$->ok = false;
         } else {
-            $$->ok = $3->ok && $7->ok && $8->ok;
+            $$->ok = true;
         }
         
-        delete $2;
-        delete $3;
-        delete $5;
-        delete $7;
-        delete $8;
-        SymbolTable::print_all();
+        delete $4;
+        delete $6;
     }
     ;
 
@@ -603,8 +614,27 @@ return_stmt:
     RETURN return_exp_opt
     {
         $$ = new TypedAttr();
-        $$->ok = $2->ok;
-        $$->type = $2->type;
+        std::string scope_name = SymbolTable::get_scope_name();
+        auto lookup_result = SymbolTable::lookup(scope_name);
+        if (!lookup_result || lookup_result->tag != Tag::PROC) {
+            std::cout << "Erro: 'RETURN' usado fora de um procedimento/função." << std::endl;
+            YYABORT;
+            $$->ok = false;
+            $$->type = "ERR";
+        } else {
+            
+            if($2->type == lookup_result->type || 
+               ($2->type == "void" && lookup_result->type == "void")) {
+                $$->ok = $2->ok;
+                $$->type = lookup_result->type;
+            } else {
+                std::cout << "Erro de tipo: 'RETURN' espera tipo '" << lookup_result->type 
+                          << "', mas recebeu '" << $2->type << "'." << std::endl;
+                YYABORT;
+                $$->ok = false;
+                $$->type = "ERR";
+            }
+        }
         delete $2;
     }
     ;
@@ -1093,7 +1123,7 @@ void yyerror(const char *s) {
 }
 
 int main(void) {
-    SymbolTable::enter_scope();
+    SymbolTable::enter_scope("global");
     yyparse();
     
     std::cout << "\n--- Conteúdo Final da Tabela de Símbolos ---" << std::endl;

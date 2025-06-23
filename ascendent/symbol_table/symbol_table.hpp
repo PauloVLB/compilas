@@ -61,19 +61,33 @@ inline std::ostream& operator<<(std::ostream& os, const TokenInfo& info) {
 class SymbolTable {
     private:
         static std::vector<std::unordered_map<std::string, TokenInfo>> scopes;
+        static std::stack<std::string> current_proc;
     
         // SymbolTable() {
         //     enter_scope(); // escopo global
         // }
     
     public:
-        static void enter_scope() {
+        static void enter_scope(std::string name) {
             scopes.emplace_back();
+            current_proc.push(name);
         }
     
         static void exit_scope() {
             if (!scopes.empty())
                 scopes.pop_back();
+            if(!current_proc.empty()){
+
+                current_proc.pop();
+            }
+        }
+
+        static std::string get_scope_name() {
+            if(!current_proc.empty()) {
+                return current_proc.top();
+            }
+
+            return "none";
         }
 
 
