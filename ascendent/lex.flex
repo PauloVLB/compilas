@@ -1,4 +1,5 @@
 %option noyywrap
+%option yylineno
 
 %{
 #include <vector> 
@@ -10,8 +11,7 @@
 extern YYSTYPE yylval;
 
 std::string current_token;
-int nLinhas = 1;
-int nColunas = 0;
+int nColunas = 1;
 
 
 void update_token(std::string token_name, std::string yytxt="") {
@@ -24,21 +24,25 @@ void update_token(std::string token_name, std::string yytxt="") {
     // SymbolTable::print_all();
 
     if(token_name == "\n" || token_name == "\r\n") {
-        nLinhas++;
-        nColunas = 0;
+        nColunas = 1;
         return;
     }
     current_token = token_name;
     //printf("Updated current token: %s\n", current_token.c_str());
     printf("%s %s \n", token_name.c_str(), yytxt.c_str());
+    yylloc.first_line = yylineno;
+    yylloc.first_column = nColunas;
     nColunas += yyleng;
+    yylloc.last_line = yylineno;
+    yylloc.last_column = nColunas;
+
 }
 
 void comment(std::string yytxt) {
     nColunas += yyleng;
     for(char c : yytxt) {
         if(c == '\n') {
-            nLinhas++;
+            yylineno++;
             nColunas = 0;
         }
     }
@@ -144,6 +148,6 @@ false {update_token(yytext); return FALSE;}
 <<EOF>> {update_token("$"); return 0;}
 " " {update_token("ignore");}
 
-. {printf("\nERRO %d %d\n", nLinhas, nColunas); return 0;}
+. {printf("\nERRO %d %d\n", yylineno, nColunas); return 0;}
 
 %%
