@@ -29,7 +29,7 @@ void update_token(std::string token_name, std::string yytxt="") {
     }
     current_token = token_name;
     //printf("Updated current token: %s\n", current_token.c_str());
-    printf("%s %s \n", token_name.c_str(), yytxt.c_str());
+    //printf("%s %s \n", token_name.c_str(), yytxt.c_str());
     yylloc.first_line = yylineno;
     yylloc.first_column = nColunas;
     nColunas += yyleng;

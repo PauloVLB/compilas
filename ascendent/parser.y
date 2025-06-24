@@ -79,8 +79,8 @@ bool handle_binary_op(
     std::string* sval;
     BoolAttr* b_attr;
     TypedAttr* t_attr;
-    std::vector<std::string>* param_types_list;
-    std::unordered_map<std::string, std::string>* member_map;
+    ListAttr* plist_attr;
+    MapAttr* map_attr;
 }
 
 %token <sval> NAME FLOAT_LITERAL INT_LITERAL STRING_LITERAL
@@ -104,15 +104,15 @@ bool handle_binary_op(
 
 %type <b_attr> program opt_decls decl_tail decl var_decl proc_decl proc_header rec_decl block proc_body_opt
 %type <b_attr> stmt_list stmt_tail stmt assign_stmt if_stmt else_opt while_stmt call_stmt
-%type <member_map> opt_struct_members struct_member_tail struct_member_decl
+%type <map_attr> opt_struct_members struct_member_tail struct_member_decl
 
 %type <t_attr> var_init_opt opt_type return_stmt return_exp_opt call_exp
 %type <t_attr> expression or_exp and_exp not_exp rel_exp add_exp mult_exp exp_exp unary_exp primary_exp
 %type <t_attr> var ref_var deref_var literal bool_literal type
 %type <t_attr> paramfield_decl
 
-%type <param_types_list> opt_param_list paramfield_tail
-%type <param_types_list> call_args_opt call_args_tail
+%type <plist_attr> opt_param_list paramfield_tail
+%type <plist_attr> call_args_opt call_args_tail
 
 
 %%
@@ -176,50 +176,46 @@ var_decl:
     {
         $$ = new BoolAttr();
         $$->ok = false; 
-        if (!$4->ok || !$5->ok) {
-            YYABORT;
-        }
+        if ($4->type != "ERR" && $5->type != "ERR") {
+            std::string var_name = *$2;
+            std::string declared_type = $4->type;
+            std::string init_type = $5->type;
 
-        std::string var_name = *$2;
-        std::string declared_type = $4->type;
-        std::string init_type = $5->type;
+            bool has_initializer = (init_type != "void");
 
-        bool has_initializer = (init_type != "void");
+            if (has_initializer) {
 
-        if (has_initializer) {
-
-            if(!check_compatible(declared_type, init_type)) {
-                print_token_location(@2.first_line, @2.first_column);
-                std::cout << "Erro de Tipo: Incompatibilidade na inicialização da variável '" << var_name
-                          << "'. O tipo declarado é '" << declared_type
-                          << "', mas a expressão de inicialização é do tipo '" << init_type << "'." << std::endl;
-                YYABORT;
-            } 
-            else {
+                if(!check_compatible(declared_type, init_type)) {
+                    print_token_location(@2.first_line, @2.first_column);
+                    std::cout << "Erro de Tipo: Incompatibilidade na inicialização da variável '" << var_name
+                            << "'. O tipo declarado é '" << declared_type
+                            << "', mas a expressão de inicialização é do tipo '" << init_type << "'." << std::endl;
+                } 
+                else {
+                    bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
+                    if (!insert_ok) {
+                        print_token_location(@2.first_line, @2.first_column);
+                        std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
+                    } else {
+                        $$->ok = true; 
+                    }
+                }
+            } else {
                 bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
                 if (!insert_ok) {
                     print_token_location(@2.first_line, @2.first_column);
                     std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
-                    YYABORT;
                 } else {
-                    $$->ok = true; 
+                    $$->ok = true;
                 }
             }
-        } else {
-            bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
-            if (!insert_ok) {
-                print_token_location(@2.first_line, @2.first_column);
-                std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
-                YYABORT;
-            } else {
-                $$->ok = true; // Sucesso
-            }
+
         }
         
         delete $2;
         delete $4;
         delete $5;
-        SymbolTable::print_all();
+        //SymbolTable::print_all();
     }
     | VAR NAME ASSIGN expression
     {
@@ -227,25 +223,22 @@ var_decl:
         $$->ok = false; 
 
         std::string var_name = *$2;
+
+        if ($4->type != "ERR") {
+            std::string init_type = $4->type;
+
+            bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, init_type, Tag::VAR));
+            if (!insert_ok) {
+                print_token_location(@2.first_line, @2.first_column);
+                std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
+            } else {
+                $$->ok = true; // Sucesso
+            }
+        }
+
         delete $2;
-
-        if (!$4->ok) {
-            YYABORT;
-        }
-
-        std::string init_type = $4->type;
-
-        bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, init_type, Tag::VAR));
-        if (!insert_ok) {
-            print_token_location(@2.first_line, @2.first_column);
-            std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
-            YYABORT;
-        } else {
-            $$->ok = true; // Sucesso
-        }
-
         delete $4;
-        SymbolTable::print_all();
+        //SymbolTable::print_all();
     }
     ;
 
@@ -273,7 +266,7 @@ proc_decl:
         
         delete $1;
         delete $2;
-        SymbolTable::print_all();
+        //SymbolTable::print_all();
     }
     ;
 
@@ -282,20 +275,19 @@ proc_header:
     {
         $$ = new BoolAttr();
         std::string proc_name = *$2;
-        delete $2;
+        $$->ok = false;
 
-        bool insert_ok = SymbolTable::insert(proc_name, TokenInfo(*$4, $6->type, Tag::PROC));
+        bool insert_ok = SymbolTable::insert(proc_name, TokenInfo($4->param_types_list, $6->type, Tag::PROC));
         SymbolTable::enter_scope(proc_name);
 
         if (!insert_ok) {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro: Redefinição do procedimento '" << proc_name << "'." << std::endl;
-            YYABORT;
-            $$->ok = false;
         } else {
             $$->ok = true;
         }
         
+        delete $2;
         delete $4;
         delete $6;
     }
@@ -304,15 +296,17 @@ proc_header:
 opt_param_list:
       /* vazio */
     {
-        $$ = new std::vector<std::string>();
+        $$ = new ListAttr();
+        $$->ok = true;
+        $$->param_types_list = std::vector<std::string>();
     }
     | paramfield_decl paramfield_tail
     {
         $$ = $2;
         if ($1->ok) {
-            $$->insert($$->begin(), $1->type);
+            $$->param_types_list.insert($$->param_types_list.begin(), $1->type);
         } else {
-            $$->clear();
+            $$->ok = false;
         }
         delete $1;
     }
@@ -321,15 +315,17 @@ opt_param_list:
 paramfield_tail:
       /* vazio */
     {
-        $$ = new std::vector<std::string>();
+        $$ = new ListAttr();
+        $$->ok = true;
+        $$->param_types_list = std::vector<std::string>();
     }
     | ',' paramfield_decl paramfield_tail
     {
         $$ = $3;
         if ($2->ok) {
-            $$->insert($$->begin(), $2->type);
+            $$->param_types_list.insert($$->param_types_list.begin(), $2->type);
         } else {
-            $$->clear();
+            $$->ok = false;
         }
         delete $2;
     }
@@ -380,24 +376,20 @@ proc_body_opt:
 rec_decl:
     STRUCT NAME '{' opt_struct_members '}'
     {
+        $$ = new BoolAttr();
+        $$->ok = false;
         std::string struct_name = *$2;
 
-        if (SymbolTable::exists_in_current_scope(struct_name)) {
-            print_token_location(@2.first_line, @2.first_column);
-             std::cout << "Erro: Redefinição do tipo '" << struct_name << "'." << std::endl;
-             YYABORT;
-        }
-
-        bool insert_ok = SymbolTable::insert(struct_name, TokenInfo({}, struct_name, Tag::STRUCT, *$4));
+        bool insert_ok = SymbolTable::insert(struct_name, TokenInfo({}, struct_name, Tag::STRUCT, $4->member_map));
         
         if (!insert_ok) {
             print_token_location(@2.first_line, @2.first_column);
-            std::cout << "Erro: Struct '" << struct_name << "' já declarado." << std::endl;
-            YYABORT;
+            std::cout << "Erro: Redefinição do tipo '" << struct_name << "'." << std::endl;
+        }
+        else {
+            $$->ok = $4->ok;
         }
         
-        $$ = new BoolAttr();
-        $$->ok = true;
 
         delete $2;
         delete $4;
@@ -407,20 +399,28 @@ rec_decl:
 opt_struct_members:
     /* vazio */
     {
-        $$ = new std::unordered_map<std::string, std::string>();
+
+        $$ = new MapAttr();
+        $$->ok = true;
+        $$->member_map = std::unordered_map<std::string, std::string>();
     }
     | struct_member_decl struct_member_tail
     {
         $$ = $2;
-        auto& first_member_map = *$1;
-        const auto& [name, type] = *first_member_map.begin();
+        $$->ok = false;
+        auto& first_member_map = $1->member_map;
+        if($1->ok) {
+            const auto [name, type] = *first_member_map.begin();
 
-        if ($$->count(name) > 0) {
-            print_token_location(@1.first_line, @1.first_column);
-            std::cout << "Erro: Membro da struct '" << name << "' já foi declarado." << std::endl;
-            YYABORT;
+            if ($$->member_map.count(name) > 0) {
+                print_token_location(@1.first_line, @1.first_column);
+                std::cout << "Erro: Membro da struct '" << name << "' já foi declarado." << std::endl;
+            }
+            else {
+                ($$->member_map)[name] = type;
+                $$->ok = true;
+            }
         }
-        (*$$)[name] = type;
         delete $1;
     }
     ;
@@ -428,20 +428,26 @@ opt_struct_members:
 struct_member_tail:
     /* vazio */
     {
-        $$ = new std::unordered_map<std::string, std::string>();
+        $$ = new MapAttr();
+        $$->ok = true;
+        $$->member_map = std::unordered_map<std::string, std::string>();
     }
     | ';' struct_member_decl struct_member_tail
     {
         $$ = $3;
-        auto& new_member_map = *$2;
-        const auto& [name, type] = *new_member_map.begin();
+        $$->ok = false;
+        auto& new_member_map = $2->member_map;
+        if ($2->ok) {
+            const auto& [name, type] = *new_member_map.begin();
 
-        if ($$->count(name) > 0) {
-            print_token_location(@2.first_line, @2.first_column);
-            std::cout << "Erro: Membro da struct '" << name << "' já foi declarado." << std::endl;
-            YYABORT;
+            if ($$->member_map.count(name) > 0) {
+                print_token_location(@2.first_line, @2.first_column);
+                std::cout << "Erro: Membro da struct '" << name << "' já foi declarado." << std::endl;
+            } else {
+                ($$->member_map)[name] = type;
+                $$->ok = true;
+            }
         }
-        (*$$)[name] = type;
         delete $2;
     }
     ;
@@ -449,17 +455,17 @@ struct_member_tail:
 struct_member_decl:
     NAME ':' type
     {
-        $$ = new std::unordered_map<std::string, std::string>();
+        $$ = new MapAttr();
+        $$->member_map = std::unordered_map<std::string, std::string>();
+        $$->ok = false;
         
-        if (!$3->ok) {
-            print_token_location(@1.first_line, @1.first_column);
-            std::cout << "Erro: Tipo '" << $3->type << "' inválido para membro de struct." << std::endl;
-            YYABORT;
+        if ($3->type != "ERR") {
+            std::string member_name = *$1;
+            std::string member_type = $3->type;
+            ($$->member_map)[member_name] = member_type;
+            $$->ok = true;
         }
 
-        std::string member_name = *$1;
-        std::string member_type = $3->type;
-        (*$$)[member_name] = member_type;
 
         delete $1;
         delete $3;
@@ -470,19 +476,20 @@ paramfield_decl:
     NAME ':' type
     {
         $$ = new TypedAttr();
-        std::string field_name = *$1;
-        bool insert_ok = SymbolTable::insert(field_name, TokenInfo({}, $3->type, Tag::PROC_PARAM));
-        
-        if (!insert_ok) {
-            print_token_location(@1.first_line, @1.first_column);
-            std::cout << "Erro: Parâmetro '" << field_name << "' já foi declarado." << std::endl;
-            YYABORT;
-            $$->ok = false;
-        } else {
-            $$->ok = $3->ok;
-        }
-        
         $$->type = $3->type;
+        $$->ok = $3->ok;
+        std::string field_name = *$1;
+        if($$->type != "ERR") {
+            bool insert_ok = SymbolTable::insert(field_name, TokenInfo({}, $3->type, Tag::PROC_PARAM));
+            
+            if (!insert_ok) {
+                print_token_location(@1.first_line, @1.first_column);
+                std::cout << "Erro: Parâmetro '" << field_name << "' já foi declarado." << std::endl;
+                $$->ok = false;
+                $$->type = "ERR";
+            }
+            
+        }
         delete $1;
         delete $3;
     }
@@ -530,19 +537,15 @@ assign_stmt:
       var ASSIGN expression
     {
         $$ = new BoolAttr();
+        $$->ok = $1->ok && $3->ok;
         
-        if (!$1->ok || !$3->ok) {
-            $$->ok = false;
-        } else {
+        if ($$->ok) {
             if (!check_compatible($1->type, $3->type)) {
                 print_token_location(@2.first_line, @2.first_column);
                 std::cout << "Erro de Tipo: Incompatibilidade na atribuição. "
                           << "Não é possível atribuir uma expressão do tipo '" << $3->type
                           << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
-                YYABORT;
                 $$->ok = false;
-            } else {
-                $$->ok = true;
             }
         }
 
@@ -552,19 +555,15 @@ assign_stmt:
     | deref_var ASSIGN expression
     {
         $$ = new BoolAttr();
+        $$->ok = $1->ok && $3->ok;
         
-        if (!$1->ok || !$3->ok) {
-            $$->ok = false;
-        } else {
+        if ($$->ok) {
             if ($1->type != $3->type) {
                 print_token_location(@2.first_line, @2.first_column);
                 std::cout << "Erro de Tipo: Incompatibilidade na atribuição. "
                           << "Não é possível atribuir uma expressão do tipo '" << $3->type
                           << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
-                YYABORT;
                 $$->ok = false;
-            } else {
-                $$->ok = true;
             }
         }
 
@@ -577,13 +576,11 @@ if_stmt:
     IF expression THEN stmt_list else_opt FI
     {
         $$ = new BoolAttr();
-        if ($2->type != "BOOL") {
+        $$->ok = $2->ok && $4->ok && $5->ok;
+        if ($2->type != "ERR" && $2->type != "BOOL") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do IF deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
-            YYABORT;
             $$->ok = false;
-        } else {
-            $$->ok = $2->ok && $4->ok && $5->ok;
         }
         delete $2;
         delete $4;
@@ -609,13 +606,11 @@ while_stmt:
     WHILE expression DO stmt_list OD
     {
         $$ = new BoolAttr();
-        if ($2->type != "BOOL") {
+        $$->ok = $2->ok && $4->ok;
+        if ($2->type != "ERR" && $2->type != "BOOL") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do WHILE deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
-            YYABORT;
             $$->ok = false;
-        } else {
-            $$->ok = $2->ok && $4->ok;
         }
         delete $2;
         delete $4;
@@ -626,29 +621,30 @@ return_stmt:
     RETURN return_exp_opt
     {
         $$ = new TypedAttr();
-        std::string scope_name = SymbolTable::get_scope_name();
-        auto lookup_result = SymbolTable::lookup(scope_name);
-        if (!lookup_result || lookup_result->tag != Tag::PROC) {
-            print_token_location(@1.first_line, @1.first_column);
-            std::cout << "Erro: 'RETURN' usado fora de um procedimento/função." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
-        } else {
-            
-            if($2->type == lookup_result->type || 
-               ($2->type == "void" && lookup_result->type == "void")) {
-                $$->ok = $2->ok;
-                $$->type = lookup_result->type;
-            } else {
+        $$->ok = $2->ok;
+        $$->type = "ERR";
+
+        if($$->ok) {
+            std::string scope_name = SymbolTable::get_scope_name();
+            auto lookup_result = SymbolTable::lookup(scope_name);
+            if (!lookup_result || lookup_result->tag != Tag::PROC) {
                 print_token_location(@1.first_line, @1.first_column);
-                std::cout << "Erro de tipo: 'RETURN' espera tipo '" << lookup_result->type 
-                          << "', mas recebeu '" << $2->type << "'." << std::endl;
-                YYABORT;
+                std::cout << "Erro: 'RETURN' usado fora de um procedimento/função." << std::endl;
                 $$->ok = false;
-                $$->type = "ERR";
+            } else {
+                
+                if($2->type == lookup_result->type || 
+                ($2->type == "void" && lookup_result->type == "void")) {
+                    $$->type = lookup_result->type;
+                } else {
+                    print_token_location(@1.first_line, @1.first_column);
+                    std::cout << "Erro de tipo: 'RETURN' espera tipo '" << lookup_result->type 
+                            << "', mas recebeu '" << $2->type << "'." << std::endl;
+                    $$->ok = false;
+                }
             }
         }
+
         delete $2;
     }
     ;
@@ -682,27 +678,24 @@ call_exp:
     NAME '(' call_args_opt ')'
     {
         $$ = new TypedAttr();
+        $$->ok = $3->ok;
+        $$->type = "ERR";
         std::string func_name = *$1;
-        delete $1;
 
         auto lookup_result = SymbolTable::lookup(func_name);
         if (!lookup_result || lookup_result->tag != Tag::PROC) {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: Função ou procedimento '" << func_name << "' não declarado." << std::endl;
-            YYABORT;
             $$->ok = false;
-            $$->type = "ERR";
-        } else {
+        } else if($$->ok) {
             const auto& declared_params = lookup_result->paramList;
-            const auto& provided_args = *$3;
+            const auto& provided_args = $3->param_types_list;
 
             if (declared_params.size() != provided_args.size()) {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro: Função '" << func_name << "' espera " << declared_params.size() 
                           << " argumentos, mas recebeu " << provided_args.size() << "." << std::endl;
-                YYABORT;
                 $$->ok = false;
-                $$->type = "ERR";
             } else {
                 bool types_match = true;
                 for (size_t i = 0; i < declared_params.size(); ++i) {
@@ -711,21 +704,18 @@ call_exp:
                         std::cout << "Erro: Incompatibilidade de tipo no argumento " << i + 1 
                                   << " da chamada para '" << func_name << "'. Esperado '" 
                                   << declared_params[i] << "', mas recebeu '" << provided_args[i] << "'." << std::endl;
-                        YYABORT;
                         types_match = false;
+                        $$->ok = false;
                         break;
                     }
                 }
 
                 if (types_match) {
-                    $$->ok = true;
                     $$->type = lookup_result->type;
-                } else {
-                    $$->ok = false;
-                    $$->type = "ERR";
-                }
+                } 
             }
         }
+        delete $1;
         delete $3;
     }
     ;
@@ -733,13 +723,18 @@ call_exp:
 call_args_opt:
       /* vazio */
     {
-        $$ = new std::vector<std::string>();
+        $$ = new ListAttr();
+        $$->ok = true;
+        $$->param_types_list = std::vector<std::string>();
     }
     | expression call_args_tail
     {
         $$ = $2;
         if ($1->ok) {
-            $$->insert($$->begin(), $1->type);
+            $$->param_types_list.insert($$->param_types_list.begin(), $1->type);
+        }
+        else {
+            $$->ok = false;
         }
         delete $1;
     }
@@ -748,13 +743,18 @@ call_args_opt:
 call_args_tail:
       /* vazio */
     {
-        $$ = new std::vector<std::string>();
+        $$ = new ListAttr();
+        $$->ok = true;
+        $$->param_types_list = std::vector<std::string>();
     }
     | ',' expression call_args_tail
     {
         $$ = $3;
         if ($2->ok) {
-            $$->insert($$->begin(), $2->type);
+            $$->param_types_list.insert($$->param_types_list.begin(), $2->type);
+        }
+        else {
+            $$->ok = false;
         }
         delete $2;
     }
@@ -773,9 +773,9 @@ expression:
 or_exp:
       or_exp OR and_exp
     {
-        if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "OR", 
+        handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "OR", 
             [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
-            [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+            [](const auto& t1, const auto& t2) { return "BOOL"; });
     }
     | and_exp { $$ = $1; }
     ;
@@ -783,9 +783,9 @@ or_exp:
 and_exp:
       and_exp AND not_exp
     {
-        if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "AND",
+        handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "AND",
             [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
-            [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+            [](const auto& t1, const auto& t2) { return "BOOL"; });
     }
     | not_exp { $$ = $1; }
     ;
@@ -810,46 +810,46 @@ not_exp:
     ;
 
 rel_exp: rel_exp LT add_exp {
-    if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<",
+    handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+        [](const auto& t1, const auto& t2) { return "BOOL"; });
 }
 | rel_exp LE add_exp {
-    if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<=",
+    handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+        [](const auto& t1, const auto& t2) { return "BOOL"; });
 }
 | rel_exp GT add_exp{
-    if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">",
+    handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+        [](const auto& t1, const auto& t2) { return "BOOL"; });
 }
 | rel_exp GE add_exp {
-    if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">=",
+    handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+        [](const auto& t1, const auto& t2) { return "BOOL"; });
 }
 | rel_exp EQ add_exp {
-    if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "=",
+    handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+        [](const auto& t1, const auto& t2) { return "BOOL"; });
 }
 | rel_exp NE add_exp {
-    if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<>",
+    handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<>",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; })){YYABORT;};
+        [](const auto& t1, const auto& t2) { return "BOOL"; });
 }
 | add_exp { $$ = $1; }
 ;
@@ -858,15 +858,15 @@ rel_exp: rel_exp LT add_exp {
 add_exp:
       add_exp PLUS mult_exp
     {
-        if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "+",
+        handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "+",
             [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
-            resolve_arithmetic_type)){YYABORT;};
+            resolve_arithmetic_type);
     }
     | add_exp MINUS mult_exp
     {
-        if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "-",
+        handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "-",
             [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
-            resolve_arithmetic_type)){YYABORT;};
+            resolve_arithmetic_type);
     }
     | mult_exp { $$ = $1; }
     ;
@@ -874,15 +874,15 @@ add_exp:
 mult_exp:
       mult_exp MULT exp_exp
     {
-        if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "*", 
+        handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "*", 
         [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); }, 
-        resolve_arithmetic_type)){YYABORT;};
+        resolve_arithmetic_type);
     }
     | mult_exp DIV exp_exp
     {
-        if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "/", 
+        handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "/", 
         [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); }, 
-        resolve_arithmetic_type)){YYABORT;};
+        resolve_arithmetic_type);
     }
     | exp_exp { $$ = $1; }
     ;
@@ -890,9 +890,9 @@ mult_exp:
 exp_exp:
       unary_exp EXP_OP exp_exp
     {
-        if(!handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "^",
+        handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "^",
             [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
-            [](const auto& t1, const auto& t2) { return "FLOAT"; })){YYABORT;};
+            [](const auto& t1, const auto& t2) { return "FLOAT"; });
     }
     | unary_exp { $$ = $1; }
     ;
@@ -902,14 +902,13 @@ unary_exp:
     {
         $$ = new TypedAttr();
         $$->ok = $2->ok;
+        $$->type = "ERR";
         if ($$->ok && ($2->type == "INT" || $2->type == "FLOAT")) {
             $$->type = $2->type;
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro de tipo: Operando unário '-' deve ser numérico." << std::endl;
-            YYABORT;
             $$->ok = false;
-            $$->type = "ERR";
         }
         delete $2;
     }
@@ -927,7 +926,6 @@ primary_exp:
         if (!lookup_result || lookup_result->tag != Tag::STRUCT) {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro: Tipo '" << type_name << "' não é um struct para 'NEW'." << std::endl;
-            YYABORT;
             $$->ok = false;
             $$->type = "ERR";
         } else {
@@ -953,7 +951,6 @@ var:
         if (!lookup_result || (lookup_result->tag != Tag::VAR && lookup_result->tag != Tag::PROC_PARAM)) {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: Variável '" << var_base_name << "' não declarada." << std::endl;
-            YYABORT;
             $$->ok = false;
             $$->type = "ERR";
         } else {
@@ -968,9 +965,8 @@ var:
         $$->type = "ERR";
 
         if ($$->ok) {
-            std::string base_type_name = $1->type; // ex: "Point"
+            std::string base_type_name = $1->type;
             std::string field_name = *$3;
-            delete $3;
 
             auto base_type_info_opt = SymbolTable::lookup(base_type_name);
 
@@ -978,7 +974,6 @@ var:
                 print_token_location(@2.first_line, @2.first_column);
                 std::cout << "Erro de tipo: Tentativa de acessar o campo '" << field_name 
                         << "' em um tipo não-struct ('" << base_type_name << "')." << std::endl;
-                YYABORT;
                 $$->ok = false;
             } else {
                 auto& base_type_info = *base_type_info_opt;
@@ -990,7 +985,6 @@ var:
                     print_token_location(@2.first_line, @2.first_column);
                     std::cout << "Erro de tipo: O tipo '" << base_type_name 
                             << "' não possui um membro chamado '" << field_name << "'." << std::endl;
-                    YYABORT;
                     $$->ok = false;
                 } else {
                     $$->ok = true;
@@ -1001,6 +995,7 @@ var:
         
         // Limpa a memória do atributo da variável.
         delete $1;
+        delete $3;
     }
 |   var '[' expression ']'
     {
@@ -1015,17 +1010,14 @@ var:
             if (index_type != "INT") {
                 print_token_location(@3.first_line, @3.first_column);
                 std::cout << "Erro de tipo: O índice de um array deve ser um inteiro, mas foi '" << index_type << "'." << std::endl;
-                YYABORT;
                 $$->ok = false;
             }
-
-            if ($$->ok) {
+            else {
                 if (base_type.rfind("ARRAY(", 0) == 0) {
                     $$->type = base_type.substr(6, base_type.length() - 7);
                 } else {
                     print_token_location(@1.first_line, @1.first_column);
                     std::cout << "Erro de tipo: Tentativa de indexar um tipo não-array ('" << base_type << "')." << std::endl;
-                    YYABORT;
                     $$->ok = false;
                 }
             }
@@ -1054,14 +1046,15 @@ deref_var:
     {
         $$ = new TypedAttr();
         $$->ok = $3->ok;
-        if ($$->ok && $3->type.rfind("REF(", 0) == 0) {
-            $$->type = $3->type.substr(4, $3->type.length() - 5);
-        } else {
-            print_token_location(@1.first_line, @1.first_column);
-            std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
+        if($$->ok) {
+            if ($3->type.rfind("REF(", 0) == 0) {
+                $$->type = $3->type.substr(4, $3->type.length() - 5);
+            } else {
+                print_token_location(@1.first_line, @1.first_column);
+                std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl;
+                $$->ok = false;
+                $$->type = "ERR";
+            }
         }
         delete $3;
     }
@@ -1069,14 +1062,15 @@ deref_var:
     {
         $$ = new TypedAttr();
         $$->ok = $3->ok;
-        if ($$->ok && $3->type.rfind("REF(", 0) == 0) {
-            $$->type = $3->type.substr(4, $3->type.length() - 5);
-        } else {
-            print_token_location(@1.first_line, @1.first_column);
-            std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl;
-            YYABORT;
-            $$->ok = false;
-            $$->type = "ERR";
+        if($$->ok) {
+            if ($3->type.rfind("REF(", 0) == 0) {
+                $$->type = $3->type.substr(4, $3->type.length() - 5);
+            } else {
+                print_token_location(@1.first_line, @1.first_column);
+                std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl;
+                $$->ok = false;
+                $$->type = "ERR";
+            }
         }
         delete $3;
     }
@@ -1112,7 +1106,6 @@ type:
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: '" << type_name << "' não é um tipo válido ou struct declarado." << std::endl;
-            YYABORT;
             $$->ok = false;
             $$->type = "ERR";
         }

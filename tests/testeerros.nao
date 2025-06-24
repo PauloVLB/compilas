@@ -11,7 +11,7 @@ begin
         name : string
     };
 
-    procedure check(value: bool, name: string)
+    procedure check(value: bool, name: string, jo:Batata)
     begin
         
     end;
@@ -25,30 +25,30 @@ begin
         var ia : array[5] of int
     in
         // Erro de atribuição: int = float
-        // i := f;
+        i := f;
 
         // Erro de operador: bool + int
-        // i := b + 1;
+        i := b + 1;
 
         // Erro de operador relacional: bool > int
-        // b := b > i;
+        b := b > i;
 
         // Erro de chamada de função: número errado de argumentos
-        // check(true);
+        check(true);
 
         // Erro de chamada de função: tipo errado de argumento
-        // check(i, "teste");
+        check(i, "teste");
 
         // Erro de acesso a membro: tentando acessar membro de tipo primitivo
-        // i := i.x;
+        i := i.x;
 
         // Erro de acesso a membro: membro não existe na struct
-        // f := p.z;
+        f := p.z;
 
         // Erro de indexação de array: variável não é um array
-        // i := f[0];
+        i := f[0];
 
         // Erro de indexação de array: índice não é inteiro
-        // i := ia[f];
+        i := ia[f]
     end
 end

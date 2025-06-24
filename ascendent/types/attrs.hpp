@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 
 typedef struct {
@@ -18,5 +20,15 @@ typedef struct {
 typedef struct {
     std::string name;
 } NamedAttr;
+
+typedef struct {
+    bool ok;
+    std::unordered_map<std::string, std::string> member_map;
+} MapAttr;
+
+typedef struct {
+    bool ok;
+    std::vector<std::string> param_types_list;
+} ListAttr;
 
 #endif
