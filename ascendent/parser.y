@@ -51,22 +51,19 @@ bool handle_binary_op(
     std::function<std::string(const std::string&, const std::string&)> resolve_result_type)
 {
     $$ = new TypedAttr();
-    $$->ok = left->ok && right->ok;
+    bool ok = (left->type != "ERR" && right->type != "ERR");
+    $$->type = "ERR";
     
-    if ($$->ok) {
+    if (ok) {
         if (are_types_valid(left->type, right->type)) {
             $$->type = resolve_result_type(left->type, right->type);
         } else {
             print_token_location(first_line, first_column);
             std::cout << "Erro de tipo: Operandos inválidos para o operador '" << op_name << "'. "
                       << "Recebeu '" << left->type << "' e '" << right->type << "'." << std::endl;
-            $$->ok = false;
-            $$->type = "ERR";
             return false;
         }
-    } else {
-        $$->type = "ERR";
-    }
+    } 
 
     delete left;
     delete right;
@@ -103,10 +100,10 @@ bool handle_binary_op(
 %right EXP_OP
 
 %type <b_attr> program opt_decls decl_tail decl var_decl proc_decl proc_header rec_decl block proc_body_opt
-%type <b_attr> stmt_list stmt_tail stmt assign_stmt if_stmt else_opt while_stmt call_stmt
+%type <b_attr> stmt_list stmt_tail stmt assign_stmt if_stmt else_opt while_stmt call_stmt return_stmt
 %type <map_attr> opt_struct_members struct_member_tail struct_member_decl
 
-%type <t_attr> var_init_opt opt_type return_stmt return_exp_opt call_exp
+%type <t_attr> var_init_opt opt_type return_exp_opt call_exp
 %type <t_attr> expression or_exp and_exp not_exp rel_exp add_exp mult_exp exp_exp unary_exp primary_exp
 %type <t_attr> var ref_var deref_var literal bool_literal type
 %type <t_attr> paramfield_decl
@@ -246,16 +243,9 @@ var_init_opt:
       /* vazio */
     {
         $$ = new TypedAttr();
-        $$->ok = true;
         $$->type = "void";
     }
-    | ASSIGN expression
-    {
-        $$ = new TypedAttr();
-        $$->ok = $2->ok;
-        $$->type = $2->type;
-        delete $2;
-    }
+    | ASSIGN expression { $$ = $2; }
     ;
 
 proc_decl:
@@ -303,7 +293,7 @@ opt_param_list:
     | paramfield_decl paramfield_tail
     {
         $$ = $2;
-        if ($1->ok) {
+        if ($1->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $1->type);
         } else {
             $$->ok = false;
@@ -322,7 +312,7 @@ paramfield_tail:
     | ',' paramfield_decl paramfield_tail
     {
         $$ = $3;
-        if ($2->ok) {
+        if ($2->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $2->type);
         } else {
             $$->ok = false;
@@ -335,16 +325,9 @@ opt_type:
       /* vazio */
     {
         $$ = new TypedAttr();
-        $$->ok = true;
         $$->type = "void";
     }
-    | ':' type
-    {
-        $$ = new TypedAttr();
-        $$->ok = $2->ok;
-        $$->type = $2->type;
-        delete $2;
-    }
+    | ':' type { $$ = $2; }
     ;
 
 block:
@@ -477,7 +460,6 @@ paramfield_decl:
     {
         $$ = new TypedAttr();
         $$->type = $3->type;
-        $$->ok = $3->ok;
         std::string field_name = *$1;
         if($$->type != "ERR") {
             bool insert_ok = SymbolTable::insert(field_name, TokenInfo({}, $3->type, Tag::PROC_PARAM));
@@ -485,7 +467,6 @@ paramfield_decl:
             if (!insert_ok) {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro: Parâmetro '" << field_name << "' já foi declarado." << std::endl;
-                $$->ok = false;
                 $$->type = "ERR";
             }
             
@@ -537,7 +518,7 @@ assign_stmt:
       var ASSIGN expression
     {
         $$ = new BoolAttr();
-        $$->ok = $1->ok && $3->ok;
+        $$->ok = ($1->type != "ERR" && $3->type != "ERR");
         
         if ($$->ok) {
             if (!check_compatible($1->type, $3->type)) {
@@ -555,7 +536,7 @@ assign_stmt:
     | deref_var ASSIGN expression
     {
         $$ = new BoolAttr();
-        $$->ok = $1->ok && $3->ok;
+        $$->ok = ($1->type != "ERR" && $3->type != "ERR");
         
         if ($$->ok) {
             if ($1->type != $3->type) {
@@ -576,7 +557,7 @@ if_stmt:
     IF expression THEN stmt_list else_opt FI
     {
         $$ = new BoolAttr();
-        $$->ok = $2->ok && $4->ok && $5->ok;
+        $$->ok = ($2->type != "ERR") && $4->ok && $5->ok;
         if ($2->type != "ERR" && $2->type != "BOOL") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do IF deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
@@ -606,7 +587,7 @@ while_stmt:
     WHILE expression DO stmt_list OD
     {
         $$ = new BoolAttr();
-        $$->ok = $2->ok && $4->ok;
+        $$->ok =($2->type != "ERR") && $4->ok;
         if ($2->type != "ERR" && $2->type != "BOOL") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do WHILE deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
@@ -620,9 +601,8 @@ while_stmt:
 return_stmt:
     RETURN return_exp_opt
     {
-        $$ = new TypedAttr();
-        $$->ok = $2->ok;
-        $$->type = "ERR";
+        $$ = new BoolAttr();
+        $$->ok = $2->type != "ERR";
 
         if($$->ok) {
             std::string scope_name = SymbolTable::get_scope_name();
@@ -635,7 +615,7 @@ return_stmt:
                 
                 if($2->type == lookup_result->type || 
                 ($2->type == "void" && lookup_result->type == "void")) {
-                    $$->type = lookup_result->type;
+                    $$->ok = true;
                 } else {
                     print_token_location(@1.first_line, @1.first_column);
                     std::cout << "Erro de tipo: 'RETURN' espera tipo '" << lookup_result->type 
@@ -653,23 +633,16 @@ return_exp_opt:
       /* vazio */
     {
         $$ = new TypedAttr();
-        $$->ok = true;
         $$->type = "void";
     }
-    | expression
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    | expression { $$ = $1; }
     ;
 
 call_stmt:
     call_exp
     {
         $$ = new BoolAttr();
-        $$->ok = $1->ok;
+        $$->ok = ($1->type != "ERR");
         delete $1;
     }
     ;
@@ -678,7 +651,7 @@ call_exp:
     NAME '(' call_args_opt ')'
     {
         $$ = new TypedAttr();
-        $$->ok = $3->ok;
+        bool ok = $3->ok;
         $$->type = "ERR";
         std::string func_name = *$1;
 
@@ -686,8 +659,7 @@ call_exp:
         if (!lookup_result || lookup_result->tag != Tag::PROC) {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: Função ou procedimento '" << func_name << "' não declarado." << std::endl;
-            $$->ok = false;
-        } else if($$->ok) {
+        } else if(ok) {
             const auto& declared_params = lookup_result->paramList;
             const auto& provided_args = $3->param_types_list;
 
@@ -695,7 +667,6 @@ call_exp:
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro: Função '" << func_name << "' espera " << declared_params.size() 
                           << " argumentos, mas recebeu " << provided_args.size() << "." << std::endl;
-                $$->ok = false;
             } else {
                 bool types_match = true;
                 for (size_t i = 0; i < declared_params.size(); ++i) {
@@ -705,7 +676,6 @@ call_exp:
                                   << " da chamada para '" << func_name << "'. Esperado '" 
                                   << declared_params[i] << "', mas recebeu '" << provided_args[i] << "'." << std::endl;
                         types_match = false;
-                        $$->ok = false;
                         break;
                     }
                 }
@@ -730,7 +700,7 @@ call_args_opt:
     | expression call_args_tail
     {
         $$ = $2;
-        if ($1->ok) {
+        if ($1->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $1->type);
         }
         else {
@@ -750,7 +720,7 @@ call_args_tail:
     | ',' expression call_args_tail
     {
         $$ = $3;
-        if ($2->ok) {
+        if ($2->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $2->type);
         }
         else {
@@ -761,13 +731,7 @@ call_args_tail:
     ;
 
 expression:
-    or_exp
-    {
-        $$ = new TypedAttr();
-        $$->ok = $1->ok;
-        $$->type = $1->type;
-        delete $1;
-    }
+    or_exp { $$ = $1; }
     ;
 
 or_exp:
@@ -794,14 +758,11 @@ not_exp:
       NOT not_exp
     {
         $$ = new TypedAttr();
-        $$->ok = $2->ok;
-        if ($$->ok && $2->type == "BOOL") {
+        if ($2->type == "BOOL") {
             $$->type = "BOOL";
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro de tipo: Operando de NOT deve ser BOOLEAN." << std::endl;
-            YYABORT;
-            $$->ok = false;
             $$->type = "ERR";
         }
         delete $2;
@@ -901,14 +862,12 @@ unary_exp:
       MINUS unary_exp
     {
         $$ = new TypedAttr();
-        $$->ok = $2->ok;
         $$->type = "ERR";
-        if ($$->ok && ($2->type == "INT" || $2->type == "FLOAT")) {
+        if ($2->type != "ERR" && ($2->type == "INT" || $2->type == "FLOAT")) {
             $$->type = $2->type;
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro de tipo: Operando unário '-' deve ser numérico." << std::endl;
-            $$->ok = false;
         }
         delete $2;
     }
@@ -926,10 +885,8 @@ primary_exp:
         if (!lookup_result || lookup_result->tag != Tag::STRUCT) {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro: Tipo '" << type_name << "' não é um struct para 'NEW'." << std::endl;
-            $$->ok = false;
             $$->type = "ERR";
         } else {
-            $$->ok = true;
             $$->type =  type_name ;
         }
         delete $2;
@@ -951,20 +908,17 @@ var:
         if (!lookup_result || (lookup_result->tag != Tag::VAR && lookup_result->tag != Tag::PROC_PARAM)) {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: Variável '" << var_base_name << "' não declarada." << std::endl;
-            $$->ok = false;
             $$->type = "ERR";
         } else {
-            $$->ok = true;
             $$->type = lookup_result->type;
         }
     }
 |   var '.' NAME
     {
         $$ = new TypedAttr();
-        $$->ok = $1->ok;
         $$->type = "ERR";
 
-        if ($$->ok) {
+        if ($1->type != "ERR") {
             std::string base_type_name = $1->type;
             std::string field_name = *$3;
 
@@ -974,7 +928,6 @@ var:
                 print_token_location(@2.first_line, @2.first_column);
                 std::cout << "Erro de tipo: Tentativa de acessar o campo '" << field_name 
                         << "' em um tipo não-struct ('" << base_type_name << "')." << std::endl;
-                $$->ok = false;
             } else {
                 auto& base_type_info = *base_type_info_opt;
 
@@ -985,9 +938,7 @@ var:
                     print_token_location(@2.first_line, @2.first_column);
                     std::cout << "Erro de tipo: O tipo '" << base_type_name 
                             << "' não possui um membro chamado '" << field_name << "'." << std::endl;
-                    $$->ok = false;
                 } else {
-                    $$->ok = true;
                     $$->type = member_iterator->second;
                 }
             }
@@ -1000,17 +951,16 @@ var:
 |   var '[' expression ']'
     {
         $$ = new TypedAttr();
-        $$->ok = $1->ok && $3->ok;
+        bool ok = ($1->type != "ERR" && $3->type != "ERR");
         $$->type = "ERR";
 
-        if ($$->ok) {
+        if (ok) {
             std::string base_type = $1->type;
             std::string index_type = $3->type;
 
             if (index_type != "INT") {
                 print_token_location(@3.first_line, @3.first_column);
                 std::cout << "Erro de tipo: O índice de um array deve ser um inteiro, mas foi '" << index_type << "'." << std::endl;
-                $$->ok = false;
             }
             else {
                 if (base_type.rfind("ARRAY(", 0) == 0) {
@@ -1018,7 +968,6 @@ var:
                 } else {
                     print_token_location(@1.first_line, @1.first_column);
                     std::cout << "Erro de tipo: Tentativa de indexar um tipo não-array ('" << base_type << "')." << std::endl;
-                    $$->ok = false;
                 }
             }
         }
@@ -1031,11 +980,9 @@ ref_var:
     REF '(' var ')'
     {
         $$ = new TypedAttr();
-        $$->ok = $3->ok;
-        if ($$->ok) {
+        $$->type = "ERR";
+        if ($3->type != "ERR") {
             $$->type = "REF(" + $3->type + ")";
-        } else {
-            $$->type = "ERR";
         }
         delete $3;
     }
@@ -1045,15 +992,13 @@ deref_var:
       DEREF '(' var ')'
     {
         $$ = new TypedAttr();
-        $$->ok = $3->ok;
-        if($$->ok) {
+        $$->type = "ERR";
+        if($3->type != "ERR") {
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl;
-                $$->ok = false;
-                $$->type = "ERR";
             }
         }
         delete $3;
@@ -1061,15 +1006,13 @@ deref_var:
     | DEREF '(' deref_var ')'
     {
         $$ = new TypedAttr();
-        $$->ok = $3->ok;
-        if($$->ok) {
+        $$->type = "ERR";
+        if($3->type != "ERR") {
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl;
-                $$->ok = false;
-                $$->type = "ERR";
             }
         }
         delete $3;
@@ -1077,23 +1020,23 @@ deref_var:
     ;
 
 literal:
-      FLOAT_LITERAL   { $$ = new TypedAttr(); $$->ok = true; $$->type = "FLOAT"; delete $1; }
-    | INT_LITERAL     { $$ = new TypedAttr(); $$->ok = true; $$->type = "INT"; delete $1; }
-    | STRING_LITERAL  { $$ = new TypedAttr(); $$->ok = true; $$->type = "STRING"; delete $1; }
+      FLOAT_LITERAL   { $$ = new TypedAttr(); $$->type = "FLOAT"; delete $1; }
+    | INT_LITERAL     { $$ = new TypedAttr(); $$->type = "INT"; delete $1; }
+    | STRING_LITERAL  { $$ = new TypedAttr(); $$->type = "STRING"; delete $1; }
     | bool_literal    { $$ = $1; }
-    | NULL_LIT        { $$ = new TypedAttr(); $$->ok = true; $$->type = "NULL"; }
+    | NULL_LIT        { $$ = new TypedAttr(); $$->type = "NULL"; }
     ;
 
 bool_literal:
-      TRUE  { $$ = new TypedAttr(); $$->ok = true; $$->type = "BOOL"; }
-    | FALSE { $$ = new TypedAttr(); $$->ok = true; $$->type = "BOOL"; }
+      TRUE  { $$ = new TypedAttr(); $$->type = "BOOL"; }
+    | FALSE { $$ = new TypedAttr(); $$->type = "BOOL"; }
     ;
 
 type:
-      FLOAT_T   { $$ = new TypedAttr(); $$->ok = true; $$->type = "FLOAT"; }
-    | INT_T     { $$ = new TypedAttr(); $$->ok = true; $$->type = "INT"; }
-    | STRING_T  { $$ = new TypedAttr(); $$->ok = true; $$->type = "STRING"; }
-    | BOOL_T    { $$ = new TypedAttr(); $$->ok = true; $$->type = "BOOL"; }
+      FLOAT_T   { $$ = new TypedAttr(); $$->type = "FLOAT"; }
+    | INT_T     { $$ = new TypedAttr(); $$->type = "INT"; }
+    | STRING_T  { $$ = new TypedAttr(); $$->type = "STRING"; }
+    | BOOL_T    { $$ = new TypedAttr(); $$->type = "BOOL"; }
     | NAME
     {
         $$ = new TypedAttr();
@@ -1101,12 +1044,10 @@ type:
         auto lookup_result = SymbolTable::lookup(type_name);
         
         if (lookup_result && lookup_result->tag == Tag::STRUCT) {
-            $$->ok = true;
             $$->type = lookup_result->type;
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: '" << type_name << "' não é um tipo válido ou struct declarado." << std::endl;
-            $$->ok = false;
             $$->type = "ERR";
         }
         delete $1;
@@ -1114,22 +1055,18 @@ type:
     | REF '(' type ')'
     {
         $$ = new TypedAttr();
-        $$->ok = $3->ok;
-        if ($$->ok) {
+        $$->type = "ERR";
+        if ($3->type != "ERR") {
             $$->type = "REF(" + $3->type + ")";
-        } else {
-            $$->type = "ERR";
         }
         delete $3;
     }
     | ARRAY '[' INT_LITERAL ']' OF type
     {
         $$ = new TypedAttr();
-        $$->ok = $6->ok;
-        if ($$->ok) {
+        $$->type = "ERR";
+        if ($6->type != "ERR") {
             $$->type = "ARRAY(" + $6->type + ")";
-        } else {
-            $$->type = "ERR";
         }
         delete $3;
         delete $6;

@@ -9,7 +9,6 @@
 
 
 typedef struct {
-    bool ok;
     std::string type;
 } TypedAttr;
 
