@@ -129,7 +129,7 @@ program:
         if ($$->ok) {
             printf("Análise sintática concluída com sucesso para o programa '%s'!\n", program_name.c_str());
         } else {
-            printf("Análise sintática encerrada devido a erro no programa '%s'.\n", program_name.c_str());
+            printf("Análise sintática encontrou erros no programa '%s'.\n", program_name.c_str());
         }
         delete $4;
     }

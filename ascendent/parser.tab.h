@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 1 "parser.y"
+#line 2 "parser.y"
 
     #include <unordered_map>
 
@@ -125,13 +125,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 20 "parser.y"
+#line 78 "parser.y"
 
     std::string* sval;
     BoolAttr* b_attr;
     TypedAttr* t_attr;
-    std::vector<std::string>* param_types_list;
-    std::unordered_map<std::string, std::string>* member_map;
+    ListAttr* plist_attr;
+    MapAttr* map_attr;
 
 #line 137 "parser.tab.h"
 
@@ -141,9 +141,23 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+/* Location type.  */
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE YYLTYPE;
+struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+};
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
+
 
 extern YYSTYPE yylval;
-
+extern YYLTYPE yylloc;
 
 int yyparse (void);
 
