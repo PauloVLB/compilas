@@ -99,6 +99,7 @@ bool handle_binary_op(
 %left MULT DIV
 %right EXP_OP
 
+%type <sval> M_enter_proc_scope
 %type <b_attr> program opt_decls decl_tail decl var_decl proc_decl proc_header rec_decl block proc_body_opt
 %type <b_attr> stmt_list stmt_tail stmt assign_stmt if_stmt else_opt while_stmt call_stmt return_stmt
 %type <map_attr> opt_struct_members struct_member_tail struct_member_decl
@@ -260,15 +261,20 @@ proc_decl:
     }
     ;
 
+M_enter_proc_scope : NAME {
+    $$ = $1;
+    std::string proc_name = *$1;
+    SymbolTable::enter_scope(proc_name);
+}
+
 proc_header:
-    PROCEDURE NAME '(' opt_param_list ')' opt_type
+    PROCEDURE M_enter_proc_scope '(' opt_param_list ')' opt_type
     {
         $$ = new BoolAttr();
         std::string proc_name = *$2;
         $$->ok = false;
 
-        bool insert_ok = SymbolTable::insert(proc_name, TokenInfo($4->param_types_list, $6->type, Tag::PROC));
-        SymbolTable::enter_scope(proc_name);
+        bool insert_ok = SymbolTable::insert_into_parent_scope(proc_name, TokenInfo($4->param_types_list, $6->type, Tag::PROC));
 
         if (!insert_ok) {
             print_token_location(@2.first_line, @2.first_column);

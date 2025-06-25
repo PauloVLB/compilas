@@ -98,6 +98,14 @@ class SymbolTable {
         return true;
     }
 
+    static bool insert_into_parent_scope(const std::string& name, const TokenInfo& info) {
+        if (scopes.size() < 2) return false; // não há escopo pai
+        auto& parent = scopes[scopes.size() - 2];
+        if (parent.count(name) > 0) return false; // redeclaração no escopo pai
+        parent[name] = info;
+        return true;
+    }
+
     static std::optional<TokenInfo> lookup(const std::string& name)  {
         for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
             auto found = it->find(name);
