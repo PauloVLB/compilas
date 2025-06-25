@@ -213,7 +213,6 @@ var_decl:
         delete $2;
         delete $4;
         delete $5;
-        //SymbolTable::print_all();
     }
     | VAR NAME ASSIGN expression
     {
@@ -236,7 +235,6 @@ var_decl:
 
         delete $2;
         delete $4;
-        //SymbolTable::print_all();
     }
     ;
 
@@ -257,7 +255,6 @@ proc_decl:
         
         delete $1;
         delete $2;
-        //SymbolTable::print_all();
     }
     ;
 
@@ -950,7 +947,6 @@ var:
             }
         }
         
-        // Limpa a memória do atributo da variável.
         delete $1;
         delete $3;
     }
@@ -1090,8 +1086,6 @@ int main(void) {
     SymbolTable::enter_scope("global");
     yyparse();
     
-    //std::cout << "\n--- Conteúdo Final da Tabela de Símbolos ---" << std::endl;
-    //SymbolTable::print_all();
     SymbolTable::exit_scope();
     
     return 0;

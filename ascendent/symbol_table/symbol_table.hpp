@@ -28,11 +28,9 @@ inline std::ostream& operator<<(std::ostream& os, const Tag& tag) {
 }
 
 struct TokenInfo {
-    std::vector<std::string> paramList; // se for PROC
+    std::vector<std::string> paramList; 
     std::string type;
     Tag tag;
-    // Para STRUCT
-    // Mapeia nome do membro para seu tipo
     std::unordered_map<std::string, std::string> members;
 
     TokenInfo(std::vector<std::string> pl, std::string t, Tag tg, std::unordered_map<std::string, std::string> mp = {})
@@ -57,16 +55,11 @@ inline std::ostream& operator<<(std::ostream& os, const TokenInfo& info) {
     return os;
 }
 
-// Class or structure declaration
 class SymbolTable {
     private:
         static std::vector<std::unordered_map<std::string, TokenInfo>> scopes;
         static std::stack<std::string> current_proc;
-    
-        // SymbolTable() {
-        //     enter_scope(); // escopo global
-        // }
-    
+
     public:
         static void enter_scope(std::string name) {
             scopes.emplace_back();
