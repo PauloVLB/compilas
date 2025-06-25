@@ -125,7 +125,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 78 "parser.y"
+#line 75 "parser.y"
 
     std::string* sval;
     BoolAttr* b_attr;

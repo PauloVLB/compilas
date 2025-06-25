@@ -1,6 +1,6 @@
-#line 1 "lex.yy.c"
+#line 2 "lex.yy.c"
 
-#line 3 "lex.yy.c"
+#line 4 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -627,8 +627,8 @@ void comment(std::string yytxt) {
     }
 }
 
-#line 630 "lex.yy.c"
 #line 631 "lex.yy.c"
+#line 632 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -848,7 +848,7 @@ YY_DECL
 #line 66 "lex.flex"
 
 
-#line 851 "lex.yy.c"
+#line 852 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1242,7 +1242,7 @@ YY_RULE_SETUP
 #line 153 "lex.flex"
 ECHO;
 	YY_BREAK
-#line 1245 "lex.yy.c"
+#line 1246 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{

@@ -1090,8 +1090,8 @@ int main(void) {
     SymbolTable::enter_scope("global");
     yyparse();
     
-    std::cout << "\n--- Conteúdo Final da Tabela de Símbolos ---" << std::endl;
-    SymbolTable::print_all();
+    //std::cout << "\n--- Conteúdo Final da Tabela de Símbolos ---" << std::endl;
+    //SymbolTable::print_all();
     SymbolTable::exit_scope();
     
     return 0;
