@@ -4,6 +4,6 @@ program correct
         begin
             var x : int
         in 
-            x := 2
+            x := 12
         end
     end

@@ -2,6 +2,14 @@
 
 Este repositório contém um compilador para a linguagem NAO, um projeto acadêmico de implementação de compilador usando análise sintática ascendente (bottom-up).
 
+## Autores
+
+- Debora Tayna da Silva Chacon
+- Dante Augusto Bezerra Pinto
+- Esther Maria da Silveira Wanderley
+- Henrique Lopes Fouquet
+- Paulo Vitor Lima Borges
+
 ## Estrutura do Projeto
 
 O compilador está organizado da seguinte forma:
@@ -54,6 +62,25 @@ Há diversos arquivos de teste disponíveis no diretório `/tests`. Por exemplo:
 ./syntax_asc < ../tests/teste2.nao
 ```
 
+## Arquivos de Teste
+
+O diretório `/tests` contém diversos arquivos de teste que demonstram diferentes funcionalidades da linguagem NAO:
+
+- **`correct.nao`**: Programa básico correto que demonstra a estrutura mínima de um programa NAO com declaração de variável e atribuição
+- **`swapexample.nao`**: Exemplo completo demonstrando o uso de referências e desreferenciamento, incluindo uma função de troca de valores
+- **`testestruct.nao`**: Teste de declaração e uso de estruturas (structs) com acesso a campos
+- **`testeref.nao`**: Teste avançado de referências, incluindo referências de referências e operações com ponteiros
+- **`testeerros.nao`**: Arquivo de teste com erros intencionais para validar a detecção de erros pelo compilador
+- **`nested.nao`**: Teste de estruturas aninhadas e escopo
+- **`test_suite.nao`**: Suite completa de testes com múltiplas funcionalidades
+
+Para executar qualquer um desses testes:
+
+```bash
+cd ascendent
+./syntax_asc < ../tests/nome_do_arquivo.nao
+```
+
 ## Limpeza
 
 Para limpar os arquivos gerados durante a compilação:
@@ -73,3 +100,4 @@ Para estender ou modificar o compilador, você pode editar os seguintes arquivos
 - `ascendent/parser.y`: Gramática da linguagem e regras de produção
 - `ascendent/main.cpp`: Ponto de entrada do compilador
 - `ascendent/symbol_table/`: Implementação da tabela de símbolos
+
