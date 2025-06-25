@@ -1,6 +1,6 @@
 # Comp2025.3
 
-Este repositório contém um compilador para a linguagem NAO, um projeto acadêmico de implementação de compilador usando análise sintática ascendente (bottom-up).
+Este repositório, no diretório `ascendent`, contém um compilador para a linguagem NAO, um projeto acadêmico de implementação de compilador usando análise sintática ascendente (bottom-up).
 
 ## Autores
 
