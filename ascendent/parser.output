@@ -1,0 +1,2661 @@
+Terminals unused in grammar
+
+    LPAREN
+    RPAREN
+    SEMICOLON
+    LBRACKET
+    RBRACKET
+    LBRACE
+    RBRACE
+    COLON
+    DOT
+    COMMA
+    CARET
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: PROGRAM NAME BEGIN_TOK opt_decls END
+
+    2 opt_decls: ε
+    3          | decl decl_tail
+
+    4 decl_tail: ε
+    5          | ';' decl decl_tail
+
+    6 decl: var_decl
+    7     | proc_decl
+    8     | rec_decl
+
+    9 var_decl: VAR NAME ':' type var_init_opt
+
+   10 var_init_opt: ε
+   11             | ASSIGN expression
+
+   12 M_proc_scope_enter: ε
+
+   13 proc_decl: PROCEDURE NAME M_proc_scope_enter '(' opt_param_list ')' opt_type block
+
+   14 opt_param_list: ε
+   15               | paramfield_decl paramfield_tail
+
+   16 paramfield_tail: ε
+   17                | ',' paramfield_decl paramfield_tail
+
+   18 opt_type: ε
+   19         | ':' type
+
+   20 block: BEGIN_TOK proc_body_opt stmt_list END
+
+   21 proc_body_opt: ε
+   22              | decl decl_tail IN
+
+   23 rec_decl: STRUCT NAME '{' opt_paramfield_decls '}'
+
+   24 opt_paramfield_decls: ε
+   25                     | paramfield_decl paramfield_decl_tail
+
+   26 paramfield_decl_tail: ε
+   27                     | ';' paramfield_decl paramfield_decl_tail
+
+   28 paramfield_decl: NAME ':' type
+
+   29 stmt_list: ε
+   30          | stmt stmt_tail
+
+   31 stmt_tail: ε
+   32          | ';' stmt stmt_tail
+
+   33 stmt: assign_stmt
+   34     | if_stmt
+   35     | while_stmt
+   36     | return_stmt
+   37     | call_stmt
+
+   38 assign_stmt: var ASSIGN expression
+   39            | deref_var ASSIGN expression
+
+   40 if_stmt: IF expression THEN stmt_list else_opt FI
+
+   41 else_opt: ε
+   42         | ELSE stmt_list
+
+   43 while_stmt: WHILE expression DO stmt_list OD
+
+   44 return_stmt: RETURN return_exp_opt
+
+   45 return_exp_opt: ε
+   46               | expression
+
+   47 call_stmt: call_exp
+
+   48 call_exp: NAME '(' call_args_opt ')'
+
+   49 call_args_opt: ε
+   50              | expression call_args_tail
+
+   51 call_args_tail: ε
+   52               | ',' expression call_args_tail
+
+   53 expression: or_exp
+
+   54 or_exp: or_exp OR and_exp
+   55       | and_exp
+
+   56 and_exp: and_exp AND not_exp
+   57        | not_exp
+
+   58 not_exp: NOT not_exp
+   59        | rel_exp
+
+   60 rel_exp: add_exp
+   61        | rel_exp LT add_exp
+   62        | rel_exp LE add_exp
+   63        | rel_exp GT add_exp
+   64        | rel_exp GE add_exp
+   65        | rel_exp EQ add_exp
+   66        | rel_exp NE add_exp
+
+   67 add_exp: add_exp PLUS mult_exp
+   68        | add_exp MINUS mult_exp
+   69        | mult_exp
+
+   70 mult_exp: mult_exp MULT exp_exp
+   71         | mult_exp DIV exp_exp
+   72         | exp_exp
+
+   73 exp_exp: unary_exp EXP_OP exp_exp
+   74        | unary_exp
+
+   75 unary_exp: MINUS unary_exp
+   76          | primary_exp
+
+   77 primary_exp: literal
+   78            | call_exp
+   79            | NEW NAME
+   80            | var
+   81            | ref_var
+   82            | deref_var
+   83            | '(' expression ')'
+
+   84 var: NAME
+   85    | var '.' NAME
+   86    | var '[' expression ']'
+
+   87 ref_var: REF '(' var ')'
+
+   88 deref_var: DEREF '(' var ')'
+   89          | DEREF '(' deref_var ')'
+
+   90 literal: FLOAT_LITERAL
+   91        | INT_LITERAL
+   92        | STRING_LITERAL
+   93        | bool_literal
+   94        | NULL_LIT
+
+   95 bool_literal: TRUE
+   96             | FALSE
+
+   97 type: FLOAT_T
+   98     | INT_T
+   99     | STRING_T
+  100     | BOOL_T
+  101     | NAME
+  102     | REF '(' type ')'
+  103     | ARRAY '[' INT_LITERAL ']' OF type
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '(' (40) 13 48 83 87 88 89 102
+    ')' (41) 13 48 83 87 88 89 102
+    ',' (44) 17 52
+    '.' (46) 85
+    ':' (58) 9 19 28
+    ';' (59) 5 27 32
+    '[' (91) 86 103
+    ']' (93) 86 103
+    '{' (123) 23
+    '}' (125) 23
+    error (256)
+    NAME <sval> (258) 1 9 13 23 28 48 79 84 85 101
+    FLOAT_LITERAL <sval> (259) 90
+    INT_LITERAL <sval> (260) 91 103
+    STRING_LITERAL <sval> (261) 92
+    TRUE (262) 95
+    FALSE (263) 96
+    NULL_LIT (264) 94
+    LPAREN (265)
+    RPAREN (266)
+    SEMICOLON (267)
+    LBRACKET (268)
+    RBRACKET (269)
+    LBRACE (270)
+    RBRACE (271)
+    COLON (272)
+    DOT (273)
+    COMMA (274)
+    CARET (275)
+    PROGRAM (276) 1
+    BEGIN_TOK (277) 1 20
+    END (278) 1 20
+    VAR (279) 9
+    PROCEDURE (280) 13
+    STRUCT (281) 23
+    IN (282) 22
+    IF (283) 40
+    THEN (284) 40
+    ELSE (285) 42
+    FI (286) 40
+    WHILE (287) 43
+    DO (288) 43
+    OD (289) 43
+    RETURN (290) 44
+    NEW (291) 79
+    DEREF (292) 88 89
+    REF (293) 87 102
+    NOT (294) 58
+    ARRAY (295) 103
+    OF (296) 103
+    ASSIGN (297) 11 38 39
+    AND (298) 56
+    OR (299) 54
+    LT (300) 61
+    LE (301) 62
+    GT (302) 63
+    GE (303) 64
+    EQ (304) 65
+    NE (305) 66
+    PLUS (306) 67
+    MINUS (307) 68 75
+    MULT (308) 70
+    DIV (309) 71
+    EXP_OP (310) 73
+    FLOAT_T (311) 97
+    INT_T (312) 98
+    STRING_T (313) 99
+    BOOL_T (314) 100
+
+
+Nonterminals, with rules where they appear
+
+    $accept (70)
+        on left: 0
+    program <b_attr> (71)
+        on left: 1
+        on right: 0
+    opt_decls <b_attr> (72)
+        on left: 2 3
+        on right: 1
+    decl_tail <b_attr> (73)
+        on left: 4 5
+        on right: 3 5 22
+    decl <b_attr> (74)
+        on left: 6 7 8
+        on right: 3 5 22
+    var_decl <b_attr> (75)
+        on left: 9
+        on right: 6
+    var_init_opt <t_attr> (76)
+        on left: 10 11
+        on right: 9
+    M_proc_scope_enter <b_attr> (77)
+        on left: 12
+        on right: 13
+    proc_decl <b_attr> (78)
+        on left: 13
+        on right: 7
+    opt_param_list <param_types_list> (79)
+        on left: 14 15
+        on right: 13
+    paramfield_tail <param_types_list> (80)
+        on left: 16 17
+        on right: 15 17
+    opt_type <t_attr> (81)
+        on left: 18 19
+        on right: 13
+    block <b_attr> (82)
+        on left: 20
+        on right: 13
+    proc_body_opt <b_attr> (83)
+        on left: 21 22
+        on right: 20
+    rec_decl <b_attr> (84)
+        on left: 23
+        on right: 8
+    opt_paramfield_decls <b_attr> (85)
+        on left: 24 25
+        on right: 23
+    paramfield_decl_tail <b_attr> (86)
+        on left: 26 27
+        on right: 25 27
+    paramfield_decl <t_attr> (87)
+        on left: 28
+        on right: 15 17 25 27
+    stmt_list <b_attr> (88)
+        on left: 29 30
+        on right: 20 40 42 43
+    stmt_tail <b_attr> (89)
+        on left: 31 32
+        on right: 30 32
+    stmt <b_attr> (90)
+        on left: 33 34 35 36 37
+        on right: 30 32
+    assign_stmt <b_attr> (91)
+        on left: 38 39
+        on right: 33
+    if_stmt <b_attr> (92)
+        on left: 40
+        on right: 34
+    else_opt <b_attr> (93)
+        on left: 41 42
+        on right: 40
+    while_stmt <b_attr> (94)
+        on left: 43
+        on right: 35
+    return_stmt <t_attr> (95)
+        on left: 44
+        on right: 36
+    return_exp_opt <t_attr> (96)
+        on left: 45 46
+        on right: 44
+    call_stmt <b_attr> (97)
+        on left: 47
+        on right: 37
+    call_exp <t_attr> (98)
+        on left: 48
+        on right: 47 78
+    call_args_opt <t_attr> (99)
+        on left: 49 50
+        on right: 48
+    call_args_tail <t_attr> (100)
+        on left: 51 52
+        on right: 50 52
+    expression <t_attr> (101)
+        on left: 53
+        on right: 11 38 39 40 43 46 50 52 83 86
+    or_exp <t_attr> (102)
+        on left: 54 55
+        on right: 53 54
+    and_exp <t_attr> (103)
+        on left: 56 57
+        on right: 54 55 56
+    not_exp <t_attr> (104)
+        on left: 58 59
+        on right: 56 57 58
+    rel_exp <t_attr> (105)
+        on left: 60 61 62 63 64 65 66
+        on right: 59 61 62 63 64 65 66
+    add_exp <t_attr> (106)
+        on left: 67 68 69
+        on right: 60 61 62 63 64 65 66 67 68
+    mult_exp <t_attr> (107)
+        on left: 70 71 72
+        on right: 67 68 69 70 71
+    exp_exp <t_attr> (108)
+        on left: 73 74
+        on right: 70 71 72 73
+    unary_exp <t_attr> (109)
+        on left: 75 76
+        on right: 73 74 75
+    primary_exp <t_attr> (110)
+        on left: 77 78 79 80 81 82 83
+        on right: 76
+    var <t_attr> (111)
+        on left: 84 85 86
+        on right: 38 80 85 86 87 88
+    ref_var <t_attr> (112)
+        on left: 87
+        on right: 81
+    deref_var <t_attr> (113)
+        on left: 88 89
+        on right: 39 82 89
+    literal <t_attr> (114)
+        on left: 90 91 92 93 94
+        on right: 77
+    bool_literal <t_attr> (115)
+        on left: 95 96
+        on right: 93
+    type <t_attr> (116)
+        on left: 97 98 99 100 101 102 103
+        on right: 9 19 28 102 103
+
+
+State 0
+
+    0 $accept: • program $end
+
+    PROGRAM  shift, and go to state 1
+
+    program  go to state 2
+
+
+State 1
+
+    1 program: PROGRAM • NAME BEGIN_TOK opt_decls END
+
+    NAME  shift, and go to state 3
+
+
+State 2
+
+    0 $accept: program • $end
+
+    $end  shift, and go to state 4
+
+
+State 3
+
+    1 program: PROGRAM NAME • BEGIN_TOK opt_decls END
+
+    BEGIN_TOK  shift, and go to state 5
+
+
+State 4
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 5
+
+    1 program: PROGRAM NAME BEGIN_TOK • opt_decls END
+
+    VAR        shift, and go to state 6
+    PROCEDURE  shift, and go to state 7
+    STRUCT     shift, and go to state 8
+
+    $default  reduce using rule 2 (opt_decls)
+
+    opt_decls  go to state 9
+    decl       go to state 10
+    var_decl   go to state 11
+    proc_decl  go to state 12
+    rec_decl   go to state 13
+
+
+State 6
+
+    9 var_decl: VAR • NAME ':' type var_init_opt
+
+    NAME  shift, and go to state 14
+
+
+State 7
+
+   13 proc_decl: PROCEDURE • NAME M_proc_scope_enter '(' opt_param_list ')' opt_type block
+
+    NAME  shift, and go to state 15
+
+
+State 8
+
+   23 rec_decl: STRUCT • NAME '{' opt_paramfield_decls '}'
+
+    NAME  shift, and go to state 16
+
+
+State 9
+
+    1 program: PROGRAM NAME BEGIN_TOK opt_decls • END
+
+    END  shift, and go to state 17
+
+
+State 10
+
+    3 opt_decls: decl • decl_tail
+
+    ';'  shift, and go to state 18
+
+    $default  reduce using rule 4 (decl_tail)
+
+    decl_tail  go to state 19
+
+
+State 11
+
+    6 decl: var_decl •
+
+    $default  reduce using rule 6 (decl)
+
+
+State 12
+
+    7 decl: proc_decl •
+
+    $default  reduce using rule 7 (decl)
+
+
+State 13
+
+    8 decl: rec_decl •
+
+    $default  reduce using rule 8 (decl)
+
+
+State 14
+
+    9 var_decl: VAR NAME • ':' type var_init_opt
+
+    ':'  shift, and go to state 20
+
+
+State 15
+
+   13 proc_decl: PROCEDURE NAME • M_proc_scope_enter '(' opt_param_list ')' opt_type block
+
+    $default  reduce using rule 12 (M_proc_scope_enter)
+
+    M_proc_scope_enter  go to state 21
+
+
+State 16
+
+   23 rec_decl: STRUCT NAME • '{' opt_paramfield_decls '}'
+
+    '{'  shift, and go to state 22
+
+
+State 17
+
+    1 program: PROGRAM NAME BEGIN_TOK opt_decls END •
+
+    $default  reduce using rule 1 (program)
+
+
+State 18
+
+    5 decl_tail: ';' • decl decl_tail
+
+    VAR        shift, and go to state 6
+    PROCEDURE  shift, and go to state 7
+    STRUCT     shift, and go to state 8
+
+    decl       go to state 23
+    var_decl   go to state 11
+    proc_decl  go to state 12
+    rec_decl   go to state 13
+
+
+State 19
+
+    3 opt_decls: decl decl_tail •
+
+    $default  reduce using rule 3 (opt_decls)
+
+
+State 20
+
+    9 var_decl: VAR NAME ':' • type var_init_opt
+
+    NAME      shift, and go to state 24
+    REF       shift, and go to state 25
+    ARRAY     shift, and go to state 26
+    FLOAT_T   shift, and go to state 27
+    INT_T     shift, and go to state 28
+    STRING_T  shift, and go to state 29
+    BOOL_T    shift, and go to state 30
+
+    type  go to state 31
+
+
+State 21
+
+   13 proc_decl: PROCEDURE NAME M_proc_scope_enter • '(' opt_param_list ')' opt_type block
+
+    '('  shift, and go to state 32
+
+
+State 22
+
+   23 rec_decl: STRUCT NAME '{' • opt_paramfield_decls '}'
+
+    NAME  shift, and go to state 33
+
+    $default  reduce using rule 24 (opt_paramfield_decls)
+
+    opt_paramfield_decls  go to state 34
+    paramfield_decl       go to state 35
+
+
+State 23
+
+    5 decl_tail: ';' decl • decl_tail
+
+    ';'  shift, and go to state 18
+
+    $default  reduce using rule 4 (decl_tail)
+
+    decl_tail  go to state 36
+
+
+State 24
+
+  101 type: NAME •
+
+    $default  reduce using rule 101 (type)
+
+
+State 25
+
+  102 type: REF • '(' type ')'
+
+    '('  shift, and go to state 37
+
+
+State 26
+
+  103 type: ARRAY • '[' INT_LITERAL ']' OF type
+
+    '['  shift, and go to state 38
+
+
+State 27
+
+   97 type: FLOAT_T •
+
+    $default  reduce using rule 97 (type)
+
+
+State 28
+
+   98 type: INT_T •
+
+    $default  reduce using rule 98 (type)
+
+
+State 29
+
+   99 type: STRING_T •
+
+    $default  reduce using rule 99 (type)
+
+
+State 30
+
+  100 type: BOOL_T •
+
+    $default  reduce using rule 100 (type)
+
+
+State 31
+
+    9 var_decl: VAR NAME ':' type • var_init_opt
+
+    ASSIGN  shift, and go to state 39
+
+    $default  reduce using rule 10 (var_init_opt)
+
+    var_init_opt  go to state 40
+
+
+State 32
+
+   13 proc_decl: PROCEDURE NAME M_proc_scope_enter '(' • opt_param_list ')' opt_type block
+
+    NAME  shift, and go to state 33
+
+    $default  reduce using rule 14 (opt_param_list)
+
+    opt_param_list   go to state 41
+    paramfield_decl  go to state 42
+
+
+State 33
+
+   28 paramfield_decl: NAME • ':' type
+
+    ':'  shift, and go to state 43
+
+
+State 34
+
+   23 rec_decl: STRUCT NAME '{' opt_paramfield_decls • '}'
+
+    '}'  shift, and go to state 44
+
+
+State 35
+
+   25 opt_paramfield_decls: paramfield_decl • paramfield_decl_tail
+
+    ';'  shift, and go to state 45
+
+    $default  reduce using rule 26 (paramfield_decl_tail)
+
+    paramfield_decl_tail  go to state 46
+
+
+State 36
+
+    5 decl_tail: ';' decl decl_tail •
+
+    $default  reduce using rule 5 (decl_tail)
+
+
+State 37
+
+  102 type: REF '(' • type ')'
+
+    NAME      shift, and go to state 24
+    REF       shift, and go to state 25
+    ARRAY     shift, and go to state 26
+    FLOAT_T   shift, and go to state 27
+    INT_T     shift, and go to state 28
+    STRING_T  shift, and go to state 29
+    BOOL_T    shift, and go to state 30
+
+    type  go to state 47
+
+
+State 38
+
+  103 type: ARRAY '[' • INT_LITERAL ']' OF type
+
+    INT_LITERAL  shift, and go to state 48
+
+
+State 39
+
+   11 var_init_opt: ASSIGN • expression
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 63
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 40
+
+    9 var_decl: VAR NAME ':' type var_init_opt •
+
+    $default  reduce using rule 9 (var_decl)
+
+
+State 41
+
+   13 proc_decl: PROCEDURE NAME M_proc_scope_enter '(' opt_param_list • ')' opt_type block
+
+    ')'  shift, and go to state 78
+
+
+State 42
+
+   15 opt_param_list: paramfield_decl • paramfield_tail
+
+    ','  shift, and go to state 79
+
+    $default  reduce using rule 16 (paramfield_tail)
+
+    paramfield_tail  go to state 80
+
+
+State 43
+
+   28 paramfield_decl: NAME ':' • type
+
+    NAME      shift, and go to state 24
+    REF       shift, and go to state 25
+    ARRAY     shift, and go to state 26
+    FLOAT_T   shift, and go to state 27
+    INT_T     shift, and go to state 28
+    STRING_T  shift, and go to state 29
+    BOOL_T    shift, and go to state 30
+
+    type  go to state 81
+
+
+State 44
+
+   23 rec_decl: STRUCT NAME '{' opt_paramfield_decls '}' •
+
+    $default  reduce using rule 23 (rec_decl)
+
+
+State 45
+
+   27 paramfield_decl_tail: ';' • paramfield_decl paramfield_decl_tail
+
+    NAME  shift, and go to state 33
+
+    paramfield_decl  go to state 82
+
+
+State 46
+
+   25 opt_paramfield_decls: paramfield_decl paramfield_decl_tail •
+
+    $default  reduce using rule 25 (opt_paramfield_decls)
+
+
+State 47
+
+  102 type: REF '(' type • ')'
+
+    ')'  shift, and go to state 83
+
+
+State 48
+
+  103 type: ARRAY '[' INT_LITERAL • ']' OF type
+
+    ']'  shift, and go to state 84
+
+
+State 49
+
+   48 call_exp: NAME • '(' call_args_opt ')'
+   84 var: NAME •
+
+    '('  shift, and go to state 85
+
+    $default  reduce using rule 84 (var)
+
+
+State 50
+
+   90 literal: FLOAT_LITERAL •
+
+    $default  reduce using rule 90 (literal)
+
+
+State 51
+
+   91 literal: INT_LITERAL •
+
+    $default  reduce using rule 91 (literal)
+
+
+State 52
+
+   92 literal: STRING_LITERAL •
+
+    $default  reduce using rule 92 (literal)
+
+
+State 53
+
+   95 bool_literal: TRUE •
+
+    $default  reduce using rule 95 (bool_literal)
+
+
+State 54
+
+   96 bool_literal: FALSE •
+
+    $default  reduce using rule 96 (bool_literal)
+
+
+State 55
+
+   94 literal: NULL_LIT •
+
+    $default  reduce using rule 94 (literal)
+
+
+State 56
+
+   79 primary_exp: NEW • NAME
+
+    NAME  shift, and go to state 86
+
+
+State 57
+
+   88 deref_var: DEREF • '(' var ')'
+   89          | DEREF • '(' deref_var ')'
+
+    '('  shift, and go to state 87
+
+
+State 58
+
+   87 ref_var: REF • '(' var ')'
+
+    '('  shift, and go to state 88
+
+
+State 59
+
+   58 not_exp: NOT • not_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    not_exp       go to state 89
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 60
+
+   75 unary_exp: MINUS • unary_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    unary_exp     go to state 90
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 61
+
+   83 primary_exp: '(' • expression ')'
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 91
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 62
+
+   78 primary_exp: call_exp •
+
+    $default  reduce using rule 78 (primary_exp)
+
+
+State 63
+
+   11 var_init_opt: ASSIGN expression •
+
+    $default  reduce using rule 11 (var_init_opt)
+
+
+State 64
+
+   53 expression: or_exp •
+   54 or_exp: or_exp • OR and_exp
+
+    OR  shift, and go to state 92
+
+    $default  reduce using rule 53 (expression)
+
+
+State 65
+
+   55 or_exp: and_exp •
+   56 and_exp: and_exp • AND not_exp
+
+    AND  shift, and go to state 93
+
+    $default  reduce using rule 55 (or_exp)
+
+
+State 66
+
+   57 and_exp: not_exp •
+
+    $default  reduce using rule 57 (and_exp)
+
+
+State 67
+
+   59 not_exp: rel_exp •
+   61 rel_exp: rel_exp • LT add_exp
+   62        | rel_exp • LE add_exp
+   63        | rel_exp • GT add_exp
+   64        | rel_exp • GE add_exp
+   65        | rel_exp • EQ add_exp
+   66        | rel_exp • NE add_exp
+
+    LT  shift, and go to state 94
+    LE  shift, and go to state 95
+    GT  shift, and go to state 96
+    GE  shift, and go to state 97
+    EQ  shift, and go to state 98
+    NE  shift, and go to state 99
+
+    $default  reduce using rule 59 (not_exp)
+
+
+State 68
+
+   60 rel_exp: add_exp •
+   67 add_exp: add_exp • PLUS mult_exp
+   68        | add_exp • MINUS mult_exp
+
+    PLUS   shift, and go to state 100
+    MINUS  shift, and go to state 101
+
+    $default  reduce using rule 60 (rel_exp)
+
+
+State 69
+
+   69 add_exp: mult_exp •
+   70 mult_exp: mult_exp • MULT exp_exp
+   71         | mult_exp • DIV exp_exp
+
+    MULT  shift, and go to state 102
+    DIV   shift, and go to state 103
+
+    $default  reduce using rule 69 (add_exp)
+
+
+State 70
+
+   72 mult_exp: exp_exp •
+
+    $default  reduce using rule 72 (mult_exp)
+
+
+State 71
+
+   73 exp_exp: unary_exp • EXP_OP exp_exp
+   74        | unary_exp •
+
+    EXP_OP  shift, and go to state 104
+
+    $default  reduce using rule 74 (exp_exp)
+
+
+State 72
+
+   76 unary_exp: primary_exp •
+
+    $default  reduce using rule 76 (unary_exp)
+
+
+State 73
+
+   80 primary_exp: var •
+   85 var: var • '.' NAME
+   86    | var • '[' expression ']'
+
+    '.'  shift, and go to state 105
+    '['  shift, and go to state 106
+
+    $default  reduce using rule 80 (primary_exp)
+
+
+State 74
+
+   81 primary_exp: ref_var •
+
+    $default  reduce using rule 81 (primary_exp)
+
+
+State 75
+
+   82 primary_exp: deref_var •
+
+    $default  reduce using rule 82 (primary_exp)
+
+
+State 76
+
+   77 primary_exp: literal •
+
+    $default  reduce using rule 77 (primary_exp)
+
+
+State 77
+
+   93 literal: bool_literal •
+
+    $default  reduce using rule 93 (literal)
+
+
+State 78
+
+   13 proc_decl: PROCEDURE NAME M_proc_scope_enter '(' opt_param_list ')' • opt_type block
+
+    ':'  shift, and go to state 107
+
+    $default  reduce using rule 18 (opt_type)
+
+    opt_type  go to state 108
+
+
+State 79
+
+   17 paramfield_tail: ',' • paramfield_decl paramfield_tail
+
+    NAME  shift, and go to state 33
+
+    paramfield_decl  go to state 109
+
+
+State 80
+
+   15 opt_param_list: paramfield_decl paramfield_tail •
+
+    $default  reduce using rule 15 (opt_param_list)
+
+
+State 81
+
+   28 paramfield_decl: NAME ':' type •
+
+    $default  reduce using rule 28 (paramfield_decl)
+
+
+State 82
+
+   27 paramfield_decl_tail: ';' paramfield_decl • paramfield_decl_tail
+
+    ';'  shift, and go to state 45
+
+    $default  reduce using rule 26 (paramfield_decl_tail)
+
+    paramfield_decl_tail  go to state 110
+
+
+State 83
+
+  102 type: REF '(' type ')' •
+
+    $default  reduce using rule 102 (type)
+
+
+State 84
+
+  103 type: ARRAY '[' INT_LITERAL ']' • OF type
+
+    OF  shift, and go to state 111
+
+
+State 85
+
+   48 call_exp: NAME '(' • call_args_opt ')'
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    $default  reduce using rule 49 (call_args_opt)
+
+    call_exp       go to state 62
+    call_args_opt  go to state 112
+    expression     go to state 113
+    or_exp         go to state 64
+    and_exp        go to state 65
+    not_exp        go to state 66
+    rel_exp        go to state 67
+    add_exp        go to state 68
+    mult_exp       go to state 69
+    exp_exp        go to state 70
+    unary_exp      go to state 71
+    primary_exp    go to state 72
+    var            go to state 73
+    ref_var        go to state 74
+    deref_var      go to state 75
+    literal        go to state 76
+    bool_literal   go to state 77
+
+
+State 86
+
+   79 primary_exp: NEW NAME •
+
+    $default  reduce using rule 79 (primary_exp)
+
+
+State 87
+
+   88 deref_var: DEREF '(' • var ')'
+   89          | DEREF '(' • deref_var ')'
+
+    NAME   shift, and go to state 114
+    DEREF  shift, and go to state 57
+
+    var        go to state 115
+    deref_var  go to state 116
+
+
+State 88
+
+   87 ref_var: REF '(' • var ')'
+
+    NAME  shift, and go to state 114
+
+    var  go to state 117
+
+
+State 89
+
+   58 not_exp: NOT not_exp •
+
+    $default  reduce using rule 58 (not_exp)
+
+
+State 90
+
+   75 unary_exp: MINUS unary_exp •
+
+    $default  reduce using rule 75 (unary_exp)
+
+
+State 91
+
+   83 primary_exp: '(' expression • ')'
+
+    ')'  shift, and go to state 118
+
+
+State 92
+
+   54 or_exp: or_exp OR • and_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    and_exp       go to state 119
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 93
+
+   56 and_exp: and_exp AND • not_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    not_exp       go to state 120
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 94
+
+   61 rel_exp: rel_exp LT • add_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    add_exp       go to state 121
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 95
+
+   62 rel_exp: rel_exp LE • add_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    add_exp       go to state 122
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 96
+
+   63 rel_exp: rel_exp GT • add_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    add_exp       go to state 123
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 97
+
+   64 rel_exp: rel_exp GE • add_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    add_exp       go to state 124
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 98
+
+   65 rel_exp: rel_exp EQ • add_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    add_exp       go to state 125
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 99
+
+   66 rel_exp: rel_exp NE • add_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    add_exp       go to state 126
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 100
+
+   67 add_exp: add_exp PLUS • mult_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    mult_exp      go to state 127
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 101
+
+   68 add_exp: add_exp MINUS • mult_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    mult_exp      go to state 128
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 102
+
+   70 mult_exp: mult_exp MULT • exp_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    exp_exp       go to state 129
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 103
+
+   71 mult_exp: mult_exp DIV • exp_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    exp_exp       go to state 130
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 104
+
+   73 exp_exp: unary_exp EXP_OP • exp_exp
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    exp_exp       go to state 131
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 105
+
+   85 var: var '.' • NAME
+
+    NAME  shift, and go to state 132
+
+
+State 106
+
+   86 var: var '[' • expression ']'
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 133
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 107
+
+   19 opt_type: ':' • type
+
+    NAME      shift, and go to state 24
+    REF       shift, and go to state 25
+    ARRAY     shift, and go to state 26
+    FLOAT_T   shift, and go to state 27
+    INT_T     shift, and go to state 28
+    STRING_T  shift, and go to state 29
+    BOOL_T    shift, and go to state 30
+
+    type  go to state 134
+
+
+State 108
+
+   13 proc_decl: PROCEDURE NAME M_proc_scope_enter '(' opt_param_list ')' opt_type • block
+
+    BEGIN_TOK  shift, and go to state 135
+
+    block  go to state 136
+
+
+State 109
+
+   17 paramfield_tail: ',' paramfield_decl • paramfield_tail
+
+    ','  shift, and go to state 79
+
+    $default  reduce using rule 16 (paramfield_tail)
+
+    paramfield_tail  go to state 137
+
+
+State 110
+
+   27 paramfield_decl_tail: ';' paramfield_decl paramfield_decl_tail •
+
+    $default  reduce using rule 27 (paramfield_decl_tail)
+
+
+State 111
+
+  103 type: ARRAY '[' INT_LITERAL ']' OF • type
+
+    NAME      shift, and go to state 24
+    REF       shift, and go to state 25
+    ARRAY     shift, and go to state 26
+    FLOAT_T   shift, and go to state 27
+    INT_T     shift, and go to state 28
+    STRING_T  shift, and go to state 29
+    BOOL_T    shift, and go to state 30
+
+    type  go to state 138
+
+
+State 112
+
+   48 call_exp: NAME '(' call_args_opt • ')'
+
+    ')'  shift, and go to state 139
+
+
+State 113
+
+   50 call_args_opt: expression • call_args_tail
+
+    ','  shift, and go to state 140
+
+    $default  reduce using rule 51 (call_args_tail)
+
+    call_args_tail  go to state 141
+
+
+State 114
+
+   84 var: NAME •
+
+    $default  reduce using rule 84 (var)
+
+
+State 115
+
+   85 var: var • '.' NAME
+   86    | var • '[' expression ']'
+   88 deref_var: DEREF '(' var • ')'
+
+    ')'  shift, and go to state 142
+    '.'  shift, and go to state 105
+    '['  shift, and go to state 106
+
+
+State 116
+
+   89 deref_var: DEREF '(' deref_var • ')'
+
+    ')'  shift, and go to state 143
+
+
+State 117
+
+   85 var: var • '.' NAME
+   86    | var • '[' expression ']'
+   87 ref_var: REF '(' var • ')'
+
+    ')'  shift, and go to state 144
+    '.'  shift, and go to state 105
+    '['  shift, and go to state 106
+
+
+State 118
+
+   83 primary_exp: '(' expression ')' •
+
+    $default  reduce using rule 83 (primary_exp)
+
+
+State 119
+
+   54 or_exp: or_exp OR and_exp •
+   56 and_exp: and_exp • AND not_exp
+
+    AND  shift, and go to state 93
+
+    $default  reduce using rule 54 (or_exp)
+
+
+State 120
+
+   56 and_exp: and_exp AND not_exp •
+
+    $default  reduce using rule 56 (and_exp)
+
+
+State 121
+
+   61 rel_exp: rel_exp LT add_exp •
+   67 add_exp: add_exp • PLUS mult_exp
+   68        | add_exp • MINUS mult_exp
+
+    PLUS   shift, and go to state 100
+    MINUS  shift, and go to state 101
+
+    $default  reduce using rule 61 (rel_exp)
+
+
+State 122
+
+   62 rel_exp: rel_exp LE add_exp •
+   67 add_exp: add_exp • PLUS mult_exp
+   68        | add_exp • MINUS mult_exp
+
+    PLUS   shift, and go to state 100
+    MINUS  shift, and go to state 101
+
+    $default  reduce using rule 62 (rel_exp)
+
+
+State 123
+
+   63 rel_exp: rel_exp GT add_exp •
+   67 add_exp: add_exp • PLUS mult_exp
+   68        | add_exp • MINUS mult_exp
+
+    PLUS   shift, and go to state 100
+    MINUS  shift, and go to state 101
+
+    $default  reduce using rule 63 (rel_exp)
+
+
+State 124
+
+   64 rel_exp: rel_exp GE add_exp •
+   67 add_exp: add_exp • PLUS mult_exp
+   68        | add_exp • MINUS mult_exp
+
+    PLUS   shift, and go to state 100
+    MINUS  shift, and go to state 101
+
+    $default  reduce using rule 64 (rel_exp)
+
+
+State 125
+
+   65 rel_exp: rel_exp EQ add_exp •
+   67 add_exp: add_exp • PLUS mult_exp
+   68        | add_exp • MINUS mult_exp
+
+    PLUS   shift, and go to state 100
+    MINUS  shift, and go to state 101
+
+    $default  reduce using rule 65 (rel_exp)
+
+
+State 126
+
+   66 rel_exp: rel_exp NE add_exp •
+   67 add_exp: add_exp • PLUS mult_exp
+   68        | add_exp • MINUS mult_exp
+
+    PLUS   shift, and go to state 100
+    MINUS  shift, and go to state 101
+
+    $default  reduce using rule 66 (rel_exp)
+
+
+State 127
+
+   67 add_exp: add_exp PLUS mult_exp •
+   70 mult_exp: mult_exp • MULT exp_exp
+   71         | mult_exp • DIV exp_exp
+
+    MULT  shift, and go to state 102
+    DIV   shift, and go to state 103
+
+    $default  reduce using rule 67 (add_exp)
+
+
+State 128
+
+   68 add_exp: add_exp MINUS mult_exp •
+   70 mult_exp: mult_exp • MULT exp_exp
+   71         | mult_exp • DIV exp_exp
+
+    MULT  shift, and go to state 102
+    DIV   shift, and go to state 103
+
+    $default  reduce using rule 68 (add_exp)
+
+
+State 129
+
+   70 mult_exp: mult_exp MULT exp_exp •
+
+    $default  reduce using rule 70 (mult_exp)
+
+
+State 130
+
+   71 mult_exp: mult_exp DIV exp_exp •
+
+    $default  reduce using rule 71 (mult_exp)
+
+
+State 131
+
+   73 exp_exp: unary_exp EXP_OP exp_exp •
+
+    $default  reduce using rule 73 (exp_exp)
+
+
+State 132
+
+   85 var: var '.' NAME •
+
+    $default  reduce using rule 85 (var)
+
+
+State 133
+
+   86 var: var '[' expression • ']'
+
+    ']'  shift, and go to state 145
+
+
+State 134
+
+   19 opt_type: ':' type •
+
+    $default  reduce using rule 19 (opt_type)
+
+
+State 135
+
+   20 block: BEGIN_TOK • proc_body_opt stmt_list END
+
+    VAR        shift, and go to state 6
+    PROCEDURE  shift, and go to state 7
+    STRUCT     shift, and go to state 8
+
+    $default  reduce using rule 21 (proc_body_opt)
+
+    decl           go to state 146
+    var_decl       go to state 11
+    proc_decl      go to state 12
+    proc_body_opt  go to state 147
+    rec_decl       go to state 13
+
+
+State 136
+
+   13 proc_decl: PROCEDURE NAME M_proc_scope_enter '(' opt_param_list ')' opt_type block •
+
+    $default  reduce using rule 13 (proc_decl)
+
+
+State 137
+
+   17 paramfield_tail: ',' paramfield_decl paramfield_tail •
+
+    $default  reduce using rule 17 (paramfield_tail)
+
+
+State 138
+
+  103 type: ARRAY '[' INT_LITERAL ']' OF type •
+
+    $default  reduce using rule 103 (type)
+
+
+State 139
+
+   48 call_exp: NAME '(' call_args_opt ')' •
+
+    $default  reduce using rule 48 (call_exp)
+
+
+State 140
+
+   52 call_args_tail: ',' • expression call_args_tail
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 148
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 141
+
+   50 call_args_opt: expression call_args_tail •
+
+    $default  reduce using rule 50 (call_args_opt)
+
+
+State 142
+
+   88 deref_var: DEREF '(' var ')' •
+
+    $default  reduce using rule 88 (deref_var)
+
+
+State 143
+
+   89 deref_var: DEREF '(' deref_var ')' •
+
+    $default  reduce using rule 89 (deref_var)
+
+
+State 144
+
+   87 ref_var: REF '(' var ')' •
+
+    $default  reduce using rule 87 (ref_var)
+
+
+State 145
+
+   86 var: var '[' expression ']' •
+
+    $default  reduce using rule 86 (var)
+
+
+State 146
+
+   22 proc_body_opt: decl • decl_tail IN
+
+    ';'  shift, and go to state 18
+
+    $default  reduce using rule 4 (decl_tail)
+
+    decl_tail  go to state 149
+
+
+State 147
+
+   20 block: BEGIN_TOK proc_body_opt • stmt_list END
+
+    NAME    shift, and go to state 49
+    IF      shift, and go to state 150
+    WHILE   shift, and go to state 151
+    RETURN  shift, and go to state 152
+    DEREF   shift, and go to state 57
+
+    $default  reduce using rule 29 (stmt_list)
+
+    stmt_list    go to state 153
+    stmt         go to state 154
+    assign_stmt  go to state 155
+    if_stmt      go to state 156
+    while_stmt   go to state 157
+    return_stmt  go to state 158
+    call_stmt    go to state 159
+    call_exp     go to state 160
+    var          go to state 161
+    deref_var    go to state 162
+
+
+State 148
+
+   52 call_args_tail: ',' expression • call_args_tail
+
+    ','  shift, and go to state 140
+
+    $default  reduce using rule 51 (call_args_tail)
+
+    call_args_tail  go to state 163
+
+
+State 149
+
+   22 proc_body_opt: decl decl_tail • IN
+
+    IN  shift, and go to state 164
+
+
+State 150
+
+   40 if_stmt: IF • expression THEN stmt_list else_opt FI
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 165
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 151
+
+   43 while_stmt: WHILE • expression DO stmt_list OD
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 166
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 152
+
+   44 return_stmt: RETURN • return_exp_opt
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    $default  reduce using rule 45 (return_exp_opt)
+
+    return_exp_opt  go to state 167
+    call_exp        go to state 62
+    expression      go to state 168
+    or_exp          go to state 64
+    and_exp         go to state 65
+    not_exp         go to state 66
+    rel_exp         go to state 67
+    add_exp         go to state 68
+    mult_exp        go to state 69
+    exp_exp         go to state 70
+    unary_exp       go to state 71
+    primary_exp     go to state 72
+    var             go to state 73
+    ref_var         go to state 74
+    deref_var       go to state 75
+    literal         go to state 76
+    bool_literal    go to state 77
+
+
+State 153
+
+   20 block: BEGIN_TOK proc_body_opt stmt_list • END
+
+    END  shift, and go to state 169
+
+
+State 154
+
+   30 stmt_list: stmt • stmt_tail
+
+    ';'  shift, and go to state 170
+
+    $default  reduce using rule 31 (stmt_tail)
+
+    stmt_tail  go to state 171
+
+
+State 155
+
+   33 stmt: assign_stmt •
+
+    $default  reduce using rule 33 (stmt)
+
+
+State 156
+
+   34 stmt: if_stmt •
+
+    $default  reduce using rule 34 (stmt)
+
+
+State 157
+
+   35 stmt: while_stmt •
+
+    $default  reduce using rule 35 (stmt)
+
+
+State 158
+
+   36 stmt: return_stmt •
+
+    $default  reduce using rule 36 (stmt)
+
+
+State 159
+
+   37 stmt: call_stmt •
+
+    $default  reduce using rule 37 (stmt)
+
+
+State 160
+
+   47 call_stmt: call_exp •
+
+    $default  reduce using rule 47 (call_stmt)
+
+
+State 161
+
+   38 assign_stmt: var • ASSIGN expression
+   85 var: var • '.' NAME
+   86    | var • '[' expression ']'
+
+    ASSIGN  shift, and go to state 172
+    '.'     shift, and go to state 105
+    '['     shift, and go to state 106
+
+
+State 162
+
+   39 assign_stmt: deref_var • ASSIGN expression
+
+    ASSIGN  shift, and go to state 173
+
+
+State 163
+
+   52 call_args_tail: ',' expression call_args_tail •
+
+    $default  reduce using rule 52 (call_args_tail)
+
+
+State 164
+
+   22 proc_body_opt: decl decl_tail IN •
+
+    $default  reduce using rule 22 (proc_body_opt)
+
+
+State 165
+
+   40 if_stmt: IF expression • THEN stmt_list else_opt FI
+
+    THEN  shift, and go to state 174
+
+
+State 166
+
+   43 while_stmt: WHILE expression • DO stmt_list OD
+
+    DO  shift, and go to state 175
+
+
+State 167
+
+   44 return_stmt: RETURN return_exp_opt •
+
+    $default  reduce using rule 44 (return_stmt)
+
+
+State 168
+
+   46 return_exp_opt: expression •
+
+    $default  reduce using rule 46 (return_exp_opt)
+
+
+State 169
+
+   20 block: BEGIN_TOK proc_body_opt stmt_list END •
+
+    $default  reduce using rule 20 (block)
+
+
+State 170
+
+   32 stmt_tail: ';' • stmt stmt_tail
+
+    NAME    shift, and go to state 49
+    IF      shift, and go to state 150
+    WHILE   shift, and go to state 151
+    RETURN  shift, and go to state 152
+    DEREF   shift, and go to state 57
+
+    stmt         go to state 176
+    assign_stmt  go to state 155
+    if_stmt      go to state 156
+    while_stmt   go to state 157
+    return_stmt  go to state 158
+    call_stmt    go to state 159
+    call_exp     go to state 160
+    var          go to state 161
+    deref_var    go to state 162
+
+
+State 171
+
+   30 stmt_list: stmt stmt_tail •
+
+    $default  reduce using rule 30 (stmt_list)
+
+
+State 172
+
+   38 assign_stmt: var ASSIGN • expression
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 177
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 173
+
+   39 assign_stmt: deref_var ASSIGN • expression
+
+    NAME            shift, and go to state 49
+    FLOAT_LITERAL   shift, and go to state 50
+    INT_LITERAL     shift, and go to state 51
+    STRING_LITERAL  shift, and go to state 52
+    TRUE            shift, and go to state 53
+    FALSE           shift, and go to state 54
+    NULL_LIT        shift, and go to state 55
+    NEW             shift, and go to state 56
+    DEREF           shift, and go to state 57
+    REF             shift, and go to state 58
+    NOT             shift, and go to state 59
+    MINUS           shift, and go to state 60
+    '('             shift, and go to state 61
+
+    call_exp      go to state 62
+    expression    go to state 178
+    or_exp        go to state 64
+    and_exp       go to state 65
+    not_exp       go to state 66
+    rel_exp       go to state 67
+    add_exp       go to state 68
+    mult_exp      go to state 69
+    exp_exp       go to state 70
+    unary_exp     go to state 71
+    primary_exp   go to state 72
+    var           go to state 73
+    ref_var       go to state 74
+    deref_var     go to state 75
+    literal       go to state 76
+    bool_literal  go to state 77
+
+
+State 174
+
+   40 if_stmt: IF expression THEN • stmt_list else_opt FI
+
+    NAME    shift, and go to state 49
+    IF      shift, and go to state 150
+    WHILE   shift, and go to state 151
+    RETURN  shift, and go to state 152
+    DEREF   shift, and go to state 57
+
+    $default  reduce using rule 29 (stmt_list)
+
+    stmt_list    go to state 179
+    stmt         go to state 154
+    assign_stmt  go to state 155
+    if_stmt      go to state 156
+    while_stmt   go to state 157
+    return_stmt  go to state 158
+    call_stmt    go to state 159
+    call_exp     go to state 160
+    var          go to state 161
+    deref_var    go to state 162
+
+
+State 175
+
+   43 while_stmt: WHILE expression DO • stmt_list OD
+
+    NAME    shift, and go to state 49
+    IF      shift, and go to state 150
+    WHILE   shift, and go to state 151
+    RETURN  shift, and go to state 152
+    DEREF   shift, and go to state 57
+
+    $default  reduce using rule 29 (stmt_list)
+
+    stmt_list    go to state 180
+    stmt         go to state 154
+    assign_stmt  go to state 155
+    if_stmt      go to state 156
+    while_stmt   go to state 157
+    return_stmt  go to state 158
+    call_stmt    go to state 159
+    call_exp     go to state 160
+    var          go to state 161
+    deref_var    go to state 162
+
+
+State 176
+
+   32 stmt_tail: ';' stmt • stmt_tail
+
+    ';'  shift, and go to state 170
+
+    $default  reduce using rule 31 (stmt_tail)
+
+    stmt_tail  go to state 181
+
+
+State 177
+
+   38 assign_stmt: var ASSIGN expression •
+
+    $default  reduce using rule 38 (assign_stmt)
+
+
+State 178
+
+   39 assign_stmt: deref_var ASSIGN expression •
+
+    $default  reduce using rule 39 (assign_stmt)
+
+
+State 179
+
+   40 if_stmt: IF expression THEN stmt_list • else_opt FI
+
+    ELSE  shift, and go to state 182
+
+    $default  reduce using rule 41 (else_opt)
+
+    else_opt  go to state 183
+
+
+State 180
+
+   43 while_stmt: WHILE expression DO stmt_list • OD
+
+    OD  shift, and go to state 184
+
+
+State 181
+
+   32 stmt_tail: ';' stmt stmt_tail •
+
+    $default  reduce using rule 32 (stmt_tail)
+
+
+State 182
+
+   42 else_opt: ELSE • stmt_list
+
+    NAME    shift, and go to state 49
+    IF      shift, and go to state 150
+    WHILE   shift, and go to state 151
+    RETURN  shift, and go to state 152
+    DEREF   shift, and go to state 57
+
+    $default  reduce using rule 29 (stmt_list)
+
+    stmt_list    go to state 185
+    stmt         go to state 154
+    assign_stmt  go to state 155
+    if_stmt      go to state 156
+    while_stmt   go to state 157
+    return_stmt  go to state 158
+    call_stmt    go to state 159
+    call_exp     go to state 160
+    var          go to state 161
+    deref_var    go to state 162
+
+
+State 183
+
+   40 if_stmt: IF expression THEN stmt_list else_opt • FI
+
+    FI  shift, and go to state 186
+
+
+State 184
+
+   43 while_stmt: WHILE expression DO stmt_list OD •
+
+    $default  reduce using rule 43 (while_stmt)
+
+
+State 185
+
+   42 else_opt: ELSE stmt_list •
+
+    $default  reduce using rule 42 (else_opt)
+
+
+State 186
+
+   40 if_stmt: IF expression THEN stmt_list else_opt FI •
+
+    $default  reduce using rule 40 (if_stmt)

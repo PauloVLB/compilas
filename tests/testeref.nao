@@ -1,0 +1,22 @@
+program swapexample 
+    begin
+        procedure swap(a : ref(int), b : ref(int))
+        begin
+            var tmp : int
+        in
+            tmp     := deref(a);
+            deref(a):= deref(b);
+            deref(b):= tmp
+        end;
+        procedure main()
+            begin
+                var x : int;
+                var t : ref(int);
+                var y : ref(ref(int))
+            in 
+                t := ref(x);
+                y := ref(t);
+                x := deref(deref(y));
+                swap(2, 3)
+            end
+        end

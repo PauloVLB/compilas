@@ -1,1 +1,45 @@
-.venv/
+# Compiled binaries
+syntax_asc
+syntax
+syntax_rec
+rec_aux
+programa
+
+# Object files
+*.o
+
+# Generated files by Flex/Bison
+lex.yy.c
+parser.tab.c
+parser.tab.h
+parser.output
+
+# Build directories
+build/
+bin/
+
+# IDE files
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Log files
+*.log
+
+# Backup files
+*.bak
+*.backup
