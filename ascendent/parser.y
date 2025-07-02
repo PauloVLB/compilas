@@ -19,24 +19,54 @@ extern int yylex();
 void yyerror(const char *s);
 
 bool is_numeric(const std::string& type) {
-    return type == "INT" || type == "FLOAT";
+    return type == "int" || type == "float";
 }
 
 std::string resolve_arithmetic_type(const std::string& t1, const std::string& t2) {
-    if (t1 == "FLOAT" || t2 == "FLOAT") {
-        return "FLOAT";
+    if (t1 == "float" || t2 == "float") {
+        return "float";
     }
-    return "INT";
+    return "int";
 }
 
 bool check_compatible(const std::string& tvar, const std::string& texp) {
     return (tvar == texp) || 
                         (texp == "NULL" && tvar.rfind("REF(", 0) == 0) || 
-                        (tvar == "FLOAT" && texp == "INT");
+                        (tvar == "float" && texp == "int");
 }
 
 void print_token_location(const int& first_line, const int& first_column) {
     std::cout << "Linha " << first_line << ", Coluna " << first_column << ": \n";
+}
+
+std::unordered_map<std::string, std::string> op_name_to_c_symbol = {
+    {"OR", "||"},
+    {"AND", "&&"},
+    {"NOT", "!"},
+    {"+", "+"},
+    {"-", "-"},
+    {"*", "*"},
+    {"/", "/"},
+    {"^", "pow"},
+    {"<", "<"},
+    {"<=", "<="},
+    {">", ">"},
+    {">=", ">="},
+    {"=", "=="},
+    {"<>", "!="}
+};
+
+int curr_var = 0;
+int curr_label = 0;
+std::string variable_declarations = "";
+
+std::string new_var(std::string type = "int") {
+    variable_declarations += type + " t" + std::to_string(curr_var) + ";\n";
+    return "t" + std::to_string(curr_var++);
+}
+
+std::string new_label() {
+    return "l" + std::to_string(curr_label++);
 }
 
 bool handle_binary_op(
@@ -53,6 +83,7 @@ bool handle_binary_op(
     $$ = new TypedAttr();
     bool ok = (left->type != "ERR" && right->type != "ERR");
     $$->type = "ERR";
+    $$->code = "";
     
     if (ok) {
         if (are_types_valid(left->type, right->type)) {
@@ -63,7 +94,19 @@ bool handle_binary_op(
                       << "Recebeu '" << left->type << "' e '" << right->type << "'." << std::endl;
             return false;
         }
-    } 
+    }
+
+    std::string left_var = left->val.empty() ? new_var(left->type) : left->val;
+    std::string right_var = right->val.empty() ? new_var(right->type) : right->val;
+    $$->val = new_var($$->type);
+    std::string op_symbol = op_name_to_c_symbol[op_name];
+    $$->code = left->code + right->code;
+    if(op_symbol == "pow") {
+        $$->code += $$->val + " = " + op_symbol + "(" + left_var + ", " + right_var + ");\n";
+    }
+    else {
+        $$->code += $$->val + " = " + left_var + " " + op_symbol + " " + right_var + ";\n";
+    }
 
     delete left;
     delete right;
@@ -125,7 +168,9 @@ program:
         $$->ok = $4->ok;
         
         if ($$->ok) {
+            $$->code = "int main() {\n" + variable_declarations + "\n" + $4->code + "}\n";
             printf("Análise sintática concluída com sucesso para o programa '%s'!\n", program_name.c_str());
+            printf("Código gerado:\n%s\n", $$->code.c_str());
         } else {
             printf("Análise sintática encontrou erros no programa '%s'.\n", program_name.c_str());
         }
@@ -138,11 +183,17 @@ opt_decls:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | decl decl_tail
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            $$->code = $1->code + $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $1;
         delete $2;
     }
@@ -153,20 +204,26 @@ decl_tail:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | ';' decl decl_tail
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok && $3->ok;
+        if ($$->ok) {
+            $$->code = $2->code + $3->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
         delete $3;
     }
     ;
 
 decl:
-      var_decl  { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | proc_decl { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | rec_decl  { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
+      var_decl  { $$ = $1; }
+    | proc_decl { $$ = $1; }
+    | rec_decl  { $$ = $1; }
     ;
 
 var_decl:
@@ -252,6 +309,12 @@ proc_decl:
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            // TODO : Criar label aqui e associar ao nome do metodo
+            $$->code = $2->code;
+        } else {
+            $$->code = "";
+        }
         
         delete $1;
         delete $2;
@@ -338,6 +401,11 @@ block:
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok && $3->ok;
+        if ($$->ok) {
+            $$->code = $3->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
         delete $3;
         SymbolTable::exit_scope();
@@ -349,11 +417,17 @@ proc_body_opt:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | decl decl_tail IN
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            $$->code = $1->code + $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $1;
         delete $2;
     }
@@ -484,11 +558,17 @@ stmt_list:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | stmt stmt_tail
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            $$->code = $1->code + $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $1;
         delete $2;
     }
@@ -499,22 +579,28 @@ stmt_tail:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | ';' stmt stmt_tail
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok && $3->ok;
+        if ($$->ok) {
+            $$->code = $2->code + $3->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
         delete $3;
     }
     ;
 
 stmt:
-      assign_stmt { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | if_stmt     { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | while_stmt  { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | return_stmt { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | call_stmt   { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
+      assign_stmt { $$ = $1; }
+    | if_stmt     { $$ = $1; }
+    | while_stmt  { $$ = $1; }
+    | return_stmt { $$ = $1; }
+    | call_stmt   { $$ = $1; }
     ;
 
 assign_stmt:
@@ -561,10 +647,20 @@ if_stmt:
     {
         $$ = new BoolAttr();
         $$->ok = ($2->type != "ERR") && $4->ok && $5->ok;
-        if ($2->type != "ERR" && $2->type != "BOOL") {
+        if ($2->type != "ERR" && $2->type != "bool") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do IF deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
             $$->ok = false;
+        }
+        if($$->ok) {
+            std::string if_label = new_label();
+            std::string end_label = new_label();
+            $$->code =  $2->code 
+                        + "if (" + $2->val + ") goto " + if_label + ";\n"
+                        + $5->code + "goto " + end_label + ";\n"
+                        + if_label + ":\n"
+                        + $4->code
+                        + end_label + ":\n";
         }
         delete $2;
         delete $4;
@@ -577,11 +673,17 @@ else_opt:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | ELSE stmt_list
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok;
+        if ($$->ok) {
+            $$->code = $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
     }
     ;
@@ -591,10 +693,23 @@ while_stmt:
     {
         $$ = new BoolAttr();
         $$->ok =($2->type != "ERR") && $4->ok;
-        if ($2->type != "ERR" && $2->type != "BOOL") {
+        if ($2->type != "ERR" && $2->type != "bool") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do WHILE deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
             $$->ok = false;
+        }
+        if($$->ok) {
+            std::string start_label = new_label();
+            std::string end_label = new_label();
+            std::string while_var = new_var("bool");
+
+            $$->code = $2->code
+                        + while_var + " = !" + $2->val + ";\n"
+                        + start_label + ":\n"
+                        + "if (" + while_var + ") goto " + end_label + ";\n"
+                        + $4->code
+                        + "goto " + start_label + ";\n"
+                        + end_label + ":\n";
         }
         delete $2;
         delete $4;
@@ -741,8 +856,8 @@ or_exp:
       or_exp OR and_exp
     {
         handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "OR", 
-            [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
-            [](const auto& t1, const auto& t2) { return "BOOL"; });
+            [](const auto& t1, const auto& t2) { return t1 == "bool" && t2 == "bool"; },
+            [](const auto& t1, const auto& t2) { return "bool"; });
     }
     | and_exp { $$ = $1; }
     ;
@@ -751,8 +866,8 @@ and_exp:
       and_exp AND not_exp
     {
         handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "AND",
-            [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
-            [](const auto& t1, const auto& t2) { return "BOOL"; });
+            [](const auto& t1, const auto& t2) { return t1 == "bool" && t2 == "bool"; },
+            [](const auto& t1, const auto& t2) { return "bool"; });
     }
     | not_exp { $$ = $1; }
     ;
@@ -761,8 +876,10 @@ not_exp:
       NOT not_exp
     {
         $$ = new TypedAttr();
-        if ($2->type == "BOOL") {
-            $$->type = "BOOL";
+        if ($2->type == "bool") {
+            $$->type = "bool";
+            $$->val = new_var("bool");
+            $$->code = $2->code + $$->val + " = !" + $2->val + ";\n";
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro de tipo: Operando de NOT deve ser BOOLEAN." << std::endl;
@@ -778,42 +895,42 @@ rel_exp: rel_exp LT add_exp {
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp LE add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp GT add_exp{
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp GE add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp EQ add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp NE add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<>",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | add_exp { $$ = $1; }
 ;
@@ -856,7 +973,7 @@ exp_exp:
     {
         handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "^",
             [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
-            [](const auto& t1, const auto& t2) { return "FLOAT"; });
+            [](const auto& t1, const auto& t2) { return "float"; });
     }
     | unary_exp { $$ = $1; }
     ;
@@ -866,8 +983,10 @@ unary_exp:
     {
         $$ = new TypedAttr();
         $$->type = "ERR";
-        if ($2->type != "ERR" && ($2->type == "INT" || $2->type == "FLOAT")) {
+        if ($2->type != "ERR" && ($2->type == "int" || $2->type == "float")) {
             $$->type = $2->type;
+            $$->val = new_var($2->type);
+            $$->code = $2->code + $$->val + " = -" + $2->val + ";\n";
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro de tipo: Operando unário '-' deve ser numérico." << std::endl;
@@ -904,6 +1023,8 @@ var:
     NAME
     {
         $$ = new TypedAttr();
+        $$->code = "";
+        $$->val = *$1;
         std::string var_base_name = *$1;
         delete $1;
 
@@ -960,7 +1081,7 @@ var:
             std::string base_type = $1->type;
             std::string index_type = $3->type;
 
-            if (index_type != "INT") {
+            if (index_type != "int") {
                 print_token_location(@3.first_line, @3.first_column);
                 std::cout << "Erro de tipo: O índice de um array deve ser um inteiro, mas foi '" << index_type << "'." << std::endl;
             }
@@ -1022,23 +1143,29 @@ deref_var:
     ;
 
 literal:
-      FLOAT_LITERAL   { $$ = new TypedAttr(); $$->type = "FLOAT"; delete $1; }
-    | INT_LITERAL     { $$ = new TypedAttr(); $$->type = "INT"; delete $1; }
-    | STRING_LITERAL  { $$ = new TypedAttr(); $$->type = "STRING"; delete $1; }
+      FLOAT_LITERAL   { 
+        $$ = new TypedAttr(); $$->type = "float"; $$->val = (*$1); $$->code = ""; delete $1; 
+        }
+    | INT_LITERAL     { 
+        $$ = new TypedAttr(); $$->type = "int"; $$->val = (*$1); $$->code = ""; delete $1; 
+        }
+    | STRING_LITERAL  { 
+        $$ = new TypedAttr(); $$->type = "STRING"; $$->val = (*$1); $$->code = ""; delete $1; 
+        }
     | bool_literal    { $$ = $1; }
     | NULL_LIT        { $$ = new TypedAttr(); $$->type = "NULL"; }
     ;
 
 bool_literal:
-      TRUE  { $$ = new TypedAttr(); $$->type = "BOOL"; }
-    | FALSE { $$ = new TypedAttr(); $$->type = "BOOL"; }
+      TRUE  { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "true"; $$->code = ""; }
+    | FALSE { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "false"; $$->code = ""; }
     ;
 
 type:
-      FLOAT_T   { $$ = new TypedAttr(); $$->type = "FLOAT"; }
-    | INT_T     { $$ = new TypedAttr(); $$->type = "INT"; }
+      FLOAT_T   { $$ = new TypedAttr(); $$->type = "float"; }
+    | INT_T     { $$ = new TypedAttr(); $$->type = "int"; }
     | STRING_T  { $$ = new TypedAttr(); $$->type = "STRING"; }
-    | BOOL_T    { $$ = new TypedAttr(); $$->type = "BOOL"; }
+    | BOOL_T    { $$ = new TypedAttr(); $$->type = "bool"; }
     | NAME
     {
         $$ = new TypedAttr();

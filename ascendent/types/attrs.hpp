@@ -10,10 +10,13 @@
 
 typedef struct {
     std::string type;
+    std::string val;
+    std::string code;
 } TypedAttr;
 
 typedef struct {
     bool ok;
+    std::string code;
 } BoolAttr;
 
 typedef struct {
