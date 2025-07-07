@@ -31,9 +31,10 @@ struct TokenInfo {
     std::string type;
     Tag tag;
     std::unordered_map<std::string, std::string> members;
+    std::string label;
 
     TokenInfo(std::vector<std::string> pl, std::string t, Tag tg, std::unordered_map<std::string, std::string> mp = {})
-        : paramList(std::move(pl)), type(t), tag(tg), members(std::move(mp)) {}
+        : paramList(std::move(pl)), type(t), tag(tg), members(std::move(mp)), label("t") {}
 
     TokenInfo() : paramList({}), type(), tag() {}
 };
@@ -88,6 +89,27 @@ class SymbolTable {
         if (current.count(name) > 0) return false; // redeclaração no mesmo escopo
         current[name] = info;
         return true;
+    }
+
+    static void set_label(const std::string& name, const std::string& label) {
+        if (scopes.empty()) return; // não há escopo
+        auto& current = scopes.back();
+        auto it = current.find(name);
+        if (it != current.end()) {
+            it->second.label = label; // atualiza o label
+        } else {
+            std::cerr << "Warning: Attempted to insert label for undeclared variable '" << name << "'\n";
+        }
+    }
+
+    static std::string get_label(const std::string& name) {
+        if (scopes.empty()) return ""; // não há escopo
+        auto& current = scopes.back();
+        auto it = current.find(name);
+        if (it != current.end()) {
+            return it->second.label; // retorna o label
+        }
+        return ""; // não encontrado
     }
 
     static bool insert_into_parent_scope(const std::string& name, const TokenInfo& info) {

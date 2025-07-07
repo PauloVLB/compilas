@@ -252,7 +252,9 @@ var_decl:
                         print_token_location(@2.first_line, @2.first_column);
                         std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
                     } else {
-                        $$->ok = true; 
+                        $$->code = $5->code;
+                        SymbolTable::set_label(var_name, $5->val);
+                        $$->ok = true;
                     }
                 }
             } else {
@@ -261,6 +263,8 @@ var_decl:
                     print_token_location(@2.first_line, @2.first_column);
                     std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
                 } else {
+                    std::string var_var = new_var($4->type);
+                    SymbolTable::set_label(var_name, var_var);
                     $$->ok = true;
                 }
             }
@@ -288,6 +292,12 @@ var_decl:
             } else {
                 $$->ok = true; // Sucesso
             }
+        }
+
+        if($$->ok) {
+            std::string var_var = new_var($4->type);
+            $$->code = $4->code;
+            SymbolTable::set_label(var_name, $4->val);
         }
 
         delete $2;
@@ -402,7 +412,7 @@ block:
         $$ = new BoolAttr();
         $$->ok = $2->ok && $3->ok;
         if ($$->ok) {
-            $$->code = $3->code;
+            $$->code = $2->code + $3->code;
         } else {
             $$->code = "";
         }
@@ -616,6 +626,10 @@ assign_stmt:
                           << "Não é possível atribuir uma expressão do tipo '" << $3->type
                           << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
                 $$->ok = false;
+            }
+            else {
+                std::string var_name = $1->val;
+                $$->code = $3->code + var_name + " = " + $3->val + ";\n";
             }
         }
 
@@ -1035,6 +1049,7 @@ var:
             $$->type = "ERR";
         } else {
             $$->type = lookup_result->type;
+            $$->val = lookup_result->label;
         }
     }
 |   var '.' NAME
