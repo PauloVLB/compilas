@@ -60,8 +60,23 @@ int curr_var = 0;
 int curr_label = 0;
 std::string variable_declarations = "";
 
+std::string resolve_type(const std::string& type) {
+    if (type == "int" || type == "float" || type == "bool") {
+        return type;
+    }
+    else if (type == "string") {
+        return "char *";
+    }
+    else if (type.rfind("REF(", 0) == 0 && type.back() == ')') {
+        // Extract the inner type recursively
+        std::string inner_type = type.substr(4, type.length() - 5);
+        return resolve_type(inner_type) + "*";
+    }
+    return "ERR";
+}
+
 std::string new_var(std::string type = "int") {
-    variable_declarations += type + " t" + std::to_string(curr_var) + ";\n";
+    variable_declarations += resolve_type(type) + " t" + std::to_string(curr_var) + ";\n";
     return "t" + std::to_string(curr_var++);
 }
 
@@ -649,6 +664,11 @@ assign_stmt:
                           << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
                 $$->ok = false;
             }
+            else {
+                // TODO: Não criar a variavel de deref_var, e colocar em *$1->val, algo assim
+                std::string var_name = $1->val;
+                $$->code = $3->code + var_name + " = " + $3->val + ";\n";
+            }
         }
 
         delete $1;
@@ -1027,10 +1047,11 @@ primary_exp:
         }
         delete $2;
     }
-    | var               { $$ = $1; }
-    | ref_var           { $$ = $1; }
-    | deref_var         { $$ = $1; }
-    | '(' expression ')'{ $$ = $2; }
+    | var               { $$ = $1; } // x := 2 + deref(y)
+    | ref_var           { $$ = $1; } // x : ref(int)
+    | deref_var         { $$ = $1; } // y1 : int        y2 : ref(ref(int))
+    | '(' expression ')'{ $$ = $2; } // x := deref(y2)       x := ref(y1)
+                                     // int* x; int y1; int* y2; x = &y1; x = *y2;
     ;
 
 var:
@@ -1121,6 +1142,9 @@ ref_var:
         $$->type = "ERR";
         if ($3->type != "ERR") {
             $$->type = "REF(" + $3->type + ")";
+            $$->val = new_var($$->type);
+            $$->code = $3->code;
+            $$->code += $$->val + " = &" + $3->val + ";\n";
         }
         delete $3;
     }
@@ -1134,6 +1158,9 @@ deref_var:
         if($3->type != "ERR") {
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
+                $$->code = $3->code;
+                $$->val = new_var($$->type);
+                $$->code += $$->val + " = *" + $3->val + ";\n";
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl;
@@ -1148,6 +1175,9 @@ deref_var:
         if($3->type != "ERR") {
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
+                $$->code = $3->code;
+                $$->val = new_var($$->type);
+                $$->code += $$->val + " = *" + $3->val + ";\n";
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl;
