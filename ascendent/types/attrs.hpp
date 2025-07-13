@@ -31,6 +31,8 @@ typedef struct {
 typedef struct {
     bool ok;
     std::vector<std::string> param_types_list;
+    std::vector<std::string> param_vals_list;
+    std::string code;
 } ListAttr;
 
 #endif

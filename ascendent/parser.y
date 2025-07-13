@@ -805,6 +805,9 @@ call_stmt:
     {
         $$ = new BoolAttr();
         $$->ok = ($1->type != "ERR");
+        if ($$->ok) {
+            $$->code = $1->code;
+        }
         delete $1;
     }
     ;
@@ -813,15 +816,16 @@ call_exp:
     NAME '(' call_args_opt ')'
     {
         $$ = new TypedAttr();
-        bool ok = $3->ok;
         $$->type = "ERR";
+        $$->code = "";
+        $$->val = "";
         std::string func_name = *$1;
 
         auto lookup_result = SymbolTable::lookup(func_name);
         if (!lookup_result || lookup_result->tag != Tag::PROC) {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: Função ou procedimento '" << func_name << "' não declarado." << std::endl;
-        } else if(ok) {
+        } else if($3->ok) {
             const auto& declared_params = lookup_result->paramList;
             const auto& provided_args = $3->param_types_list;
 
@@ -844,6 +848,35 @@ call_exp:
 
                 if (types_match) {
                     $$->type = lookup_result->type;
+                    $$->code = $3->code;
+
+                    if (func_name == "readint") {
+                        $$->val = new_var("int");
+                        $$->code += "scanf(\"%d\", &" + $$->val + ");\n";
+                    } else if (func_name == "readfloat") {
+                        $$->val = new_var("float");
+                        $$->code += "scanf(\"%f\", &" + $$->val + ");\n";
+                    } else if (func_name == "readchar") {
+                        $$->val = new_var("int");
+                        $$->code += $$->val + " = getchar();\n";
+                    } else if (func_name == "readstring") {
+                        $$->val = new_var("string"); 
+                        $$->code += "scanf(\"%s\", " + $$->val + ");\n"; 
+                    } else if (func_name == "readline") {
+                        $$->val = new_var("string"); 
+                        $$->code += "scanf(\"%[^\n]%*c\", " + $$->val + ");\n"; 
+                    } else if (func_name == "printint") {
+                        $$->code += "printf(\"%d\", " + $3->param_vals_list[0] + ");\n";
+                    } else if (func_name == "printfloat") {
+                        $$->code += "printf(\"%f\", " + $3->param_vals_list[0] + ");\n";
+                    } else if (func_name == "printstr") {
+                        $$->code += "printf(\"%s\", " + $3->param_vals_list[0] + ");\n";
+                    } else if (func_name == "printline") {
+                        $$->code += "printf(\"%s\\n\", " + $3->param_vals_list[0] + ");\n";
+                    } else {
+                        // Tratamento para funções definidas pelo usuário vem aqui
+                       $$->code =+ ""
+                    }
                 } 
             }
         }
@@ -858,12 +891,16 @@ call_args_opt:
         $$ = new ListAttr();
         $$->ok = true;
         $$->param_types_list = std::vector<std::string>();
+        $$->param_vals_list = std::vector<std::string>();
+        $$->code = "";                                   
     }
     | expression call_args_tail
     {
         $$ = $2;
         if ($1->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $1->type);
+            $$->param_vals_list.insert($$->param_vals_list.begin(), $1->val); 
+            $$->code = $1->code + $$->code;
         }
         else {
             $$->ok = false;
@@ -878,12 +915,16 @@ call_args_tail:
         $$ = new ListAttr();
         $$->ok = true;
         $$->param_types_list = std::vector<std::string>();
+        $$->param_vals_list = std::vector<std::string>();
+        $$->code = "";
     }
     | ',' expression call_args_tail
     {
         $$ = $3;
         if ($2->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $2->type);
+            $$->param_vals_list = std::vector<std::string>();
+            $$->code = "";
         }
         else {
             $$->ok = false;
@@ -1267,6 +1308,17 @@ void yyerror(const char *s) {
 
 int main(void) {
     SymbolTable::enter_scope("global");
+
+    SymbolTable::insert("readint", TokenInfo({}, "int", Tag::PROC));
+    SymbolTable::insert("readfloat", TokenInfo({}, "float", Tag::PROC));
+    SymbolTable::insert("readchar", TokenInfo({}, "int", Tag::PROC));
+    SymbolTable::insert("readstring", TokenInfo({}, "string", Tag::PROC));
+    SymbolTable::insert("readline", TokenInfo({}, "string", Tag::PROC));
+    SymbolTable::insert("printint", TokenInfo({ "int" }, "void", Tag::PROC));
+    SymbolTable::insert("printfloat", TokenInfo({ "float" }, "void", Tag::PROC));
+    SymbolTable::insert("printstr", TokenInfo({ "string" }, "void", Tag::PROC));
+    SymbolTable::insert("printline", TokenInfo({ "string" }, "void", Tag::PROC));
+
     yyparse();
     
     SymbolTable::exit_scope();
