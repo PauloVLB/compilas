@@ -76,8 +76,17 @@ std::string resolve_type(const std::string& type) {
 }
 
 std::string new_var(std::string type = "int") {
-    variable_declarations += resolve_type(type) + " t" + std::to_string(curr_var) + ";\n";
-    return "t" + std::to_string(curr_var++);
+    std::string var_name = "t" + std::to_string(curr_var++);
+    if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
+        size_t comma_pos = type.find(',');
+        size_t start_pos = 6; 
+        std::string size_str = type.substr(start_pos, comma_pos - start_pos);
+        std::string inner_type_str = type.substr(comma_pos + 1, type.length() - comma_pos - 2);
+        variable_declarations += resolve_type(inner_type_str) + " " + var_name + "[" + size_str + "];\n";
+    } else {
+        variable_declarations += resolve_type(type) + " " + var_name + ";\n";
+    }
+    return var_name;
 }
 
 std::string new_label() {
@@ -272,7 +281,7 @@ var_decl:
                         $$->ok = true;
                     }
                 }
-            } else {
+            } else { 
                 bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
                 if (!insert_ok) {
                     print_token_location(@2.first_line, @2.first_column);
@@ -283,6 +292,7 @@ var_decl:
                     $$->ok = true;
                 }
             }
+
 
         }
         
@@ -1110,9 +1120,10 @@ var:
 |   var '[' expression ']'
     {
         $$ = new TypedAttr();
-        bool ok = ($1->type != "ERR" && $3->type != "ERR");
         $$->type = "ERR";
+        $$->code = "";
 
+        bool ok = ($1->type != "ERR" && $3->type != "ERR");
         if (ok) {
             std::string base_type = $1->type;
             std::string index_type = $3->type;
@@ -1121,13 +1132,15 @@ var:
                 print_token_location(@3.first_line, @3.first_column);
                 std::cout << "Erro de tipo: O índice de um array deve ser um inteiro, mas foi '" << index_type << "'." << std::endl;
             }
-            else {
-                if (base_type.rfind("ARRAY(", 0) == 0) {
-                    $$->type = base_type.substr(6, base_type.length() - 7);
-                } else {
-                    print_token_location(@1.first_line, @1.first_column);
-                    std::cout << "Erro de tipo: Tentativa de indexar um tipo não-array ('" << base_type << "')." << std::endl;
-                }
+            else if (base_type.rfind("ARRAY(", 0) == 0 && base_type.back() == ')') {
+                size_t comma_pos = base_type.find(',');
+                $$->type = base_type.substr(comma_pos + 1, base_type.length() - comma_pos - 2);
+                $$->code = $1->code + $3->code;
+                $$->val = $1->val + "[" + $3->val + "]";
+
+            } else {
+                print_token_location(@1.first_line, @1.first_column);
+                std::cout << "Erro de tipo: Tentativa de indexar um tipo não-array ('" << base_type << "')." << std::endl;
             }
         }
         delete $1;
@@ -1142,9 +1155,8 @@ ref_var:
         $$->type = "ERR";
         if ($3->type != "ERR") {
             $$->type = "REF(" + $3->type + ")";
-            $$->val = new_var($$->type);
-            $$->code = $3->code;
-            $$->code += $$->val + " = &" + $3->val + ";\n";
+            $$->code = $3->code; 
+            $$->val = "&(" + $3->val + ")"; 
         }
         delete $3;
     }
@@ -1159,8 +1171,7 @@ deref_var:
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
                 $$->code = $3->code;
-                $$->val = new_var($$->type);
-                $$->code += $$->val + " = *" + $3->val + ";\n";
+                $$->val = "*(" + $3->val + ")";
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl;
@@ -1176,8 +1187,7 @@ deref_var:
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
                 $$->code = $3->code;
-                $$->val = new_var($$->type);
-                $$->code += $$->val + " = *" + $3->val + ";\n";
+                $$->val = "*(" + $3->val + ")";
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl;
@@ -1237,13 +1247,14 @@ type:
     }
     | ARRAY '[' INT_LITERAL ']' OF type
     {
-        $$ = new TypedAttr();
-        $$->type = "ERR";
-        if ($6->type != "ERR") {
-            $$->type = "ARRAY(" + $6->type + ")";
-        }
-        delete $3;
-        delete $6;
+    $$ = new TypedAttr();
+    $$->type = "ERR";
+    if ($6->type != "ERR") {
+        std::string size_str = *$3;
+        $$->type = "ARRAY(" + size_str + "," + $6->type + ")";
+    }
+    delete $3;
+    delete $6;
     }
     ;
 
