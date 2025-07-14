@@ -61,8 +61,10 @@ int curr_label = 0;
 std::string variable_declarations = "";
 
 std::string resolve_type(const std::string& type) {
-    if (type == "int" || type == "float" || type == "bool") {
+    if (type == "int" || type == "float") {
         return type;
+    }else if (type == "bool"){
+        return "int";
     }
     else if (type == "string") {
         return "char *";
@@ -702,9 +704,9 @@ if_stmt:
             $$->code =  $2->code 
                         + "if (" + $2->val + ") goto " + if_label + ";\n"
                         + $5->code + "goto " + end_label + ";\n"
-                        + if_label + ":\n"
-                        + $4->code
-                        + end_label + ":\n";
+                        + if_label + ":{\n"
+                        + $4->code +"}"
+                        + end_label + ":{\n}";
         }
         delete $2;
         delete $4;
@@ -747,13 +749,13 @@ while_stmt:
             std::string end_label = new_label();
             std::string while_var = new_var("bool");
 
-            $$->code = $2->code
+            $$->code =  start_label + ":{\n"
+                        + $2->code
                         + while_var + " = !" + $2->val + ";\n"
-                        + start_label + ":\n"
                         + "if (" + while_var + ") goto " + end_label + ";\n"
                         + $4->code
-                        + "goto " + start_label + ";\n"
-                        + end_label + ":\n";
+                        + "goto " + start_label + ";\n}"
+                        + end_label + ":{\n}";
         }
         delete $2;
         delete $4;
@@ -875,7 +877,7 @@ call_exp:
                         $$->code += "printf(\"%s\\n\", " + $3->param_vals_list[0] + ");\n";
                     } else {
                         // Tratamento para funções definidas pelo usuário vem aqui
-                       $$->code =+ ""
+                       $$->code =+ "";
                     }
                 } 
             }
@@ -1246,21 +1248,21 @@ literal:
         $$ = new TypedAttr(); $$->type = "int"; $$->val = (*$1); $$->code = ""; delete $1; 
         }
     | STRING_LITERAL  { 
-        $$ = new TypedAttr(); $$->type = "STRING"; $$->val = (*$1); $$->code = ""; delete $1; 
+        $$ = new TypedAttr(); $$->type = "string"; $$->val = (*$1); $$->code = ""; delete $1; 
         }
     | bool_literal    { $$ = $1; }
     | NULL_LIT        { $$ = new TypedAttr(); $$->type = "NULL"; }
     ;
 
 bool_literal:
-      TRUE  { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "true"; $$->code = ""; }
-    | FALSE { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "false"; $$->code = ""; }
+      TRUE  { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "1"; $$->code = ""; }
+    | FALSE { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "0"; $$->code = ""; }
     ;
 
 type:
       FLOAT_T   { $$ = new TypedAttr(); $$->type = "float"; }
     | INT_T     { $$ = new TypedAttr(); $$->type = "int"; }
-    | STRING_T  { $$ = new TypedAttr(); $$->type = "STRING"; }
+    | STRING_T  { $$ = new TypedAttr(); $$->type = "string"; }
     | BOOL_T    { $$ = new TypedAttr(); $$->type = "bool"; }
     | NAME
     {
