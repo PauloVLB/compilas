@@ -77,8 +77,8 @@ std::string resolve_type(const std::string& type) {
     return "ERR";
 }
 
-std::string new_var(std::string type = "int") {
-    std::string var_name = "t" + std::to_string(curr_var++);
+std::string new_var(std::string type = "int", std::string var_original_name = "") {
+    std::string var_name =  var_original_name + "t" + std::to_string(curr_var++);
     if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
         size_t comma_pos = type.find(',');
         size_t start_pos = 6; 
@@ -289,7 +289,7 @@ var_decl:
                     print_token_location(@2.first_line, @2.first_column);
                     std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
                 } else {
-                    std::string var_var = new_var($4->type);
+                    std::string var_var = new_var($4->type, var_name );
                     SymbolTable::set_label(var_name, var_var);
                     $$->ok = true;
                 }
