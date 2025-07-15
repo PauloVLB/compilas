@@ -708,7 +708,7 @@ assign_stmt:
             }
             else {
                 std::string var_name = $1->val;
-                $$->code = $3->code + var_name + " = " + $3->val + ";\n";
+                $$->code = $1->code + $3->code + var_name + " = " + $3->val + ";\n";
             }
         }
 
