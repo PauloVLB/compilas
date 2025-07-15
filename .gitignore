@@ -18,8 +18,9 @@ parser.output
 build/
 bin/
 
-# Out directories
+# Out directories/files
 out/
+*.out
 
 # IDE files
 .vscode/

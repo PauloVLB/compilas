@@ -757,8 +757,8 @@ if_stmt:
                         + "if (" + $2->val + ") goto " + if_label + ";\n"
                         + $5->code + "goto " + end_label + ";\n"
                         + if_label + ":{\n"
-                        + $4->code +"}"
-                        + end_label + ":{\n}";
+                        + $4->code +"}\n"
+                        + end_label + ":{}\n";
         }
         delete $2;
         delete $4;
@@ -806,8 +806,8 @@ while_stmt:
                         + while_var + " = !" + $2->val + ";\n"
                         + "if (" + while_var + ") goto " + end_label + ";\n"
                         + $4->code
-                        + "goto " + start_label + ";\n}"
-                        + end_label + ":{\n}";
+                        + "goto " + start_label + ";\n}\n"
+                        + end_label + ":{}\n";
         }
         delete $2;
         delete $4;

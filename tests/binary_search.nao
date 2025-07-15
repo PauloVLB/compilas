@@ -1,0 +1,46 @@
+program BinSearch
+begin
+
+    // Procedimento Principal
+    procedure main()
+    begin
+        // Declaração de Variáveis Locais
+        var l : int := -1;
+        var r : int := 10;
+        var arr   : array [10] of int;
+        var temp        : int;
+        var num : int;
+        var mid : int
+    in
+        temp := 0;
+        while temp < 10 do 
+            arr[temp] := temp;
+            temp := temp + 1
+        od;
+
+        printstr("Digite um numero a ser procurado: ");
+        num := readint();
+
+        while l + 1 < r do
+            mid := (l + r)/2;
+            if arr[mid] <= num
+            then
+                l := mid
+            else
+                r := mid
+            fi
+        od;
+
+        if l >= 0 && arr[l] = num
+        then
+            printstr("Numero encontrado no indice ");
+            printint(l);
+            printline("")
+        else
+            printline("Numero nao encontrado.")
+        fi
+
+
+    end
+
+end
