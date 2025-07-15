@@ -59,6 +59,7 @@ std::unordered_map<std::string, std::string> op_name_to_c_symbol = {
 int curr_var = 0;
 int curr_label = 0;
 std::string variable_declarations = "";
+std::string header_declarations = "#include <stdio.h>\n\n";
 
 std::string resolve_type(const std::string& type) {
     if (type == "int" || type == "float") {
@@ -73,6 +74,14 @@ std::string resolve_type(const std::string& type) {
         // Extract the inner type recursively
         std::string inner_type = type.substr(4, type.length() - 5);
         return resolve_type(inner_type) + "*";
+    }
+    else {
+        // Check if type is a struct name
+        auto lookup_result = SymbolTable::lookup(type);
+        if (lookup_result && lookup_result->tag == Tag::STRUCT) {
+            std::string label = lookup_result->label;
+            return "struct " + label;
+        }
     }
     return "ERR";
 }
@@ -194,7 +203,7 @@ program:
         $$->ok = $4->ok;
         
         if ($$->ok) {
-            $$->code = "int main() {\n" + variable_declarations + "\n" + $4->code + "}\n";
+            $$->code = header_declarations + "int main() {\n" + variable_declarations + "\n" + $4->code + "}\n";
             printf("Análise sintática concluída com sucesso para o programa '%s'!\n", program_name.c_str());
             printf("Código gerado:\n%s\n", $$->code.c_str());
         } else {
@@ -476,6 +485,7 @@ rec_decl:
         $$ = new BoolAttr();
         $$->ok = false;
         std::string struct_name = *$2;
+        std::string label = struct_name + "t" + std::to_string(curr_var++);
 
         bool insert_ok = SymbolTable::insert(struct_name, TokenInfo({}, struct_name, Tag::STRUCT, $4->member_map));
         
@@ -485,7 +495,12 @@ rec_decl:
         }
         else {
             $$->ok = $4->ok;
+            header_declarations += "struct " + label + " {\n"
+                                + $4->code + "};\n\n";
+            SymbolTable::set_label(struct_name, label);
         }
+
+
         
 
         delete $2;
@@ -500,6 +515,7 @@ opt_struct_members:
         $$ = new MapAttr();
         $$->ok = true;
         $$->member_map = std::unordered_map<std::string, std::string>();
+        $$->code = "";
     }
     | struct_member_decl struct_member_tail
     {
@@ -516,6 +532,9 @@ opt_struct_members:
             else {
                 ($$->member_map)[name] = type;
                 $$->ok = true;
+                $$->code = "    " + resolve_type(type) + " " + name + ";\n"
+                        + $2->code;
+
             }
         }
         delete $1;
@@ -528,6 +547,7 @@ struct_member_tail:
         $$ = new MapAttr();
         $$->ok = true;
         $$->member_map = std::unordered_map<std::string, std::string>();
+        $$->code = "";
     }
     | ';' struct_member_decl struct_member_tail
     {
@@ -543,6 +563,8 @@ struct_member_tail:
             } else {
                 ($$->member_map)[name] = type;
                 $$->ok = true;
+                $$->code = "    " + resolve_type(type) + " " + name + ";\n"
+                        + $3->code;
             }
         }
         delete $2;
@@ -561,6 +583,7 @@ struct_member_decl:
             std::string member_type = $3->type;
             ($$->member_map)[member_name] = member_type;
             $$->ok = true;
+            $$->code = "    " + resolve_type(member_type) + " " + member_name + ";\n";
         }
 
 
@@ -1153,6 +1176,7 @@ var:
                             << "' não possui um membro chamado '" << field_name << "'." << std::endl;
                 } else {
                     $$->type = member_iterator->second;
+                    $$->val = $1->val + "." + field_name;
                 }
             }
         }

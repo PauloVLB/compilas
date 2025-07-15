@@ -26,6 +26,7 @@ typedef struct {
 typedef struct {
     bool ok;
     std::unordered_map<std::string, std::string> member_map;
+    std::string code;
 } MapAttr;
 
 typedef struct {
