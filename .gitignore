@@ -18,6 +18,9 @@ parser.output
 build/
 bin/
 
+# Out directories
+out/
+
 # IDE files
 .vscode/
 *.swp

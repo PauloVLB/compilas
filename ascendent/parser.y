@@ -59,7 +59,7 @@ std::unordered_map<std::string, std::string> op_name_to_c_symbol = {
 int curr_var = 0;
 int curr_label = 0;
 std::string variable_declarations = "";
-std::string header_declarations = "#include <stdio.h>\n\n";
+std::string header_declarations = "#include <stdio.h>\n#include <math.h>\n\n";
 
 std::string resolve_type(const std::string& type) {
     if (type == "int" || type == "float") {
@@ -75,6 +75,13 @@ std::string resolve_type(const std::string& type) {
         std::string inner_type = type.substr(4, type.length() - 5);
         return resolve_type(inner_type) + "*";
     }
+    // else if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
+    //     size_t comma_pos = type.find(',');
+    //     size_t start_pos = 6; 
+    //     std::string size_str = type.substr(start_pos, comma_pos - start_pos);
+    //     std::string inner_type_str = type.substr(comma_pos + 1, type.length() - comma_pos - 2);
+    //     return resolve_type(inner_type_str) + "[" + size_str + "];\n";
+    // }
     else {
         // Check if type is a struct name
         auto lookup_result = SymbolTable::lookup(type);
@@ -86,14 +93,27 @@ std::string resolve_type(const std::string& type) {
     return "ERR";
 }
 
-std::string new_var(std::string type = "int", std::string var_original_name = "") {
-    std::string var_name =  var_original_name + "t" + std::to_string(curr_var++);
+void resolve_array_type(std::string& type, std::string& inner_type, std::string& cols) {
     if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
         size_t comma_pos = type.find(',');
         size_t start_pos = 6; 
         std::string size_str = type.substr(start_pos, comma_pos - start_pos);
         std::string inner_type_str = type.substr(comma_pos + 1, type.length() - comma_pos - 2);
-        variable_declarations += resolve_type(inner_type_str) + " " + var_name + "[" + size_str + "];\n";
+        cols += "[" + size_str + "]";
+        resolve_array_type(inner_type_str, inner_type, cols);
+    }
+    else {
+        inner_type = resolve_type(type);
+    }
+}
+
+std::string new_var(std::string type = "int", std::string var_original_name = "") {
+    std::string var_name =  var_original_name + "t" + std::to_string(curr_var++);
+    if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
+        std::string inner_type_str;
+        std::string cols = "";
+        resolve_array_type(type, inner_type_str, cols);
+        variable_declarations += inner_type_str + " " + var_name + cols + ";\n";
     } else {
         variable_declarations += resolve_type(type) + " " + var_name + ";\n";
     }
@@ -206,6 +226,14 @@ program:
             $$->code = header_declarations + "int main() {\n" + variable_declarations + "\n" + $4->code + "}\n";
             printf("Análise sintática concluída com sucesso para o programa '%s'!\n", program_name.c_str());
             printf("Código gerado:\n%s\n", $$->code.c_str());
+            FILE* out = fopen(("../out/" + program_name + ".c").c_str(), "w");
+            if (out) {
+                fputs($$->code.c_str(), out);
+                fclose(out);
+                printf("Código salvo em '../out/%s.c'\n", program_name.c_str());
+            } else {
+                printf("Erro ao abrir arquivo para escrita.\n");
+            }
         } else {
             printf("Análise sintática encontrou erros no programa '%s'.\n", program_name.c_str());
         }
@@ -287,8 +315,9 @@ var_decl:
                         print_token_location(@2.first_line, @2.first_column);
                         std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
                     } else {
-                        $$->code = $5->code;
-                        SymbolTable::set_label(var_name, $5->val);
+                        std::string var_var = new_var($4->type, var_name );
+                        SymbolTable::set_label(var_name, var_var);
+                        $$->code = $5->code + var_var + " = " + $5->val + ";\n";
                         $$->ok = true;
                     }
                 }
@@ -331,9 +360,9 @@ var_decl:
         }
 
         if($$->ok) {
-            std::string var_var = new_var($4->type);
-            $$->code = $4->code;
-            SymbolTable::set_label(var_name, $4->val);
+            std::string var_var = new_var($4->type, var_name );
+            SymbolTable::set_label(var_name, var_var);
+            $$->code = $4->code + var_var + " = " + $4->val + ";\n";
         }
 
         delete $2;
