@@ -1,0 +1,16 @@
+program if_example 
+    begin
+        procedure main()
+        begin
+            var x : int
+        in 
+            x := 12;
+
+            if x > 15 
+            then
+                printline("O mundo nao faz sentido")
+            else
+                printline("O mundo faz sentido")
+            fi
+        end
+    end

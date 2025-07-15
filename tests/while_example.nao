@@ -1,0 +1,15 @@
+program while_example 
+    begin
+        procedure main()
+        begin
+            var x : int
+        in 
+            x := 12;
+
+            while x < 21 do
+                printint(x);
+                printline("");
+                x := x + 1
+            od
+        end
+    end
