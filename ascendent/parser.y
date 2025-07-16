@@ -19,24 +19,109 @@ extern int yylex();
 void yyerror(const char *s);
 
 bool is_numeric(const std::string& type) {
-    return type == "INT" || type == "FLOAT";
+    return type == "int" || type == "float";
 }
 
 std::string resolve_arithmetic_type(const std::string& t1, const std::string& t2) {
-    if (t1 == "FLOAT" || t2 == "FLOAT") {
-        return "FLOAT";
+    if (t1 == "float" || t2 == "float") {
+        return "float";
     }
-    return "INT";
+    return "int";
 }
 
 bool check_compatible(const std::string& tvar, const std::string& texp) {
     return (tvar == texp) || 
                         (texp == "NULL" && tvar.rfind("REF(", 0) == 0) || 
-                        (tvar == "FLOAT" && texp == "INT");
+                        (tvar == "float" && texp == "int");
 }
 
 void print_token_location(const int& first_line, const int& first_column) {
     std::cout << "Linha " << first_line << ", Coluna " << first_column << ": \n";
+}
+
+std::unordered_map<std::string, std::string> op_name_to_c_symbol = {
+    {"OR", "||"},
+    {"AND", "&&"},
+    {"NOT", "!"},
+    {"+", "+"},
+    {"-", "-"},
+    {"*", "*"},
+    {"/", "/"},
+    {"^", "pow"},
+    {"<", "<"},
+    {"<=", "<="},
+    {">", ">"},
+    {">=", ">="},
+    {"=", "=="},
+    {"<>", "!="}
+};
+
+int curr_var = 0;
+int curr_label = 0;
+std::string variable_declarations = "";
+std::string header_declarations = "#include <stdio.h>\n#include <math.h>\n\n";
+
+std::string resolve_type(const std::string& type) {
+    if (type == "int" || type == "float") {
+        return type;
+    }else if (type == "bool"){
+        return "int";
+    }
+    else if (type == "string") {
+        return "char *";
+    }
+    else if (type.rfind("REF(", 0) == 0 && type.back() == ')') {
+        // Extract the inner type recursively
+        std::string inner_type = type.substr(4, type.length() - 5);
+        return resolve_type(inner_type) + "*";
+    }
+    // else if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
+    //     size_t comma_pos = type.find(',');
+    //     size_t start_pos = 6; 
+    //     std::string size_str = type.substr(start_pos, comma_pos - start_pos);
+    //     std::string inner_type_str = type.substr(comma_pos + 1, type.length() - comma_pos - 2);
+    //     return resolve_type(inner_type_str) + "[" + size_str + "];\n";
+    // }
+    else {
+        // Check if type is a struct name
+        auto lookup_result = SymbolTable::lookup(type);
+        if (lookup_result && lookup_result->tag == Tag::STRUCT) {
+            std::string label = lookup_result->label;
+            return "struct " + label;
+        }
+    }
+    return "ERR";
+}
+
+void resolve_array_type(std::string& type, std::string& inner_type, std::string& cols) {
+    if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
+        size_t comma_pos = type.find(',');
+        size_t start_pos = 6; 
+        std::string size_str = type.substr(start_pos, comma_pos - start_pos);
+        std::string inner_type_str = type.substr(comma_pos + 1, type.length() - comma_pos - 2);
+        cols += "[" + size_str + "]";
+        resolve_array_type(inner_type_str, inner_type, cols);
+    }
+    else {
+        inner_type = resolve_type(type);
+    }
+}
+
+std::string new_var(std::string type = "int", std::string var_original_name = "") {
+    std::string var_name =  var_original_name + "t" + std::to_string(curr_var++);
+    if (type.rfind("ARRAY(", 0) == 0 && type.back() == ')') {
+        std::string inner_type_str;
+        std::string cols = "";
+        resolve_array_type(type, inner_type_str, cols);
+        variable_declarations += inner_type_str + " " + var_name + cols + ";\n";
+    } else {
+        variable_declarations += resolve_type(type) + " " + var_name + ";\n";
+    }
+    return var_name;
+}
+
+std::string new_label() {
+    return "l" + std::to_string(curr_label++);
 }
 
 bool handle_binary_op(
@@ -53,6 +138,7 @@ bool handle_binary_op(
     $$ = new TypedAttr();
     bool ok = (left->type != "ERR" && right->type != "ERR");
     $$->type = "ERR";
+    $$->code = "";
     
     if (ok) {
         if (are_types_valid(left->type, right->type)) {
@@ -63,7 +149,19 @@ bool handle_binary_op(
                       << "Recebeu '" << left->type << "' e '" << right->type << "'." << std::endl;
             return false;
         }
-    } 
+    }
+
+    std::string left_var = left->val.empty() ? new_var(left->type) : left->val;
+    std::string right_var = right->val.empty() ? new_var(right->type) : right->val;
+    $$->val = new_var($$->type);
+    std::string op_symbol = op_name_to_c_symbol[op_name];
+    $$->code = left->code + right->code;
+    if(op_symbol == "pow") {
+        $$->code += $$->val + " = " + op_symbol + "(" + left_var + ", " + right_var + ");\n";
+    }
+    else {
+        $$->code += $$->val + " = " + left_var + " " + op_symbol + " " + right_var + ";\n";
+    }
 
     delete left;
     delete right;
@@ -125,7 +223,17 @@ program:
         $$->ok = $4->ok;
         
         if ($$->ok) {
+            $$->code = header_declarations + "int main() {\n" + variable_declarations + "\n" + $4->code + "}\n";
             printf("Análise sintática concluída com sucesso para o programa '%s'!\n", program_name.c_str());
+            printf("Código gerado:\n%s\n", $$->code.c_str());
+            FILE* out = fopen(("../out/" + program_name + ".c").c_str(), "w");
+            if (out) {
+                fputs($$->code.c_str(), out);
+                fclose(out);
+                printf("Código salvo em '../out/%s.c'\n", program_name.c_str());
+            } else {
+                printf("Erro ao abrir arquivo para escrita.\n");
+            }
         } else {
             printf("Análise sintática encontrou erros no programa '%s'.\n", program_name.c_str());
         }
@@ -138,11 +246,17 @@ opt_decls:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | decl decl_tail
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            $$->code = $1->code + $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $1;
         delete $2;
     }
@@ -153,20 +267,26 @@ decl_tail:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | ';' decl decl_tail
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok && $3->ok;
+        if ($$->ok) {
+            $$->code = $2->code + $3->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
         delete $3;
     }
     ;
 
 decl:
-      var_decl  { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | proc_decl { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | rec_decl  { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
+      var_decl  { $$ = $1; }
+    | proc_decl { $$ = $1; }
+    | rec_decl  { $$ = $1; }
     ;
 
 var_decl:
@@ -195,18 +315,24 @@ var_decl:
                         print_token_location(@2.first_line, @2.first_column);
                         std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
                     } else {
-                        $$->ok = true; 
+                        std::string var_var = new_var($4->type, var_name );
+                        SymbolTable::set_label(var_name, var_var);
+                        $$->code = $5->code + var_var + " = " + $5->val + ";\n";
+                        $$->ok = true;
                     }
                 }
-            } else {
+            } else { 
                 bool insert_ok = SymbolTable::insert(var_name, TokenInfo({}, declared_type, Tag::VAR));
                 if (!insert_ok) {
                     print_token_location(@2.first_line, @2.first_column);
                     std::cout << "Erro: Variável '" << var_name << "' já declarada." << std::endl;
                 } else {
+                    std::string var_var = new_var($4->type, var_name );
+                    SymbolTable::set_label(var_name, var_var);
                     $$->ok = true;
                 }
             }
+
 
         }
         
@@ -233,6 +359,12 @@ var_decl:
             }
         }
 
+        if($$->ok) {
+            std::string var_var = new_var($4->type, var_name );
+            SymbolTable::set_label(var_name, var_var);
+            $$->code = $4->code + var_var + " = " + $4->val + ";\n";
+        }
+
         delete $2;
         delete $4;
     }
@@ -252,6 +384,12 @@ proc_decl:
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            // TODO : Criar label aqui e associar ao nome do metodo
+            $$->code = $2->code;
+        } else {
+            $$->code = "";
+        }
         
         delete $1;
         delete $2;
@@ -338,6 +476,11 @@ block:
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok && $3->ok;
+        if ($$->ok) {
+            $$->code = $2->code + $3->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
         delete $3;
         SymbolTable::exit_scope();
@@ -349,11 +492,17 @@ proc_body_opt:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | decl decl_tail IN
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            $$->code = $1->code + $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $1;
         delete $2;
     }
@@ -365,6 +514,7 @@ rec_decl:
         $$ = new BoolAttr();
         $$->ok = false;
         std::string struct_name = *$2;
+        std::string label = struct_name + "t" + std::to_string(curr_var++);
 
         bool insert_ok = SymbolTable::insert(struct_name, TokenInfo({}, struct_name, Tag::STRUCT, $4->member_map));
         
@@ -374,7 +524,12 @@ rec_decl:
         }
         else {
             $$->ok = $4->ok;
+            header_declarations += "struct " + label + " {\n"
+                                + $4->code + "};\n\n";
+            SymbolTable::set_label(struct_name, label);
         }
+
+
         
 
         delete $2;
@@ -389,6 +544,7 @@ opt_struct_members:
         $$ = new MapAttr();
         $$->ok = true;
         $$->member_map = std::unordered_map<std::string, std::string>();
+        $$->code = "";
     }
     | struct_member_decl struct_member_tail
     {
@@ -405,6 +561,9 @@ opt_struct_members:
             else {
                 ($$->member_map)[name] = type;
                 $$->ok = true;
+                $$->code = "    " + resolve_type(type) + " " + name + ";\n"
+                        + $2->code;
+
             }
         }
         delete $1;
@@ -417,6 +576,7 @@ struct_member_tail:
         $$ = new MapAttr();
         $$->ok = true;
         $$->member_map = std::unordered_map<std::string, std::string>();
+        $$->code = "";
     }
     | ';' struct_member_decl struct_member_tail
     {
@@ -432,6 +592,8 @@ struct_member_tail:
             } else {
                 ($$->member_map)[name] = type;
                 $$->ok = true;
+                $$->code = "    " + resolve_type(type) + " " + name + ";\n"
+                        + $3->code;
             }
         }
         delete $2;
@@ -450,6 +612,7 @@ struct_member_decl:
             std::string member_type = $3->type;
             ($$->member_map)[member_name] = member_type;
             $$->ok = true;
+            $$->code = "    " + resolve_type(member_type) + " " + member_name + ";\n";
         }
 
 
@@ -484,11 +647,17 @@ stmt_list:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | stmt stmt_tail
     {
         $$ = new BoolAttr();
         $$->ok = $1->ok && $2->ok;
+        if ($$->ok) {
+            $$->code = $1->code + $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $1;
         delete $2;
     }
@@ -499,22 +668,28 @@ stmt_tail:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | ';' stmt stmt_tail
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok && $3->ok;
+        if ($$->ok) {
+            $$->code = $2->code + $3->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
         delete $3;
     }
     ;
 
 stmt:
-      assign_stmt { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | if_stmt     { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | while_stmt  { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | return_stmt { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
-    | call_stmt   { $$ = new BoolAttr(); $$->ok = $1->ok; delete $1; }
+      assign_stmt { $$ = $1; }
+    | if_stmt     { $$ = $1; }
+    | while_stmt  { $$ = $1; }
+    | return_stmt { $$ = $1; }
+    | call_stmt   { $$ = $1; }
     ;
 
 assign_stmt:
@@ -530,6 +705,10 @@ assign_stmt:
                           << "Não é possível atribuir uma expressão do tipo '" << $3->type
                           << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
                 $$->ok = false;
+            }
+            else {
+                std::string var_name = $1->val;
+                $$->code = $1->code + $3->code + var_name + " = " + $3->val + ";\n";
             }
         }
 
@@ -549,6 +728,11 @@ assign_stmt:
                           << "' a uma variável do tipo '" << $1->type << "'." << std::endl;
                 $$->ok = false;
             }
+            else {
+                // TODO: Não criar a variavel de deref_var, e colocar em *$1->val, algo assim
+                std::string var_name = $1->val;
+                $$->code = $3->code + var_name + " = " + $3->val + ";\n";
+            }
         }
 
         delete $1;
@@ -561,10 +745,20 @@ if_stmt:
     {
         $$ = new BoolAttr();
         $$->ok = ($2->type != "ERR") && $4->ok && $5->ok;
-        if ($2->type != "ERR" && $2->type != "BOOL") {
+        if ($2->type != "ERR" && $2->type != "bool") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do IF deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
             $$->ok = false;
+        }
+        if($$->ok) {
+            std::string if_label = new_label();
+            std::string end_label = new_label();
+            $$->code =  $2->code 
+                        + "if (" + $2->val + ") goto " + if_label + ";\n"
+                        + $5->code + "goto " + end_label + ";\n"
+                        + if_label + ":{\n"
+                        + $4->code +"}\n"
+                        + end_label + ":{}\n";
         }
         delete $2;
         delete $4;
@@ -577,11 +771,17 @@ else_opt:
     {
         $$ = new BoolAttr();
         $$->ok = true;
+        $$->code = "";
     }
     | ELSE stmt_list
     {
         $$ = new BoolAttr();
         $$->ok = $2->ok;
+        if ($$->ok) {
+            $$->code = $2->code;
+        } else {
+            $$->code = "";
+        }
         delete $2;
     }
     ;
@@ -591,10 +791,23 @@ while_stmt:
     {
         $$ = new BoolAttr();
         $$->ok =($2->type != "ERR") && $4->ok;
-        if ($2->type != "ERR" && $2->type != "BOOL") {
+        if ($2->type != "ERR" && $2->type != "bool") {
             print_token_location(@2.first_line, @2.first_column);
             std::cout << "Erro de tipo: Condição do WHILE deve ser BOOL, mas foi '" << $2->type << "'." << std::endl;
             $$->ok = false;
+        }
+        if($$->ok) {
+            std::string start_label = new_label();
+            std::string end_label = new_label();
+            std::string while_var = new_var("bool");
+
+            $$->code =  start_label + ":{\n"
+                        + $2->code
+                        + while_var + " = !" + $2->val + ";\n"
+                        + "if (" + while_var + ") goto " + end_label + ";\n"
+                        + $4->code
+                        + "goto " + start_label + ";\n}\n"
+                        + end_label + ":{}\n";
         }
         delete $2;
         delete $4;
@@ -646,6 +859,9 @@ call_stmt:
     {
         $$ = new BoolAttr();
         $$->ok = ($1->type != "ERR");
+        if ($$->ok) {
+            $$->code = $1->code;
+        }
         delete $1;
     }
     ;
@@ -654,15 +870,16 @@ call_exp:
     NAME '(' call_args_opt ')'
     {
         $$ = new TypedAttr();
-        bool ok = $3->ok;
         $$->type = "ERR";
+        $$->code = "";
+        $$->val = "";
         std::string func_name = *$1;
 
         auto lookup_result = SymbolTable::lookup(func_name);
         if (!lookup_result || lookup_result->tag != Tag::PROC) {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro: Função ou procedimento '" << func_name << "' não declarado." << std::endl;
-        } else if(ok) {
+        } else if($3->ok) {
             const auto& declared_params = lookup_result->paramList;
             const auto& provided_args = $3->param_types_list;
 
@@ -685,6 +902,35 @@ call_exp:
 
                 if (types_match) {
                     $$->type = lookup_result->type;
+                    $$->code = $3->code;
+
+                    if (func_name == "readint") {
+                        $$->val = new_var("int");
+                        $$->code += "scanf(\"%d\", &" + $$->val + ");\n";
+                    } else if (func_name == "readfloat") {
+                        $$->val = new_var("float");
+                        $$->code += "scanf(\"%f\", &" + $$->val + ");\n";
+                    } else if (func_name == "readchar") {
+                        $$->val = new_var("int");
+                        $$->code += $$->val + " = getchar();\n";
+                    } else if (func_name == "readstring") {
+                        $$->val = new_var("string"); 
+                        $$->code += "scanf(\"%s\", " + $$->val + ");\n"; 
+                    } else if (func_name == "readline") {
+                        $$->val = new_var("string"); 
+                        $$->code += "scanf(\"%[^\n]%*c\", " + $$->val + ");\n"; 
+                    } else if (func_name == "printint") {
+                        $$->code += "printf(\"%d\", " + $3->param_vals_list[0] + ");\n";
+                    } else if (func_name == "printfloat") {
+                        $$->code += "printf(\"%f\", " + $3->param_vals_list[0] + ");\n";
+                    } else if (func_name == "printstr") {
+                        $$->code += "printf(\"%s\", " + $3->param_vals_list[0] + ");\n";
+                    } else if (func_name == "printline") {
+                        $$->code += "printf(\"%s\\n\", " + $3->param_vals_list[0] + ");\n";
+                    } else {
+                        // Tratamento para funções definidas pelo usuário vem aqui
+                       $$->code =+ "";
+                    }
                 } 
             }
         }
@@ -699,12 +945,16 @@ call_args_opt:
         $$ = new ListAttr();
         $$->ok = true;
         $$->param_types_list = std::vector<std::string>();
+        $$->param_vals_list = std::vector<std::string>();
+        $$->code = "";                                   
     }
     | expression call_args_tail
     {
         $$ = $2;
         if ($1->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $1->type);
+            $$->param_vals_list.insert($$->param_vals_list.begin(), $1->val); 
+            $$->code = $1->code + $$->code;
         }
         else {
             $$->ok = false;
@@ -719,12 +969,16 @@ call_args_tail:
         $$ = new ListAttr();
         $$->ok = true;
         $$->param_types_list = std::vector<std::string>();
+        $$->param_vals_list = std::vector<std::string>();
+        $$->code = "";
     }
     | ',' expression call_args_tail
     {
         $$ = $3;
         if ($2->type != "ERR") {
             $$->param_types_list.insert($$->param_types_list.begin(), $2->type);
+            $$->param_vals_list = std::vector<std::string>();
+            $$->code = "";
         }
         else {
             $$->ok = false;
@@ -741,8 +995,8 @@ or_exp:
       or_exp OR and_exp
     {
         handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "OR", 
-            [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
-            [](const auto& t1, const auto& t2) { return "BOOL"; });
+            [](const auto& t1, const auto& t2) { return t1 == "bool" && t2 == "bool"; },
+            [](const auto& t1, const auto& t2) { return "bool"; });
     }
     | and_exp { $$ = $1; }
     ;
@@ -751,8 +1005,8 @@ and_exp:
       and_exp AND not_exp
     {
         handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "AND",
-            [](const auto& t1, const auto& t2) { return t1 == "BOOL" && t2 == "BOOL"; },
-            [](const auto& t1, const auto& t2) { return "BOOL"; });
+            [](const auto& t1, const auto& t2) { return t1 == "bool" && t2 == "bool"; },
+            [](const auto& t1, const auto& t2) { return "bool"; });
     }
     | not_exp { $$ = $1; }
     ;
@@ -761,8 +1015,10 @@ not_exp:
       NOT not_exp
     {
         $$ = new TypedAttr();
-        if ($2->type == "BOOL") {
-            $$->type = "BOOL";
+        if ($2->type == "bool") {
+            $$->type = "bool";
+            $$->val = new_var("bool");
+            $$->code = $2->code + $$->val + " = !" + $2->val + ";\n";
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro de tipo: Operando de NOT deve ser BOOLEAN." << std::endl;
@@ -778,42 +1034,42 @@ rel_exp: rel_exp LT add_exp {
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp LE add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp GT add_exp{
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp GE add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, ">=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp EQ add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "=",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | rel_exp NE add_exp {
     handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "<>",
         [](const auto& t1, const auto& t2) { 
             return (is_numeric(t1) && is_numeric(t2)) || (t1 == t2); 
         },
-        [](const auto& t1, const auto& t2) { return "BOOL"; });
+        [](const auto& t1, const auto& t2) { return "bool"; });
 }
 | add_exp { $$ = $1; }
 ;
@@ -856,7 +1112,7 @@ exp_exp:
     {
         handle_binary_op($$, @2.first_line, @2.first_column, $1, $3, "^",
             [](const auto& t1, const auto& t2) { return is_numeric(t1) && is_numeric(t2); },
-            [](const auto& t1, const auto& t2) { return "FLOAT"; });
+            [](const auto& t1, const auto& t2) { return "float"; });
     }
     | unary_exp { $$ = $1; }
     ;
@@ -866,8 +1122,10 @@ unary_exp:
     {
         $$ = new TypedAttr();
         $$->type = "ERR";
-        if ($2->type != "ERR" && ($2->type == "INT" || $2->type == "FLOAT")) {
+        if ($2->type != "ERR" && ($2->type == "int" || $2->type == "float")) {
             $$->type = $2->type;
+            $$->val = new_var($2->type);
+            $$->code = $2->code + $$->val + " = -" + $2->val + ";\n";
         } else {
             print_token_location(@1.first_line, @1.first_column);
             std::cout << "Erro de tipo: Operando unário '-' deve ser numérico." << std::endl;
@@ -894,16 +1152,19 @@ primary_exp:
         }
         delete $2;
     }
-    | var               { $$ = $1; }
-    | ref_var           { $$ = $1; }
-    | deref_var         { $$ = $1; }
-    | '(' expression ')'{ $$ = $2; }
+    | var               { $$ = $1; } // x := 2 + deref(y)
+    | ref_var           { $$ = $1; } // x : ref(int)
+    | deref_var         { $$ = $1; } // y1 : int        y2 : ref(ref(int))
+    | '(' expression ')'{ $$ = $2; } // x := deref(y2)       x := ref(y1)
+                                     // int* x; int y1; int* y2; x = &y1; x = *y2;
     ;
 
 var:
     NAME
     {
         $$ = new TypedAttr();
+        $$->code = "";
+        $$->val = *$1;
         std::string var_base_name = *$1;
         delete $1;
 
@@ -914,6 +1175,7 @@ var:
             $$->type = "ERR";
         } else {
             $$->type = lookup_result->type;
+            $$->val = lookup_result->label;
         }
     }
 |   var '.' NAME
@@ -942,7 +1204,9 @@ var:
                     std::cout << "Erro de tipo: O tipo '" << base_type_name 
                             << "' não possui um membro chamado '" << field_name << "'." << std::endl;
                 } else {
+                    $$->code = $1->code;
                     $$->type = member_iterator->second;
+                    $$->val = $1->val + "." + field_name;
                 }
             }
         }
@@ -953,24 +1217,27 @@ var:
 |   var '[' expression ']'
     {
         $$ = new TypedAttr();
-        bool ok = ($1->type != "ERR" && $3->type != "ERR");
         $$->type = "ERR";
+        $$->code = "";
 
+        bool ok = ($1->type != "ERR" && $3->type != "ERR");
         if (ok) {
             std::string base_type = $1->type;
             std::string index_type = $3->type;
 
-            if (index_type != "INT") {
+            if (index_type != "int") {
                 print_token_location(@3.first_line, @3.first_column);
                 std::cout << "Erro de tipo: O índice de um array deve ser um inteiro, mas foi '" << index_type << "'." << std::endl;
             }
-            else {
-                if (base_type.rfind("ARRAY(", 0) == 0) {
-                    $$->type = base_type.substr(6, base_type.length() - 7);
-                } else {
-                    print_token_location(@1.first_line, @1.first_column);
-                    std::cout << "Erro de tipo: Tentativa de indexar um tipo não-array ('" << base_type << "')." << std::endl;
-                }
+            else if (base_type.rfind("ARRAY(", 0) == 0 && base_type.back() == ')') {
+                size_t comma_pos = base_type.find(',');
+                $$->type = base_type.substr(comma_pos + 1, base_type.length() - comma_pos - 2);
+                $$->code = $1->code + $3->code;
+                $$->val = $1->val + "[" + $3->val + "]";
+
+            } else {
+                print_token_location(@1.first_line, @1.first_column);
+                std::cout << "Erro de tipo: Tentativa de indexar um tipo não-array ('" << base_type << "')." << std::endl;
             }
         }
         delete $1;
@@ -985,6 +1252,8 @@ ref_var:
         $$->type = "ERR";
         if ($3->type != "ERR") {
             $$->type = "REF(" + $3->type + ")";
+            $$->code = $3->code; 
+            $$->val = "&(" + $3->val + ")"; 
         }
         delete $3;
     }
@@ -998,6 +1267,8 @@ deref_var:
         if($3->type != "ERR") {
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
+                $$->code = $3->code;
+                $$->val = "*(" + $3->val + ")";
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência." << std::endl;
@@ -1012,6 +1283,8 @@ deref_var:
         if($3->type != "ERR") {
             if ($3->type.rfind("REF(", 0) == 0) {
                 $$->type = $3->type.substr(4, $3->type.length() - 5);
+                $$->code = $3->code;
+                $$->val = "*(" + $3->val + ")";
             } else {
                 print_token_location(@1.first_line, @1.first_column);
                 std::cout << "Erro de tipo: DEREF exige um tipo de referência (cascata)." << std::endl;
@@ -1022,23 +1295,29 @@ deref_var:
     ;
 
 literal:
-      FLOAT_LITERAL   { $$ = new TypedAttr(); $$->type = "FLOAT"; delete $1; }
-    | INT_LITERAL     { $$ = new TypedAttr(); $$->type = "INT"; delete $1; }
-    | STRING_LITERAL  { $$ = new TypedAttr(); $$->type = "STRING"; delete $1; }
+      FLOAT_LITERAL   { 
+        $$ = new TypedAttr(); $$->type = "float"; $$->val = (*$1); $$->code = ""; delete $1; 
+        }
+    | INT_LITERAL     { 
+        $$ = new TypedAttr(); $$->type = "int"; $$->val = (*$1); $$->code = ""; delete $1; 
+        }
+    | STRING_LITERAL  { 
+        $$ = new TypedAttr(); $$->type = "string"; $$->val = (*$1); $$->code = ""; delete $1; 
+        }
     | bool_literal    { $$ = $1; }
     | NULL_LIT        { $$ = new TypedAttr(); $$->type = "NULL"; }
     ;
 
 bool_literal:
-      TRUE  { $$ = new TypedAttr(); $$->type = "BOOL"; }
-    | FALSE { $$ = new TypedAttr(); $$->type = "BOOL"; }
+      TRUE  { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "1"; $$->code = ""; }
+    | FALSE { $$ = new TypedAttr(); $$->type = "bool"; $$->val = "0"; $$->code = ""; }
     ;
 
 type:
-      FLOAT_T   { $$ = new TypedAttr(); $$->type = "FLOAT"; }
-    | INT_T     { $$ = new TypedAttr(); $$->type = "INT"; }
-    | STRING_T  { $$ = new TypedAttr(); $$->type = "STRING"; }
-    | BOOL_T    { $$ = new TypedAttr(); $$->type = "BOOL"; }
+      FLOAT_T   { $$ = new TypedAttr(); $$->type = "float"; }
+    | INT_T     { $$ = new TypedAttr(); $$->type = "int"; }
+    | STRING_T  { $$ = new TypedAttr(); $$->type = "string"; }
+    | BOOL_T    { $$ = new TypedAttr(); $$->type = "bool"; }
     | NAME
     {
         $$ = new TypedAttr();
@@ -1065,13 +1344,14 @@ type:
     }
     | ARRAY '[' INT_LITERAL ']' OF type
     {
-        $$ = new TypedAttr();
-        $$->type = "ERR";
-        if ($6->type != "ERR") {
-            $$->type = "ARRAY(" + $6->type + ")";
-        }
-        delete $3;
-        delete $6;
+    $$ = new TypedAttr();
+    $$->type = "ERR";
+    if ($6->type != "ERR") {
+        std::string size_str = *$3;
+        $$->type = "ARRAY(" + size_str + "," + $6->type + ")";
+    }
+    delete $3;
+    delete $6;
     }
     ;
 
@@ -1084,6 +1364,17 @@ void yyerror(const char *s) {
 
 int main(void) {
     SymbolTable::enter_scope("global");
+
+    SymbolTable::insert("readint", TokenInfo({}, "int", Tag::PROC));
+    SymbolTable::insert("readfloat", TokenInfo({}, "float", Tag::PROC));
+    SymbolTable::insert("readchar", TokenInfo({}, "int", Tag::PROC));
+    SymbolTable::insert("readstring", TokenInfo({}, "string", Tag::PROC));
+    SymbolTable::insert("readline", TokenInfo({}, "string", Tag::PROC));
+    SymbolTable::insert("printint", TokenInfo({ "int" }, "void", Tag::PROC));
+    SymbolTable::insert("printfloat", TokenInfo({ "float" }, "void", Tag::PROC));
+    SymbolTable::insert("printstr", TokenInfo({ "string" }, "void", Tag::PROC));
+    SymbolTable::insert("printline", TokenInfo({ "string" }, "void", Tag::PROC));
+
     yyparse();
     
     SymbolTable::exit_scope();

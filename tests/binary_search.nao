@@ -1,0 +1,52 @@
+program binary_search
+begin
+
+    // Procedimento Principal
+    procedure main()
+    begin
+        // Declaração de Variáveis Locais
+        var l : int := -1;
+        var r : int := 10;
+        var arr : array [100005] of int;
+        var temp : int;
+        var num : int;
+        var mid : int;
+        var n : int;
+        var k : int
+    in
+        n := readint();
+        k := readint();
+        temp := 0;
+        while temp < n do 
+            arr[temp] := readint();
+            temp := temp + 1
+        od;
+
+        temp := 0;
+        while temp < k do
+            num := readint();
+
+            l := -1;
+            r := n;
+            while l + 1 < r do
+                mid := (l + r)/2;
+                if arr[mid] <= num
+                then
+                    l := mid
+                else
+                    r := mid
+                fi
+            od;
+
+            if l >= 0 && arr[l] = num
+            then
+                printline("YES")
+            else
+                printline("NO")
+            fi;
+            temp := temp + 1
+        od
+
+    end
+
+end

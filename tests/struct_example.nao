@@ -1,0 +1,20 @@
+program struct_example 
+    begin
+        struct Pessoa {
+            idade : int;
+            nome : string
+        };
+        procedure main()
+        begin
+            var p : Pessoa
+        in 
+            p.idade := 78;
+            p.nome := "Henrique Lopes Fouquet";
+
+            printstr("A pessoa de nome: ");
+            printstr(p.nome);
+            printstr(" tem idade igual a ");
+            printint(p.idade);
+            printline(" anos")
+        end
+    end
