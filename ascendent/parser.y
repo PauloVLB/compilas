@@ -1204,6 +1204,7 @@ var:
                     std::cout << "Erro de tipo: O tipo '" << base_type_name 
                             << "' não possui um membro chamado '" << field_name << "'." << std::endl;
                 } else {
+                    $$->code = $1->code;
                     $$->type = member_iterator->second;
                     $$->val = $1->val + "." + field_name;
                 }
